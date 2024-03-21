@@ -1,10 +1,11 @@
 import Header from "./Header";
 import Sidebar from "./sidebar/Sidebar";
-import Dp from "./dp/Dp";
-import Geqo from "./geqo/Geqo";
-import SQLEditor from "./SQLEditor";
+import MainView from "./MainView";
 import React, { useState } from "react";
+
+
 import "../App.css";
+
 
 function Layout() {
   const [useGeqo, setUseGeqo] = useState(false);
@@ -21,9 +22,9 @@ function Layout() {
 
     <div className="flex flex-col h-full">
       <Header />
-      <div className="main-container grow">
+      <div className="main-container grow flex">
         <Sidebar />
-        <div className="view-container"></div>
+        <MainView />
       </div>
     </div>
   );
