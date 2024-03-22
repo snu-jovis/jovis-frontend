@@ -2,66 +2,65 @@
  * parseDp.js: 데이터 전처리
  */
 
+
 export function parseDp(data) {
     const { optimizer } = data;
     const result = [];
-  
-    // Process base entries as before
-    optimizer.base.forEach(baseEntry => {
-        result.push({
-            id: baseEntry.relid,
-            parentIds: [],
-        });
-    });
-  
-    // A map to track unique nodes and prevent duplication
+
+    // Unique ID map to track nodes
     const uniqueNodeMap = new Map();
-  
-    // Process dp entries
-    optimizer.dp.forEach(dpEntry => {
-        // Prepare the dpEntry itself
-        const dpEntryNode = {
-            id: dpEntry.relid,
-            parentIds: new Set(), // Use a Set to avoid duplicate parent IDs
-        };
-  
-        // Ensure dpEntry is unique and add to results
-        if (!uniqueNodeMap.has(dpEntry.relid)) {
-            uniqueNodeMap.set(dpEntry.relid, dpEntryNode);
-            result.push(dpEntryNode);
+
+    // Process base and dp entries
+    [...optimizer.base, ...optimizer.dp].forEach(entry => {
+        // Ensure each entry is unique
+        if (!uniqueNodeMap.has(entry.relid)) {
+            const newNode = {
+                id: entry.relid,
+                parentIds: [],
+            };
+            uniqueNodeMap.set(entry.relid, newNode);
+            result.push(newNode);
         }
-  
-        // Process each path
-        dpEntry.paths.forEach(path => {
-            const pathNodeId = `${dpEntry.relid} - ${path.node}`;
-            if (!uniqueNodeMap.has(pathNodeId)) {
-                // New node for the path
-                const pathNode = {
-                    id: pathNodeId,
-                    parentIds: new Set(),
-                };
-                uniqueNodeMap.set(pathNodeId, pathNode);
-                result.push(pathNode);
-            }
-  
-            // Link pathNode to dpEntry
-            dpEntryNode.parentIds.add(pathNodeId);
-  
-            // Handle joins
-            if (path.join) {
-                const { outer, inner } = path.join;
-                [outer?.relid, inner?.relid].forEach(relid => {
-                    if (relid) {
-                        uniqueNodeMap.get(pathNodeId).parentIds.add(relid);
-                    }
-                });
-            }
-        });
+
+        // additional handling for dp paths
+        if (entry.paths) {
+            entry.paths.forEach(path => {
+                // define a unique ID for the path node
+                const pathNodeId = `${entry.relid} - ${path.node}`;
+                if (!uniqueNodeMap.has(pathNodeId)) {
+                    // Create a new node for the path
+                    const pathNode = {
+                        id: pathNodeId,
+                        parentIds: [],
+                    };
+                    uniqueNodeMap.set(pathNodeId, pathNode);
+                    result.push(pathNode);
+                    // Link the path node to its dpEntry parent
+                    uniqueNodeMap.get(entry.relid).parentIds.push(pathNodeId);
+                }
+
+                // process join information
+                if (path.join) {
+                    const processJoinSide = (side) => {
+                        if (side && !uniqueNodeMap.has(side.relid)) {
+                            const joinNode = {
+                                id: side.relid,
+                                parentIds: [],
+                            };
+                            uniqueNodeMap.set(side.relid, joinNode);
+                            result.push(joinNode);
+                        }
+                        if (side) {
+                            uniqueNodeMap.get(pathNodeId).parentIds.push(side.relid);
+                        }
+                    };
+
+                    processJoinSide(path.join.outer);
+                    processJoinSide(path.join.inner);
+                }
+            });
+        }
     });
-  
-    // Convert parentIds from Set to Array and finalize the result
-    return result.map(node => ({
-        ...node,
-        parentIds: Array.from(node.parentIds),
-    }));
+
+    return result;
 }
