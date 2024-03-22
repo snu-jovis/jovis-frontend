@@ -1,0 +1,19 @@
+.geqo-container {
+  display: flex;
+}
+
+.chart-container {
+  width: 400px;
+  display: grid;
+  place-content: center;
+}
+
+.full-container {
+  width: 800px;
+  /* display: grid; */
+  /* place-content: center; */
+}
+
+.indiv-container {
+  width: 400px;
+}

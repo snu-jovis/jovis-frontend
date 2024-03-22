@@ -1,27 +1,12 @@
-.header {
-    position: fixed; /* 상단에 고정 */
-    width: 100%;
-    top: 0;
-    left: 0;
-    right: 0;
-    background-color: white;
-    z-index: 1000; /* 가장 앞에 위치 하도록 */
-  }
-  
-  .header-items {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 5px 1rem;
-  }
-  
-  .header-logo {
-    width: 20px;
-    height: 20px;
-  }
-  
-  .header-name {
-    font-family: "NanumSquareEB";
-    font-size: x-large;
-  }
-  
+.header-container {
+  position: fixed; /* 상단에 고정 */
+  width: 100%;
+  top: 0;
+  background-color: white;
+  z-index: 1000; /* 가장 앞에 위치 하도록 */
+}
+
+.header-title {
+  font-family: "NanumSquareEB";
+  font-size: x-large;
+}

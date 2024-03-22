@@ -1,0 +1,15 @@
+.parents-container {
+  display: flex;
+}
+
+.child-container {
+  display: flex;
+  justify-content: center;
+}
+
+.sign {
+  font-size: xx-large;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
