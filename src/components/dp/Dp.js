@@ -53,25 +53,32 @@ const Dp = (props) => {
 
         // use this to render our edges
         const line = d3.line().curve(d3.curveMonotoneY);
-        // here's the layout operator, uncomment some of the settings
-        const layout = d3dag
-          .sugiyama()
-          .nodeSize(nodeSize)
-          .gap([nodeRadius, nodeRadius])
-          .tweaks([shape]);
-
+        const layout = d3dag.sugiyama()
+        .nodeSize(node => {
+            if (node.data.id.includes(" - ")) {
+                const textLength = node.data.id.length * 6;
+                return [textLength + 20, 30]; 
+            } else {
+                return [50, 50]; // Size for circles
+            }
+        })
+        .gap([20, 20])
+        .tweaks([shape]);
 
         // actually perform the layout and get the final size
         const { width, height } = layout(graph);
       
         // color
-        const steps = graph.nnodes() - 1;
-        const interp = d3.interpolateRainbow;
-        const colorMap = new Map(
-          [...graph.nodes()]
-            .sort((a, b) => a.y - b.y)
-            .map((node, i) => [node.data.id, interp(i / steps)])
-        );
+        const colorMap = new Map();
+        const nodesArray = Array.from(graph.nodes());
+        
+        const nodeTypes = [...new Set(nodesArray.map(node => {
+            const parts = node.data.id.split(" - ");
+            return parts.length > 1 ? parts[1] : node.data.id; 
+        }))];
+                nodeTypes.forEach((type, i) => {
+            colorMap.set(type, d3.interpolateRainbow(i / nodeTypes.length));
+        });
 
         // create graph
         const svg = d3
@@ -82,7 +89,6 @@ const Dp = (props) => {
         .attr("width", width)
         .attr("height", height + 2 * marginY)
         .append("g") // 그룹으로 묶어서
-        // .attr("transform", `translate(${width / 2}, ${marginY})`) // margin 적용
         .attr('transform', `scale(1, -1) translate(0, -${height})`, {marginY})
         .call(
           d3.zoom().on("zoom", (event) => {
@@ -112,15 +118,33 @@ const Dp = (props) => {
         .enter()
         .append("g")
         .attr("transform", ({ x, y }) => `translate(${x}, ${y})`);
-
-        // create node circles
-        nodes
-        .append("circle")
-        .attr("r", nodeRadius)
-        .attr("fill", (n) => {
-          const color = colorMap.get(n.data.id);
-          return color;
-        });
+        
+        nodes.each(function(d) {
+          const node = d3.select(this);
+          const parts = d.data.id.split(" - ");
+          const nodeType = parts.length > 1 ? parts[1] : parts[0];
+      
+          if (d.data.id.includes(" - ")) { 
+              node.append("rect")
+                  .attr("width", d.data.id.length * 6 + 20)
+                  .attr("height", 30)
+                  .attr("x", -d.data.id.length * 3 - 10)
+                  .attr("y", -15)
+                  .attr("fill", colorMap.get(nodeType))
+                  .attr("stroke", "black");
+          } else {
+              node.append("circle")
+                  .attr("r", nodeRadius) 
+                  .attr("fill", colorMap.get(nodeType));
+          }
+      });
+      
+      // text 
+      nodes.append("text")
+          .text(d => d.data.id.split(" - ").pop()) 
+          .attr("text-anchor", "middle")
+          .attr("alignment-baseline", "middle")
+          .attr("fill", "white");
 
         // create arrows
         const arrowSize = (nodeRadius * nodeRadius) / 20.0;
@@ -147,39 +171,24 @@ const Dp = (props) => {
           .attr("stroke-width", 1.5)
           .attr("stroke-dasharray", `${arrowLen},${arrowLen}`);
 
-
-          // add text to nodes
-          nodes
-          .append("text")
-          .text((d) => {
-            // " - "로 문자열을 분리하여 paths.node 부분만 추출
-            const parts = d.data.id.split(" - ");
-            return parts.length > 1 ? parts.slice(1).join(" - ") : parts[0];
-          })
-          .attr("font-family", "sans-serif")
-          .attr("text-anchor", "middle")
-          .attr("alignment-baseline", "middle")
-          .attr("fill", "white");
-
-
     } catch (error) {
       console.error("Error building graph:", error);
     }
 
-    const sliderSvg = d3.select(sliderRef.current);
-    sliderSvg.attr('width', sliderWidth).attr('height', sliderHeight);
-    const x = d3.scaleLinear()
-    .domain([0, 100]) // 슬라이더 범위
-    .range([sliderMargin.left, sliderWidth - sliderMargin.right])
-    .clamp(true);
+      const sliderSvg = d3.select(sliderRef.current);
+      sliderSvg.attr('width', sliderWidth).attr('height', sliderHeight);
+      const x = d3.scaleLinear()
+      .domain([0, 100]) // 슬라이더 범위
+      .range([sliderMargin.left, sliderWidth - sliderMargin.right])
+      .clamp(true);
 
-    sliderSvg.append('g')
-    .attr('class', 'slider')
-    .attr('transform', `translate(0,${sliderHeight / 2})`)
-    .call(sliderBottom(x)
-    .step(1)
-    .ticks(5));
-    }
+      sliderSvg.append('g')
+      .attr('class', 'slider')
+      .attr('transform', `translate(0,${sliderHeight / 2})`)
+      .call(sliderBottom(x)
+      .step(1)
+      .ticks(5));
+      }
     )
 
     return (
