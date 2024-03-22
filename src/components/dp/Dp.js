@@ -1,20 +1,33 @@
 import React, { useEffect, useState, useRef } from "react";
+import "../../assets/stylesheets/Dp.css";
 import { parseDp } from "./parseDp";
-import data from "../../data/dp/dp.json";
+import dp from "../../data/dp/dp.json";
 import * as d3 from "d3";
 import * as d3dag from "https://cdn.skypack.dev/d3-dag@1.0.0-1";
-
+import { sliderBottom } from 'd3-simple-slider';
+// import { Checkbox, Button } from "@material-tailwind/react";
 
 const Dp = (props) => {
     const dagSvg = useRef(null);
-    const svgHeight = 1920;
+    const sliderRef = useRef(null);
+   
+    const svgHeight = 1280;
     const svgWidth = document.body.clientWidth;
+    const sliderWidth = 300;
+    const sliderHeight = 100; 
+    const sliderMargin = { top: 20, right: 50, bottom: 20, left: 50 };
+    
     const marginY = 35;
+    
+    const query = dp.query;
+    const queryResult = dp.result;
 
+    const targetEntry = dp.optimizer.dp[dp.optimizer.dp.length - 1];
+    const totalCost = targetEntry ? targetEntry.cheapest_total_paths.total_cost : "N/A"; 
 
     const [results, setResults] = useState([]);
     useEffect(() => {
-      const result = parseDp(data);
+      const result = parseDp(dp);
       setResults(result);
       }, [])
 
@@ -24,16 +37,16 @@ const Dp = (props) => {
     // --------- //
     useEffect(() => {
         d3.select(dagSvg.current).selectAll("*").remove(); //clear
+        d3.select(sliderRef.current).selectAll("*").remove();
 
         try{
-        // create our builder and turn data into a graph
         const graph = d3dag.graphStratify()(results);
 
         // -------------- //
         // Compute Layout //
         // -------------- //
         // set the layout functions
-        const nodeRadius = 20;
+        const nodeRadius = 25;
         const nodeSize = [nodeRadius * 2, nodeRadius * 2];
         // this truncates the edges so we can render arrows nicely
         const shape = d3dag.tweakShape(nodeSize, d3dag.shapeEllipse);
@@ -46,7 +59,6 @@ const Dp = (props) => {
           .nodeSize(nodeSize)
           .gap([nodeRadius, nodeRadius])
           .tweaks([shape]);
-
 
 
         // actually perform the layout and get the final size
@@ -111,9 +123,10 @@ const Dp = (props) => {
         });
 
         // create arrows
-        const arrowSize = (nodeRadius * nodeRadius) / 5.0;
+        const arrowSize = (nodeRadius * nodeRadius) / 20.0;
         const arrowLen = Math.sqrt((4 * arrowSize) / Math.sqrt(3));
         const arrow = d3.symbol().type(d3.symbolTriangle).size(arrowSize);
+        
         svg
           .append("g")
           .selectAll("path")
@@ -138,8 +151,11 @@ const Dp = (props) => {
           // add text to nodes
           nodes
           .append("text")
-          .text((d) => d.data.id)
-          .attr("font-weight", "bold")
+          .text((d) => {
+            // " - "로 문자열을 분리하여 paths.node 부분만 추출
+            const parts = d.data.id.split(" - ");
+            return parts.length > 1 ? parts.slice(1).join(" - ") : parts[0];
+          })
           .attr("font-family", "sans-serif")
           .attr("text-anchor", "middle")
           .attr("alignment-baseline", "middle")
@@ -149,13 +165,36 @@ const Dp = (props) => {
     } catch (error) {
       console.error("Error building graph:", error);
     }
+
+    const sliderSvg = d3.select(sliderRef.current);
+    sliderSvg.attr('width', sliderWidth).attr('height', sliderHeight);
+    const x = d3.scaleLinear()
+    .domain([0, 100]) // 슬라이더 범위
+    .range([sliderMargin.left, sliderWidth - sliderMargin.right])
+    .clamp(true);
+
+    sliderSvg.append('g')
+    .attr('class', 'slider')
+    .attr('transform', `translate(0,${sliderHeight / 2})`)
+    .call(sliderBottom(x)
+    .step(1)
+    .ticks(5));
     }
     )
-
 
     return (
         <div>
           <h1>DP</h1>
+          <h2>Query</h2>
+          <p>{query}</p>
+          <h2>Result</h2>
+          <p>{queryResult}</p>
+          <h2>Total Cost</h2>
+          <p>{totalCost}</p>
+          <div className="controls-container">
+                <input type="button" value="Play/Pause" />
+                <svg className="slider" ref={sliderRef} width={sliderWidth} height={sliderHeight}></svg>
+          </div>
           <svg
           className="node-label"
           ref={dagSvg}

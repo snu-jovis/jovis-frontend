@@ -2,116 +2,66 @@
  * parseDp.js: 데이터 전처리
  */
 
-
-// const data = [
-//   {
-//     id: "a",
-//     parentIds: []
-//   },
-//   {
-//     id: "b",
-//     parentIds: []
-//   },
-//   {
-//     id: "c",
-//     parentIds: []
-//   },
-//   {
-//     id: "d",
-//     parentIds: []
-//   },
-//   {
-//     id: "a b",
-//     parentIds: ["a", "b"]
-//   },
-//   {
-//     id: "a c",
-//     parentIds: ["a", "c"]
-//   },
-//   {
-//     id: "a d",
-//     parentIds: ["a", "d"]
-//   },
-//   {
-//     id: "b c",
-//     parentIds: ["b", "c"]
-//   },
-//   {
-//     id: "b d",
-//     parentIds: ["b", "d"]
-//   },
-//   {
-//     id: "c d",
-//     parentIds: ["c", "d"]
-//   },
-//   {
-//     id: "a b c",
-//     parentIds: ["b c", "a c", "a b"]
-//   },
-//   {
-//     id: "a b d",
-//     parentIds: ["a b", "a d", "b d"]
-//   },
-//   {
-//     id: "a c d",
-//     parentIds: ["c d", "a c", "c d"]
-//   },
-//   {
-//     id: "b c d",
-//     parentIds: ["b c", "c d", "b d"]
-//   },
-//   {
-//     id: "a b c d",
-//     parentIds: ["b c d", "a c d", "a b", "c d", ]
-//   }
-// ];
-    
-
 export function parseDp(data) {
-  const optimizerData = data.optimizer;
-  const result = [];
-
-  // Step 1: Process base entries
-  optimizerData.base.forEach(baseEntry => {
-      result.push({
-          id: baseEntry.relid,
-          parentIds: []
-      });
-  });
-
-  // Step 2 & 3: Process dp entries
-  optimizerData.dp.forEach(dpEntry => {
-      // Directly add dp entry with empty parentIds for now
-      result.push({
-          id: dpEntry.relid,
-          parentIds: [] // To be populated next
-      });
-
-      dpEntry.paths.forEach(path => {
-          // Handle joins if any
-          if (path.join) {
-              let outerRelid = path.join.outer?.relid;
-              let innerRelid = path.join.inner?.relid;
-
-              // Find or create parent entries for outer and inner joins
-              [outerRelid, innerRelid].forEach(relid => {
-                  if (relid) {
-                      // Find existing or add new parentId
-                      let parentIdEntry = result.find(entry => entry.id === relid);
-                      if (!parentIdEntry) {
-                          parentIdEntry = { id: relid, parentIds: [] };
-                          result.push(parentIdEntry);
-                      }
-                      // Add to parentIds of current path's entry if not already included
-                      const currentEntry = result.find(entry => entry.id === dpEntry.relid);
-                      if (!currentEntry.parentIds.includes(parentIdEntry.id)) {
-                          currentEntry.parentIds.push(parentIdEntry.id);
-                      }
-                  }
-              });
-          }
-      });
-  });
-
-  return result;
+    const { optimizer } = data;
+    const result = [];
+  
+    // Process base entries as before
+    optimizer.base.forEach(baseEntry => {
+        result.push({
+            id: baseEntry.relid,
+            parentIds: [],
+        });
+    });
+  
+    // A map to track unique nodes and prevent duplication
+    const uniqueNodeMap = new Map();
+  
+    // Process dp entries
+    optimizer.dp.forEach(dpEntry => {
+        // Prepare the dpEntry itself
+        const dpEntryNode = {
+            id: dpEntry.relid,
+            parentIds: new Set(), // Use a Set to avoid duplicate parent IDs
+        };
+  
+        // Ensure dpEntry is unique and add to results
+        if (!uniqueNodeMap.has(dpEntry.relid)) {
+            uniqueNodeMap.set(dpEntry.relid, dpEntryNode);
+            result.push(dpEntryNode);
+        }
+  
+        // Process each path
+        dpEntry.paths.forEach(path => {
+            const pathNodeId = `${dpEntry.relid} - ${path.node}`;
+            if (!uniqueNodeMap.has(pathNodeId)) {
+                // New node for the path
+                const pathNode = {
+                    id: pathNodeId,
+                    parentIds: new Set(),
+                };
+                uniqueNodeMap.set(pathNodeId, pathNode);
+                result.push(pathNode);
+            }
+  
+            // Link pathNode to dpEntry
+            dpEntryNode.parentIds.add(pathNodeId);
+  
+            // Handle joins
+            if (path.join) {
+                const { outer, inner } = path.join;
+                [outer?.relid, inner?.relid].forEach(relid => {
+                    if (relid) {
+                        uniqueNodeMap.get(pathNodeId).parentIds.add(relid);
+                    }
+                });
+            }
+        });
+    });
+  
+    // Convert parentIds from Set to Array and finalize the result
+    return result.map(node => ({
+        ...node,
+        parentIds: Array.from(node.parentIds),
+    }));
 }
