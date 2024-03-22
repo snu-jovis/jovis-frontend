@@ -2,10 +2,14 @@ import './App.css';
 import Layout from './components/Layout';
 import React from 'react';
 
+import { HistoryProvider } from './components/providers/HistoryProvider';
+
 function App() {
   return (
     <div className="App">
-      <Layout/>
+      <HistoryProvider>
+        <Layout/>
+      </HistoryProvider>
     </div>
   );
 }

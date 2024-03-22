@@ -1,24 +1,47 @@
-import Dp from "./dp/Dp";
-import Geqo from "./geqo/Geqo";
-import SQLEditor from "./SQLEditor";
+import { useRef, useContext } from 'react';
+
 import Editor, { DiffEditor, useMonaco, loader } from '@monaco-editor/react';
 import { Button } from "@material-tailwind/react";
 
+import Dp from "./dp/Dp";
+import Geqo from "./geqo/Geqo";
+import SQLEditor from "./SQLEditor";
+
+import { HistoryContext } from "./providers/HistoryProvider";
+
 
 export default function MainView() {
+
+    const editorRef = useRef(null);
+    const { addHistory } = useContext(HistoryContext);
+
+    const handleEditorDidMount = (editor, monaco) => {
+        editorRef.current = editor;
+    }
+
+    const onClickSubmit = () => {
+        const sql = editorRef.current.getValue();
+        addHistory(sql);
+    }
+
+    const onClickClear = () => {
+        editorRef.current.setValue("");
+    }
+
     return (
         <div className="view-container grow">
             <div className="border-2 border-solid flex flex-col">
                 <Editor height="20vh" 
                     defaultLanguage="sql" 
-                    defaultValue="SELECT 'Hello World'" 
+                    defaultValue="/* Type your query here */" 
                     // theme="vs-dark" 
+                    onMount={handleEditorDidMount}
                     options={{
-                    minimap: { enabled: false },
+                        minimap: { enabled: false },
                     }}/>
                 <div className="flex flex-row-reverse gap-2 m-4">
-                    <Button variant="outlined" ripple={false}>Clear</Button>
-                    <Button ripple={false}>Submit</Button>
+                    <Button variant="outlined" ripple={false} onClick={onClickClear}>Clear</Button>
+                    <Button ripple={false} onClick={onClickSubmit}>Submit</Button>
                 </div>
             </div>
             <div className="flex justify-center items-center h-60">
