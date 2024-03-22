@@ -8,6 +8,7 @@ import Geqo from "./geqo/Geqo";
 import SQLEditor from "./SQLEditor";
 
 import { HistoryContext } from "./providers/HistoryProvider";
+import axios from 'axios';
 
 
 export default function MainView() {
@@ -22,6 +23,14 @@ export default function MainView() {
     const onClickSubmit = () => {
         const sql = editorRef.current.getValue();
         addHistory(sql);
+
+        axios.post("http://localhost:8000/query/", {
+            query: sql
+        }).then((response) => {
+            console.log(response);
+        }).catch((error) => {
+            console.log(error);
+        });
     }
 
     const onClickClear = () => {

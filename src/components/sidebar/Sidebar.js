@@ -11,7 +11,6 @@ function Sidebar(props) {
   const [ localHistory, setLocalHistory] = useState([]);
 
   useEffect(() => {
-    console.log(history);
     setLocalHistory(history.map((item) => item.title));
   }, [history]);
 
