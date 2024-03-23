@@ -1,63 +1,67 @@
+.App {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
 .main-container {
-    padding-top: 50px;
-    display: flex; /* sidebar와 visualization view가 수평에 위치하도록 */
-    justify-content: center;
-  }
-  
-  .view-container {
-    min-width: 550px;
-    width: 40vw;
-    height: 90vh;
-    padding: 5px;
-    text-align: center;
-    overflow-x: hidden; /* hide when horizontally overflowed */
-    overflow-y: auto; /* scroll when vertically overflowed */
-  }
-  
-  .title {
-    text-align: center;
-    font-family: "NanumSquareEB";
-    font-size: large;
-    color: black;
-    background-color: #f0f8ff;
-    border-radius: 10px;
-    padding: 5px;
-    margin: 10px;
-  }
-  
-  .text {
-    font-family: "NanumSquareB";
-    font-size: small;
-  }
-  
-  .control-panel {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin: 5px 0;
-  }
-  
-  .control-panel-metric {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-right: 20px;
-  }
-  
-  .control-panel-term {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  
-  .control-panel p {
-    font-family: "NanumSquareEB";
-    font-size: 14px;
-    margin-right: 10px;
-  }
-  
-  .control-panel-options {
-    font-family: "NanumSquareB";
-    font-size: 14px;
-  }
-  
+  display: flex; /* sidebar와 visualization view가 수평에 위치하도록 */
+  justify-content: left;
+}
+
+.view-container {
+  min-width: 550px;
+  width: 40vw;
+  height: 90vh;
+  padding: 5px;
+  text-align: center;
+  overflow-x: hidden; /* hide when horizontally overflowed */
+  overflow-y: auto; /* scroll when vertically overflowed */
+}
+
+.title {
+  text-align: center;
+  font-family: "NanumSquareEB";
+  font-size: large;
+  color: black;
+  background-color: #f0f8ff;
+  border-radius: 10px;
+  padding: 5px;
+  margin: 10px;
+}
+
+.text {
+  font-family: "NanumSquareB";
+  font-size: small;
+}
+
+.control-panel {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 5px 0;
+}
+
+.control-panel-metric {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-right: 20px;
+}
+
+.control-panel-term {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.control-panel p {
+  font-family: "NanumSquareEB";
+  font-size: 14px;
+  margin-right: 10px;
+}
+
+.control-panel-options {
+  font-family: "NanumSquareB";
+  font-size: 14px;
+}

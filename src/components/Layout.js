@@ -1,17 +1,19 @@
 import Header from "./Header";
-import Dp from "./dp/Dp";
-import Geqo from "./geqo/Geqo";
+import Sidebar from "./sidebar/Sidebar";
+import MainView from "./MainView";
 import React, { useState } from "react";
+
+
 import "../App.css";
 
-function Layout() {
-  const [useGeqo, setUseGeqo] = useState(false);
 
+function Layout() {
   return (
-    <div>
+    <div className="flex flex-col h-full">
       <Header />
-      <div className="main-container">
-        useGeqo ? <Geqo/> : <Dp/>
+      <div className="main-container grow flex">
+        <Sidebar />
+        <MainView />
       </div>
     </div>
   );
