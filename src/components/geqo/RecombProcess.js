@@ -2,14 +2,13 @@ import React, { useContext, useEffect, useRef } from "react";
 import * as d3 from "d3";
 import { GeqoContext } from "../../contexts/GeqoContext";
 import "../../assets/stylesheets/RecombProcess.css";
-import originalData from "../../data/geqo.json";
 
-function preprocessData(data) {
+function preprocessData(relMap, data) {
   const numbers = data.split(" ").map(Number);
 
   const nodes = numbers.map((num, i) => ({
     id: num,
-    name: originalData.optimizer.geqo.map[num.toString()],
+    name: relMap[num.toString()],
   }));
 
   const links = numbers.map((num, i) => ({
@@ -21,8 +20,6 @@ function preprocessData(data) {
 }
 
 function addColor(momData, dadData, childData) {
-  console.log(momData, dadData, childData);
-
   momData.links.forEach((momLink) => {
     const childLink = childData.links.find(
       (link) =>
@@ -63,7 +60,7 @@ function addColor(momData, dadData, childData) {
 }
 
 const RecombProcess = () => {
-  const { mom, dad, child } = useContext(GeqoContext);
+  const { relMap, mom, dad, child } = useContext(GeqoContext);
 
   const momRef = useRef();
   const dadRef = useRef();
@@ -74,7 +71,7 @@ const RecombProcess = () => {
   const height = 200;
 
   function drawGraph(svgRef, data) {
-    const domain = Object.keys(originalData.optimizer.geqo.map).map(Number); // [1, 2, 3, 4, 5]
+    const domain = Object.keys(relMap).map(Number); // [1, 2, 3, 4, 5]
     const y = d3.scalePoint(domain, [0, height]);
 
     const svg = d3.select(svgRef.current);
@@ -187,9 +184,9 @@ const RecombProcess = () => {
 
   useEffect(() => {
     if ((mom !== "") & (dad !== "") & (child !== "")) {
-      const momData = preprocessData(mom);
-      const dadData = preprocessData(dad);
-      const childData = preprocessData(child);
+      const momData = preprocessData(relMap, mom);
+      const dadData = preprocessData(relMap, dad);
+      const childData = preprocessData(relMap, child);
 
       addColor(momData, dadData, childData);
 

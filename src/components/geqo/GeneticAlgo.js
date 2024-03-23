@@ -10,7 +10,10 @@ const GeneticAlgo = () => {
   const numGen = geqoData.length;
   const numGene = geqoData[0].pool.length;
 
-  const { setChosen, setMom, setDad, setChild } = useContext(GeqoContext);
+  const { setRelMap, setChosen, setMom, setDad, setChild } =
+    useContext(GeqoContext);
+
+  setRelMap(data.optimizer.geqo.map);
 
   const [isRecomb, setIsRecomb] = useState(false);
 
@@ -69,7 +72,7 @@ const GeneticAlgo = () => {
       (gen, i) => i >= selectedGen[0] && i <= selectedGen[1]
     );
 
-    if (filteredGen.length < 50) {
+    if (filteredGen.length < 40) {
       setIsRecomb(true);
     } else {
       setIsRecomb(false);
@@ -80,17 +83,45 @@ const GeneticAlgo = () => {
         (gene, i) => i >= selectedGene[0] && i <= selectedGene[1]
       );
 
+      const tooltip = d3
+        .select("body")
+        .append("div")
+        .attr("class", "gene-tooltip");
+
       filteredGene.forEach((gene, j) => {
         const rect = svg
           .append("rect")
           .attr("x", i * rectWidth)
           .attr("y", j * rectHeight)
-          .attr("width", isRecomb ? rectWidth / 4 : rectWidth)
+          .attr("width", isRecomb ? rectWidth / 2 : rectWidth)
           .attr("height", rectHeight)
           .attr("fill", gene.color)
+          // .attr("fill", function () {
+          //   if (gene.parents) return gene.color;
+          //   else return "ghostwhite";
+          // })
           .attr("stroke", "lightgrey")
-          .attr("stroke-width", 0.2)
-          .attr("transform", `translate(${margin.x},${margin.y})`);
+          .attr("stroke-width", 0.1)
+          .attr("transform", `translate(${margin.x},${margin.y})`)
+          .on("mouseover", function (event, d) {
+            d3.select(this).attr("fill", d3.rgb(gene.color).darker());
+
+            tooltip
+              .html(
+                `Gen num: ${gen.gen_num}<br>Pop num: ${gene.population_num}<br>Gene: ${gene.gene}<br>Fitness: ${gene.fitness}`
+              )
+              .style("visibility", "visible");
+          })
+          .on("mousemove", function (event) {
+            tooltip
+              .style("top", event.pageY - 50 + "px")
+              .style("left", event.pageX + 10 + "px");
+          })
+          .on("mouseout", function () {
+            d3.select(this).attr("fill", gene.color);
+
+            tooltip.html(``).style("visibility", "hidden");
+          });
 
         rect.on("click", (event, d) => {
           handleClick(i, gene);
@@ -98,18 +129,18 @@ const GeneticAlgo = () => {
 
         if (isRecomb) {
           if (gene.parents) {
-            rect.attr("stroke", "black").attr("stroke-width", 1);
+            // rect.attr("stroke", "black").attr("stroke-width", 1);
 
             svg
               .append("line")
-              .attr("x1", (i - 1) * rectWidth + rectWidth / 4)
+              .attr("x1", (i - 1) * rectWidth + rectWidth / 2)
               .attr("y1", gene.parents[0] * rectHeight + rectHeight / 2)
               .attr("x2", (i - 1) * rectWidth + rectWidth)
               .attr("y2", j * rectHeight + rectHeight / 2)
               .attr("stroke", "red");
             svg
               .append("line")
-              .attr("x1", (i - 1) * rectWidth + rectWidth / 4)
+              .attr("x1", (i - 1) * rectWidth + rectWidth / 2)
               .attr("y1", gene.parents[1] * rectHeight + rectHeight / 2)
               .attr("x2", (i - 1) * rectWidth + rectWidth)
               .attr("y2", j * rectHeight + rectHeight / 2)

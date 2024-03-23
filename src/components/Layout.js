@@ -5,6 +5,7 @@ import Dp from "./dp/Dp";
 import Geqo from "./geqo/Geqo";
 import { useState } from "react";
 import "../App.css";
+import GeqoContextProvider from "../contexts/GeqoContext";
 
 function Layout() {
   const [useGeqo, setUseGeqo] = useState(true);
@@ -15,7 +16,13 @@ function Layout() {
       <div className="main-container">
         {/* <Sidebar /> */}
         {/* <SQLEditor /> */}
-        {useGeqo ? <Geqo /> : <Dp />}
+        {useGeqo ? (
+          <GeqoContextProvider>
+            <Geqo />
+          </GeqoContextProvider>
+        ) : (
+          <Dp />
+        )}
       </div>
     </div>
   );
