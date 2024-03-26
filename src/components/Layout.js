@@ -1,28 +1,17 @@
 import Header from "./Header";
-import Sidebar from "./Sidebar";
-import SQLEditor from "./SQLEditor";
-import Dp from "./dp/Dp";
-import Geqo from "./geqo/Geqo";
-import { useState } from "react";
+import Sidebar from "./sidebar/Sidebar";
+import MainView from "./MainView";
+import React, { useState } from "react";
+
 import "../App.css";
-import GeqoContextProvider from "../contexts/GeqoContext";
 
 function Layout() {
-  const [useGeqo, setUseGeqo] = useState(true);
-
   return (
-    <div>
+    <div className="flex flex-col h-full">
       <Header />
-      <div className="main-container">
-        {/* <Sidebar /> */}
-        {/* <SQLEditor /> */}
-        {useGeqo ? (
-          <GeqoContextProvider>
-            <Geqo />
-          </GeqoContextProvider>
-        ) : (
-          <Dp />
-        )}
+      <div className="main-container grow flex">
+        <Sidebar />
+        <MainView />
       </div>
     </div>
   );
