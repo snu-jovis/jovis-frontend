@@ -1,0 +1,4698 @@
+{
+  "query": "select * from a, b, c, d where a.int4 = b.int4 and b.int4 = c.int4 and c.int4 = d.int4  limit 1;",
+  "result": "[(711, 711, 711, 711)]",
+  "optimizer": {
+    "type": "dp",
+    "base": [
+      {
+        "relid": "a",
+        "rows": 1000,
+        "width": 4,
+        "paths": [
+          {
+            "node": "IdxScan",
+            "relid": "a",
+            "ro_relid": "b",
+            "rows": 2,
+            "startup_cost": 0.28,
+            "total_cost": 0.36,
+            "pathkeys": "((a.int4, b.int4, c.int4, d.int4))"
+          },
+          {
+            "node": "IdxScan",
+            "relid": "a",
+            "ro_relid": "c",
+            "rows": 2,
+            "startup_cost": 0.28,
+            "total_cost": 0.36,
+            "pathkeys": "((a.int4, b.int4, c.int4, d.int4))"
+          },
+          {
+            "node": "IdxScan",
+            "relid": "a",
+            "ro_relid": "d",
+            "rows": 2,
+            "startup_cost": 0.28,
+            "total_cost": 0.36,
+            "pathkeys": "((a.int4, b.int4, c.int4, d.int4))"
+          },
+          {
+            "node": "SeqScan",
+            "relid": "a",
+            "rows": 1000,
+            "startup_cost": 0.0,
+            "total_cost": 18.0
+          },
+          {
+            "node": "IdxScan",
+            "relid": "a",
+            "rows": 1000,
+            "startup_cost": 0.28,
+            "total_cost": 66.94,
+            "pathkeys": "((a.int4, b.int4, c.int4, d.int4))"
+          }
+        ],
+        "cheapest_param_paths": [
+          {
+            "node": "SeqScan",
+            "relid": "a",
+            "rows": 1000,
+            "startup_cost": 0.0,
+            "total_cost": 18.0
+          },
+          {
+            "node": "IdxScan",
+            "relid": "a",
+            "ro_relid": "b",
+            "rows": 2,
+            "startup_cost": 0.28,
+            "total_cost": 0.36,
+            "pathkeys": "((a.int4, b.int4, c.int4, d.int4))"
+          },
+          {
+            "node": "IdxScan",
+            "relid": "a",
+            "ro_relid": "c",
+            "rows": 2,
+            "startup_cost": 0.28,
+            "total_cost": 0.36,
+            "pathkeys": "((a.int4, b.int4, c.int4, d.int4))"
+          },
+          {
+            "node": "IdxScan",
+            "relid": "a",
+            "ro_relid": "d",
+            "rows": 2,
+            "startup_cost": 0.28,
+            "total_cost": 0.36,
+            "pathkeys": "((a.int4, b.int4, c.int4, d.int4))"
+          }
+        ],
+        "cheapest_startup_paths": {
+          "node": "SeqScan",
+          "relid": "a",
+          "rows": 1000,
+          "startup_cost": 0.0,
+          "total_cost": 18.0
+        },
+        "cheapest_total_paths": {
+          "node": "SeqScan",
+          "relid": "a",
+          "rows": 1000,
+          "startup_cost": 0.0,
+          "total_cost": 18.0
+        }
+      },
+      {
+        "relid": "b",
+        "rows": 1000,
+        "width": 4,
+        "paths": [
+          {
+            "node": "SeqScan",
+            "relid": "b",
+            "rows": 1000,
+            "startup_cost": 0.0,
+            "total_cost": 18.0
+          }
+        ],
+        "cheapest_param_paths": [
+          {
+            "node": "SeqScan",
+            "relid": "b",
+            "rows": 1000,
+            "startup_cost": 0.0,
+            "total_cost": 18.0
+          }
+        ],
+        "cheapest_startup_paths": {
+          "node": "SeqScan",
+          "relid": "b",
+          "rows": 1000,
+          "startup_cost": 0.0,
+          "total_cost": 18.0
+        },
+        "cheapest_total_paths": {
+          "node": "SeqScan",
+          "relid": "b",
+          "rows": 1000,
+          "startup_cost": 0.0,
+          "total_cost": 18.0
+        }
+      },
+      {
+        "relid": "c",
+        "rows": 1000,
+        "width": 4,
+        "paths": [
+          {
+            "node": "SeqScan",
+            "relid": "c",
+            "rows": 1000,
+            "startup_cost": 0.0,
+            "total_cost": 18.0
+          }
+        ],
+        "cheapest_param_paths": [
+          {
+            "node": "SeqScan",
+            "relid": "c",
+            "rows": 1000,
+            "startup_cost": 0.0,
+            "total_cost": 18.0
+          }
+        ],
+        "cheapest_startup_paths": {
+          "node": "SeqScan",
+          "relid": "c",
+          "rows": 1000,
+          "startup_cost": 0.0,
+          "total_cost": 18.0
+        },
+        "cheapest_total_paths": {
+          "node": "SeqScan",
+          "relid": "c",
+          "rows": 1000,
+          "startup_cost": 0.0,
+          "total_cost": 18.0
+        }
+      },
+      {
+        "relid": "d",
+        "rows": 1000,
+        "width": 4,
+        "paths": [
+          {
+            "node": "SeqScan",
+            "relid": "d",
+            "rows": 1000,
+            "startup_cost": 0.0,
+            "total_cost": 18.0
+          }
+        ],
+        "cheapest_param_paths": [
+          {
+            "node": "SeqScan",
+            "relid": "d",
+            "rows": 1000,
+            "startup_cost": 0.0,
+            "total_cost": 18.0
+          }
+        ],
+        "cheapest_startup_paths": {
+          "node": "SeqScan",
+          "relid": "d",
+          "rows": 1000,
+          "startup_cost": 0.0,
+          "total_cost": 18.0
+        },
+        "cheapest_total_paths": {
+          "node": "SeqScan",
+          "relid": "d",
+          "rows": 1000,
+          "startup_cost": 0.0,
+          "total_cost": 18.0
+        }
+      }
+    ],
+    "geqo": {},
+    "dp": [
+      {
+        "relid": "a b",
+        "rows": 1543,
+        "width": 8,
+        "paths": [
+          {
+            "node": "HashJoin",
+            "relid": "a b",
+            "rows": 1543,
+            "startup_cost": 30.5,
+            "total_cost": 72.68,
+            "join": {
+              "clauses": "a.int4 = b.int4",
+              "outer": {
+                "node": "SeqScan",
+                "relid": "b",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 18.0
+              },
+              "inner": {
+                "node": "SeqScan",
+                "relid": "a",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 18.0
+              }
+            }
+          },
+          {
+            "node": "MergeJoin",
+            "relid": "a b",
+            "rows": 1543,
+            "startup_cost": 68.1,
+            "total_cost": 160.42,
+            "pathkeys": "((a.int4, b.int4, c.int4, d.int4))",
+            "join": {
+              "clauses": "a.int4 = b.int4",
+              "mergejoin_info": {
+                "outerkeys_exist": "0",
+                "innerkeys_exist": "1",
+                "m_inner_exist": "0"
+              },
+              "outer": {
+                "node": "IdxScan",
+                "relid": "a",
+                "rows": 1000,
+                "startup_cost": 0.28,
+                "total_cost": 66.94,
+                "pathkeys": "((a.int4, b.int4, c.int4, d.int4))"
+              },
+              "inner": {
+                "node": "SeqScan",
+                "relid": "b",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 18.0
+              }
+            }
+          },
+          {
+            "node": "NestLoop",
+            "relid": "a b",
+            "rows": 1543,
+            "startup_cost": 0.29,
+            "total_cost": 284.41,
+            "join": {
+              "clauses": "",
+              "outer": {
+                "node": "SeqScan",
+                "relid": "b",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 18.0
+              },
+              "inner": {
+                "node": "Memoize",
+                "relid": "a",
+                "ro_relid": "b",
+                "rows": 2,
+                "startup_cost": 0.29,
+                "total_cost": 0.37,
+                "pathkeys": "((a.int4, b.int4, c.int4, d.int4))",
+                "sub": {
+                  "node": "IdxScan",
+                  "relid": "a",
+                  "ro_relid": "b",
+                  "rows": 2,
+                  "startup_cost": 0.28,
+                  "total_cost": 0.36,
+                  "pathkeys": "((a.int4, b.int4, c.int4, d.int4))"
+                }
+              }
+            }
+          },
+          {
+            "node": "NestLoop",
+            "relid": "a b",
+            "rows": 1543,
+            "startup_cost": 0.28,
+            "total_cost": 400.0,
+            "join": {
+              "clauses": "",
+              "outer": {
+                "node": "SeqScan",
+                "relid": "b",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 18.0
+              },
+              "inner": {
+                "node": "IdxScan",
+                "relid": "a",
+                "ro_relid": "b",
+                "rows": 2,
+                "startup_cost": 0.28,
+                "total_cost": 0.36,
+                "pathkeys": "((a.int4, b.int4, c.int4, d.int4))"
+              }
+            }
+          },
+          {
+            "node": "NestLoop",
+            "relid": "a b",
+            "rows": 1543,
+            "startup_cost": 0.0,
+            "total_cost": 15038.5,
+            "join": {
+              "clauses": "a.int4 = b.int4",
+              "outer": {
+                "node": "SeqScan",
+                "relid": "a",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 18.0
+              },
+              "inner": {
+                "node": "Material",
+                "relid": "b",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 23.0,
+                "sub": {
+                  "node": "SeqScan",
+                  "relid": "b",
+                  "rows": 1000,
+                  "startup_cost": 0.0,
+                  "total_cost": 18.0
+                }
+              }
+            }
+          },
+          {
+            "node": "NestLoop",
+            "relid": "a b",
+            "rows": 1543,
+            "startup_cost": 0.28,
+            "total_cost": 15087.44,
+            "pathkeys": "((a.int4, b.int4, c.int4, d.int4))",
+            "join": {
+              "clauses": "a.int4 = b.int4",
+              "outer": {
+                "node": "IdxScan",
+                "relid": "a",
+                "rows": 1000,
+                "startup_cost": 0.28,
+                "total_cost": 66.94,
+                "pathkeys": "((a.int4, b.int4, c.int4, d.int4))"
+              },
+              "inner": {
+                "node": "Material",
+                "relid": "b",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 23.0,
+                "sub": {
+                  "node": "SeqScan",
+                  "relid": "b",
+                  "rows": 1000,
+                  "startup_cost": 0.0,
+                  "total_cost": 18.0
+                }
+              }
+            }
+          }
+        ],
+        "cheapest_param_paths": [
+          {
+            "node": "HashJoin",
+            "relid": "a b",
+            "rows": 1543,
+            "startup_cost": 30.5,
+            "total_cost": 72.68,
+            "join": {
+              "clauses": "a.int4 = b.int4",
+              "outer": {
+                "node": "SeqScan",
+                "relid": "b",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 18.0
+              },
+              "inner": {
+                "node": "SeqScan",
+                "relid": "a",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 18.0
+              }
+            }
+          }
+        ],
+        "cheapest_startup_paths": {
+          "node": "NestLoop",
+          "relid": "a b",
+          "rows": 1543,
+          "startup_cost": 0.0,
+          "total_cost": 15038.5,
+          "join": {
+            "clauses": "a.int4 = b.int4",
+            "outer": {
+              "node": "SeqScan",
+              "relid": "a",
+              "rows": 1000,
+              "startup_cost": 0.0,
+              "total_cost": 18.0
+            },
+            "inner": {
+              "node": "Material",
+              "relid": "b",
+              "rows": 1000,
+              "startup_cost": 0.0,
+              "total_cost": 23.0,
+              "sub": {
+                "node": "SeqScan",
+                "relid": "b",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 18.0
+              }
+            }
+          }
+        },
+        "cheapest_total_paths": {
+          "node": "HashJoin",
+          "relid": "a b",
+          "rows": 1543,
+          "startup_cost": 30.5,
+          "total_cost": 72.68,
+          "join": {
+            "clauses": "a.int4 = b.int4",
+            "outer": {
+              "node": "SeqScan",
+              "relid": "b",
+              "rows": 1000,
+              "startup_cost": 0.0,
+              "total_cost": 18.0
+            },
+            "inner": {
+              "node": "SeqScan",
+              "relid": "a",
+              "rows": 1000,
+              "startup_cost": 0.0,
+              "total_cost": 18.0
+            }
+          }
+        }
+      },
+      {
+        "relid": "a c",
+        "rows": 1507,
+        "width": 8,
+        "paths": [
+          {
+            "node": "HashJoin",
+            "relid": "a c",
+            "rows": 1507,
+            "startup_cost": 30.5,
+            "total_cost": 72.32,
+            "join": {
+              "clauses": "a.int4 = c.int4",
+              "outer": {
+                "node": "SeqScan",
+                "relid": "a",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 18.0
+              },
+              "inner": {
+                "node": "SeqScan",
+                "relid": "c",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 18.0
+              }
+            }
+          },
+          {
+            "node": "MergeJoin",
+            "relid": "a c",
+            "rows": 1507,
+            "startup_cost": 68.12,
+            "total_cost": 159.67,
+            "pathkeys": "((a.int4, b.int4, c.int4, d.int4))",
+            "join": {
+              "clauses": "a.int4 = c.int4",
+              "mergejoin_info": {
+                "outerkeys_exist": "0",
+                "innerkeys_exist": "1",
+                "m_inner_exist": "0"
+              },
+              "outer": {
+                "node": "IdxScan",
+                "relid": "a",
+                "rows": 1000,
+                "startup_cost": 0.28,
+                "total_cost": 66.94,
+                "pathkeys": "((a.int4, b.int4, c.int4, d.int4))"
+              },
+              "inner": {
+                "node": "SeqScan",
+                "relid": "c",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 18.0
+              }
+            }
+          },
+          {
+            "node": "NestLoop",
+            "relid": "a c",
+            "rows": 1507,
+            "startup_cost": 0.29,
+            "total_cost": 286.94,
+            "join": {
+              "clauses": "",
+              "outer": {
+                "node": "SeqScan",
+                "relid": "c",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 18.0
+              },
+              "inner": {
+                "node": "Memoize",
+                "relid": "a",
+                "ro_relid": "c",
+                "rows": 2,
+                "startup_cost": 0.29,
+                "total_cost": 0.37,
+                "pathkeys": "((a.int4, b.int4, c.int4, d.int4))",
+                "sub": {
+                  "node": "IdxScan",
+                  "relid": "a",
+                  "ro_relid": "c",
+                  "rows": 2,
+                  "startup_cost": 0.28,
+                  "total_cost": 0.36,
+                  "pathkeys": "((a.int4, b.int4, c.int4, d.int4))"
+                }
+              }
+            }
+          },
+          {
+            "node": "NestLoop",
+            "relid": "a c",
+            "rows": 1507,
+            "startup_cost": 0.28,
+            "total_cost": 400.0,
+            "join": {
+              "clauses": "",
+              "outer": {
+                "node": "SeqScan",
+                "relid": "c",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 18.0
+              },
+              "inner": {
+                "node": "IdxScan",
+                "relid": "a",
+                "ro_relid": "c",
+                "rows": 2,
+                "startup_cost": 0.28,
+                "total_cost": 0.36,
+                "pathkeys": "((a.int4, b.int4, c.int4, d.int4))"
+              }
+            }
+          },
+          {
+            "node": "NestLoop",
+            "relid": "a c",
+            "rows": 1507,
+            "startup_cost": 0.0,
+            "total_cost": 15038.5,
+            "join": {
+              "clauses": "a.int4 = c.int4",
+              "outer": {
+                "node": "SeqScan",
+                "relid": "a",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 18.0
+              },
+              "inner": {
+                "node": "Material",
+                "relid": "c",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 23.0,
+                "sub": {
+                  "node": "SeqScan",
+                  "relid": "c",
+                  "rows": 1000,
+                  "startup_cost": 0.0,
+                  "total_cost": 18.0
+                }
+              }
+            }
+          },
+          {
+            "node": "NestLoop",
+            "relid": "a c",
+            "rows": 1507,
+            "startup_cost": 0.28,
+            "total_cost": 15087.44,
+            "pathkeys": "((a.int4, b.int4, c.int4, d.int4))",
+            "join": {
+              "clauses": "a.int4 = c.int4",
+              "outer": {
+                "node": "IdxScan",
+                "relid": "a",
+                "rows": 1000,
+                "startup_cost": 0.28,
+                "total_cost": 66.94,
+                "pathkeys": "((a.int4, b.int4, c.int4, d.int4))"
+              },
+              "inner": {
+                "node": "Material",
+                "relid": "c",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 23.0,
+                "sub": {
+                  "node": "SeqScan",
+                  "relid": "c",
+                  "rows": 1000,
+                  "startup_cost": 0.0,
+                  "total_cost": 18.0
+                }
+              }
+            }
+          }
+        ],
+        "cheapest_param_paths": [
+          {
+            "node": "HashJoin",
+            "relid": "a c",
+            "rows": 1507,
+            "startup_cost": 30.5,
+            "total_cost": 72.32,
+            "join": {
+              "clauses": "a.int4 = c.int4",
+              "outer": {
+                "node": "SeqScan",
+                "relid": "a",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 18.0
+              },
+              "inner": {
+                "node": "SeqScan",
+                "relid": "c",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 18.0
+              }
+            }
+          }
+        ],
+        "cheapest_startup_paths": {
+          "node": "NestLoop",
+          "relid": "a c",
+          "rows": 1507,
+          "startup_cost": 0.0,
+          "total_cost": 15038.5,
+          "join": {
+            "clauses": "a.int4 = c.int4",
+            "outer": {
+              "node": "SeqScan",
+              "relid": "a",
+              "rows": 1000,
+              "startup_cost": 0.0,
+              "total_cost": 18.0
+            },
+            "inner": {
+              "node": "Material",
+              "relid": "c",
+              "rows": 1000,
+              "startup_cost": 0.0,
+              "total_cost": 23.0,
+              "sub": {
+                "node": "SeqScan",
+                "relid": "c",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 18.0
+              }
+            }
+          }
+        },
+        "cheapest_total_paths": {
+          "node": "HashJoin",
+          "relid": "a c",
+          "rows": 1507,
+          "startup_cost": 30.5,
+          "total_cost": 72.32,
+          "join": {
+            "clauses": "a.int4 = c.int4",
+            "outer": {
+              "node": "SeqScan",
+              "relid": "a",
+              "rows": 1000,
+              "startup_cost": 0.0,
+              "total_cost": 18.0
+            },
+            "inner": {
+              "node": "SeqScan",
+              "relid": "c",
+              "rows": 1000,
+              "startup_cost": 0.0,
+              "total_cost": 18.0
+            }
+          }
+        }
+      },
+      {
+        "relid": "a d",
+        "rows": 1509,
+        "width": 8,
+        "paths": [
+          {
+            "node": "HashJoin",
+            "relid": "a d",
+            "rows": 1509,
+            "startup_cost": 30.5,
+            "total_cost": 72.34,
+            "join": {
+              "clauses": "a.int4 = d.int4",
+              "outer": {
+                "node": "SeqScan",
+                "relid": "a",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 18.0
+              },
+              "inner": {
+                "node": "SeqScan",
+                "relid": "d",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 18.0
+              }
+            }
+          },
+          {
+            "node": "MergeJoin",
+            "relid": "a d",
+            "rows": 1509,
+            "startup_cost": 68.1,
+            "total_cost": 159.91,
+            "pathkeys": "((a.int4, b.int4, c.int4, d.int4))",
+            "join": {
+              "clauses": "a.int4 = d.int4",
+              "mergejoin_info": {
+                "outerkeys_exist": "0",
+                "innerkeys_exist": "1",
+                "m_inner_exist": "0"
+              },
+              "outer": {
+                "node": "IdxScan",
+                "relid": "a",
+                "rows": 1000,
+                "startup_cost": 0.28,
+                "total_cost": 66.94,
+                "pathkeys": "((a.int4, b.int4, c.int4, d.int4))"
+              },
+              "inner": {
+                "node": "SeqScan",
+                "relid": "d",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 18.0
+              }
+            }
+          },
+          {
+            "node": "NestLoop",
+            "relid": "a d",
+            "rows": 1509,
+            "startup_cost": 0.29,
+            "total_cost": 288.75,
+            "join": {
+              "clauses": "",
+              "outer": {
+                "node": "SeqScan",
+                "relid": "d",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 18.0
+              },
+              "inner": {
+                "node": "Memoize",
+                "relid": "a",
+                "ro_relid": "d",
+                "rows": 2,
+                "startup_cost": 0.29,
+                "total_cost": 0.37,
+                "pathkeys": "((a.int4, b.int4, c.int4, d.int4))",
+                "sub": {
+                  "node": "IdxScan",
+                  "relid": "a",
+                  "ro_relid": "d",
+                  "rows": 2,
+                  "startup_cost": 0.28,
+                  "total_cost": 0.36,
+                  "pathkeys": "((a.int4, b.int4, c.int4, d.int4))"
+                }
+              }
+            }
+          },
+          {
+            "node": "NestLoop",
+            "relid": "a d",
+            "rows": 1509,
+            "startup_cost": 0.28,
+            "total_cost": 400.0,
+            "join": {
+              "clauses": "",
+              "outer": {
+                "node": "SeqScan",
+                "relid": "d",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 18.0
+              },
+              "inner": {
+                "node": "IdxScan",
+                "relid": "a",
+                "ro_relid": "d",
+                "rows": 2,
+                "startup_cost": 0.28,
+                "total_cost": 0.36,
+                "pathkeys": "((a.int4, b.int4, c.int4, d.int4))"
+              }
+            }
+          },
+          {
+            "node": "NestLoop",
+            "relid": "a d",
+            "rows": 1509,
+            "startup_cost": 0.0,
+            "total_cost": 15038.5,
+            "join": {
+              "clauses": "a.int4 = d.int4",
+              "outer": {
+                "node": "SeqScan",
+                "relid": "a",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 18.0
+              },
+              "inner": {
+                "node": "Material",
+                "relid": "d",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 23.0,
+                "sub": {
+                  "node": "SeqScan",
+                  "relid": "d",
+                  "rows": 1000,
+                  "startup_cost": 0.0,
+                  "total_cost": 18.0
+                }
+              }
+            }
+          },
+          {
+            "node": "NestLoop",
+            "relid": "a d",
+            "rows": 1509,
+            "startup_cost": 0.28,
+            "total_cost": 15087.44,
+            "pathkeys": "((a.int4, b.int4, c.int4, d.int4))",
+            "join": {
+              "clauses": "a.int4 = d.int4",
+              "outer": {
+                "node": "IdxScan",
+                "relid": "a",
+                "rows": 1000,
+                "startup_cost": 0.28,
+                "total_cost": 66.94,
+                "pathkeys": "((a.int4, b.int4, c.int4, d.int4))"
+              },
+              "inner": {
+                "node": "Material",
+                "relid": "d",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 23.0,
+                "sub": {
+                  "node": "SeqScan",
+                  "relid": "d",
+                  "rows": 1000,
+                  "startup_cost": 0.0,
+                  "total_cost": 18.0
+                }
+              }
+            }
+          }
+        ],
+        "cheapest_param_paths": [
+          {
+            "node": "HashJoin",
+            "relid": "a d",
+            "rows": 1509,
+            "startup_cost": 30.5,
+            "total_cost": 72.34,
+            "join": {
+              "clauses": "a.int4 = d.int4",
+              "outer": {
+                "node": "SeqScan",
+                "relid": "a",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 18.0
+              },
+              "inner": {
+                "node": "SeqScan",
+                "relid": "d",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 18.0
+              }
+            }
+          }
+        ],
+        "cheapest_startup_paths": {
+          "node": "NestLoop",
+          "relid": "a d",
+          "rows": 1509,
+          "startup_cost": 0.0,
+          "total_cost": 15038.5,
+          "join": {
+            "clauses": "a.int4 = d.int4",
+            "outer": {
+              "node": "SeqScan",
+              "relid": "a",
+              "rows": 1000,
+              "startup_cost": 0.0,
+              "total_cost": 18.0
+            },
+            "inner": {
+              "node": "Material",
+              "relid": "d",
+              "rows": 1000,
+              "startup_cost": 0.0,
+              "total_cost": 23.0,
+              "sub": {
+                "node": "SeqScan",
+                "relid": "d",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 18.0
+              }
+            }
+          }
+        },
+        "cheapest_total_paths": {
+          "node": "HashJoin",
+          "relid": "a d",
+          "rows": 1509,
+          "startup_cost": 30.5,
+          "total_cost": 72.34,
+          "join": {
+            "clauses": "a.int4 = d.int4",
+            "outer": {
+              "node": "SeqScan",
+              "relid": "a",
+              "rows": 1000,
+              "startup_cost": 0.0,
+              "total_cost": 18.0
+            },
+            "inner": {
+              "node": "SeqScan",
+              "relid": "d",
+              "rows": 1000,
+              "startup_cost": 0.0,
+              "total_cost": 18.0
+            }
+          }
+        }
+      },
+      {
+        "relid": "b c",
+        "rows": 1518,
+        "width": 8,
+        "paths": [
+          {
+            "node": "HashJoin",
+            "relid": "b c",
+            "rows": 1518,
+            "startup_cost": 30.5,
+            "total_cost": 72.43,
+            "join": {
+              "clauses": "b.int4 = c.int4",
+              "outer": {
+                "node": "SeqScan",
+                "relid": "b",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 18.0
+              },
+              "inner": {
+                "node": "SeqScan",
+                "relid": "c",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 18.0
+              }
+            }
+          },
+          {
+            "node": "MergeJoin",
+            "relid": "b c",
+            "rows": 1518,
+            "startup_cost": 135.68,
+            "total_cost": 163.42,
+            "pathkeys": "((a.int4, b.int4, c.int4, d.int4))",
+            "join": {
+              "clauses": "b.int4 = c.int4",
+              "mergejoin_info": {
+                "outerkeys_exist": "1",
+                "innerkeys_exist": "1",
+                "m_inner_exist": "0"
+              },
+              "outer": {
+                "node": "SeqScan",
+                "relid": "b",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 18.0
+              },
+              "inner": {
+                "node": "SeqScan",
+                "relid": "c",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 18.0
+              }
+            }
+          },
+          {
+            "node": "NestLoop",
+            "relid": "b c",
+            "rows": 1518,
+            "startup_cost": 0.0,
+            "total_cost": 15038.5,
+            "join": {
+              "clauses": "b.int4 = c.int4",
+              "outer": {
+                "node": "SeqScan",
+                "relid": "b",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 18.0
+              },
+              "inner": {
+                "node": "Material",
+                "relid": "c",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 23.0,
+                "sub": {
+                  "node": "SeqScan",
+                  "relid": "c",
+                  "rows": 1000,
+                  "startup_cost": 0.0,
+                  "total_cost": 18.0
+                }
+              }
+            }
+          }
+        ],
+        "cheapest_param_paths": [
+          {
+            "node": "HashJoin",
+            "relid": "b c",
+            "rows": 1518,
+            "startup_cost": 30.5,
+            "total_cost": 72.43,
+            "join": {
+              "clauses": "b.int4 = c.int4",
+              "outer": {
+                "node": "SeqScan",
+                "relid": "b",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 18.0
+              },
+              "inner": {
+                "node": "SeqScan",
+                "relid": "c",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 18.0
+              }
+            }
+          }
+        ],
+        "cheapest_startup_paths": {
+          "node": "NestLoop",
+          "relid": "b c",
+          "rows": 1518,
+          "startup_cost": 0.0,
+          "total_cost": 15038.5,
+          "join": {
+            "clauses": "b.int4 = c.int4",
+            "outer": {
+              "node": "SeqScan",
+              "relid": "b",
+              "rows": 1000,
+              "startup_cost": 0.0,
+              "total_cost": 18.0
+            },
+            "inner": {
+              "node": "Material",
+              "relid": "c",
+              "rows": 1000,
+              "startup_cost": 0.0,
+              "total_cost": 23.0,
+              "sub": {
+                "node": "SeqScan",
+                "relid": "c",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 18.0
+              }
+            }
+          }
+        },
+        "cheapest_total_paths": {
+          "node": "HashJoin",
+          "relid": "b c",
+          "rows": 1518,
+          "startup_cost": 30.5,
+          "total_cost": 72.43,
+          "join": {
+            "clauses": "b.int4 = c.int4",
+            "outer": {
+              "node": "SeqScan",
+              "relid": "b",
+              "rows": 1000,
+              "startup_cost": 0.0,
+              "total_cost": 18.0
+            },
+            "inner": {
+              "node": "SeqScan",
+              "relid": "c",
+              "rows": 1000,
+              "startup_cost": 0.0,
+              "total_cost": 18.0
+            }
+          }
+        }
+      },
+      {
+        "relid": "b d",
+        "rows": 1506,
+        "width": 8,
+        "paths": [
+          {
+            "node": "HashJoin",
+            "relid": "b d",
+            "rows": 1506,
+            "startup_cost": 30.5,
+            "total_cost": 72.31,
+            "join": {
+              "clauses": "b.int4 = d.int4",
+              "outer": {
+                "node": "SeqScan",
+                "relid": "b",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 18.0
+              },
+              "inner": {
+                "node": "SeqScan",
+                "relid": "d",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 18.0
+              }
+            }
+          },
+          {
+            "node": "MergeJoin",
+            "relid": "b d",
+            "rows": 1506,
+            "startup_cost": 135.66,
+            "total_cost": 163.25,
+            "pathkeys": "((a.int4, b.int4, c.int4, d.int4))",
+            "join": {
+              "clauses": "b.int4 = d.int4",
+              "mergejoin_info": {
+                "outerkeys_exist": "1",
+                "innerkeys_exist": "1",
+                "m_inner_exist": "0"
+              },
+              "outer": {
+                "node": "SeqScan",
+                "relid": "b",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 18.0
+              },
+              "inner": {
+                "node": "SeqScan",
+                "relid": "d",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 18.0
+              }
+            }
+          },
+          {
+            "node": "NestLoop",
+            "relid": "b d",
+            "rows": 1506,
+            "startup_cost": 0.0,
+            "total_cost": 15038.5,
+            "join": {
+              "clauses": "b.int4 = d.int4",
+              "outer": {
+                "node": "SeqScan",
+                "relid": "b",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 18.0
+              },
+              "inner": {
+                "node": "Material",
+                "relid": "d",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 23.0,
+                "sub": {
+                  "node": "SeqScan",
+                  "relid": "d",
+                  "rows": 1000,
+                  "startup_cost": 0.0,
+                  "total_cost": 18.0
+                }
+              }
+            }
+          }
+        ],
+        "cheapest_param_paths": [
+          {
+            "node": "HashJoin",
+            "relid": "b d",
+            "rows": 1506,
+            "startup_cost": 30.5,
+            "total_cost": 72.31,
+            "join": {
+              "clauses": "b.int4 = d.int4",
+              "outer": {
+                "node": "SeqScan",
+                "relid": "b",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 18.0
+              },
+              "inner": {
+                "node": "SeqScan",
+                "relid": "d",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 18.0
+              }
+            }
+          }
+        ],
+        "cheapest_startup_paths": {
+          "node": "NestLoop",
+          "relid": "b d",
+          "rows": 1506,
+          "startup_cost": 0.0,
+          "total_cost": 15038.5,
+          "join": {
+            "clauses": "b.int4 = d.int4",
+            "outer": {
+              "node": "SeqScan",
+              "relid": "b",
+              "rows": 1000,
+              "startup_cost": 0.0,
+              "total_cost": 18.0
+            },
+            "inner": {
+              "node": "Material",
+              "relid": "d",
+              "rows": 1000,
+              "startup_cost": 0.0,
+              "total_cost": 23.0,
+              "sub": {
+                "node": "SeqScan",
+                "relid": "d",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 18.0
+              }
+            }
+          }
+        },
+        "cheapest_total_paths": {
+          "node": "HashJoin",
+          "relid": "b d",
+          "rows": 1506,
+          "startup_cost": 30.5,
+          "total_cost": 72.31,
+          "join": {
+            "clauses": "b.int4 = d.int4",
+            "outer": {
+              "node": "SeqScan",
+              "relid": "b",
+              "rows": 1000,
+              "startup_cost": 0.0,
+              "total_cost": 18.0
+            },
+            "inner": {
+              "node": "SeqScan",
+              "relid": "d",
+              "rows": 1000,
+              "startup_cost": 0.0,
+              "total_cost": 18.0
+            }
+          }
+        }
+      },
+      {
+        "relid": "c d",
+        "rows": 1503,
+        "width": 8,
+        "paths": [
+          {
+            "node": "HashJoin",
+            "relid": "c d",
+            "rows": 1503,
+            "startup_cost": 30.5,
+            "total_cost": 72.28,
+            "join": {
+              "clauses": "c.int4 = d.int4",
+              "outer": {
+                "node": "SeqScan",
+                "relid": "c",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 18.0
+              },
+              "inner": {
+                "node": "SeqScan",
+                "relid": "d",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 18.0
+              }
+            }
+          },
+          {
+            "node": "MergeJoin",
+            "relid": "c d",
+            "rows": 1503,
+            "startup_cost": 135.67,
+            "total_cost": 163.19,
+            "pathkeys": "((a.int4, b.int4, c.int4, d.int4))",
+            "join": {
+              "clauses": "c.int4 = d.int4",
+              "mergejoin_info": {
+                "outerkeys_exist": "1",
+                "innerkeys_exist": "1",
+                "m_inner_exist": "0"
+              },
+              "outer": {
+                "node": "SeqScan",
+                "relid": "c",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 18.0
+              },
+              "inner": {
+                "node": "SeqScan",
+                "relid": "d",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 18.0
+              }
+            }
+          },
+          {
+            "node": "NestLoop",
+            "relid": "c d",
+            "rows": 1503,
+            "startup_cost": 0.0,
+            "total_cost": 15038.5,
+            "join": {
+              "clauses": "c.int4 = d.int4",
+              "outer": {
+                "node": "SeqScan",
+                "relid": "c",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 18.0
+              },
+              "inner": {
+                "node": "Material",
+                "relid": "d",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 23.0,
+                "sub": {
+                  "node": "SeqScan",
+                  "relid": "d",
+                  "rows": 1000,
+                  "startup_cost": 0.0,
+                  "total_cost": 18.0
+                }
+              }
+            }
+          }
+        ],
+        "cheapest_param_paths": [
+          {
+            "node": "HashJoin",
+            "relid": "c d",
+            "rows": 1503,
+            "startup_cost": 30.5,
+            "total_cost": 72.28,
+            "join": {
+              "clauses": "c.int4 = d.int4",
+              "outer": {
+                "node": "SeqScan",
+                "relid": "c",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 18.0
+              },
+              "inner": {
+                "node": "SeqScan",
+                "relid": "d",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 18.0
+              }
+            }
+          }
+        ],
+        "cheapest_startup_paths": {
+          "node": "NestLoop",
+          "relid": "c d",
+          "rows": 1503,
+          "startup_cost": 0.0,
+          "total_cost": 15038.5,
+          "join": {
+            "clauses": "c.int4 = d.int4",
+            "outer": {
+              "node": "SeqScan",
+              "relid": "c",
+              "rows": 1000,
+              "startup_cost": 0.0,
+              "total_cost": 18.0
+            },
+            "inner": {
+              "node": "Material",
+              "relid": "d",
+              "rows": 1000,
+              "startup_cost": 0.0,
+              "total_cost": 23.0,
+              "sub": {
+                "node": "SeqScan",
+                "relid": "d",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 18.0
+              }
+            }
+          }
+        },
+        "cheapest_total_paths": {
+          "node": "HashJoin",
+          "relid": "c d",
+          "rows": 1503,
+          "startup_cost": 30.5,
+          "total_cost": 72.28,
+          "join": {
+            "clauses": "c.int4 = d.int4",
+            "outer": {
+              "node": "SeqScan",
+              "relid": "c",
+              "rows": 1000,
+              "startup_cost": 0.0,
+              "total_cost": 18.0
+            },
+            "inner": {
+              "node": "SeqScan",
+              "relid": "d",
+              "rows": 1000,
+              "startup_cost": 0.0,
+              "total_cost": 18.0
+            }
+          }
+        }
+      },
+      {
+        "relid": "a b c",
+        "rows": 2325,
+        "width": 12,
+        "paths": [
+          {
+            "node": "HashJoin",
+            "relid": "a b c",
+            "rows": 2325,
+            "startup_cost": 61.0,
+            "total_cost": 139.63,
+            "join": {
+              "clauses": "a.int4 = b.int4",
+              "outer": {
+                "node": "HashJoin",
+                "relid": "b c",
+                "rows": 1518,
+                "startup_cost": 30.5,
+                "total_cost": 72.43,
+                "join": {
+                  "clauses": "b.int4 = c.int4",
+                  "outer": {
+                    "node": "SeqScan",
+                    "relid": "b",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 18.0
+                  },
+                  "inner": {
+                    "node": "SeqScan",
+                    "relid": "c",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 18.0
+                  }
+                }
+              },
+              "inner": {
+                "node": "SeqScan",
+                "relid": "a",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 18.0
+              }
+            }
+          },
+          {
+            "node": "MergeJoin",
+            "relid": "a b c",
+            "rows": 2325,
+            "startup_cost": 152.92,
+            "total_cost": 257.21,
+            "pathkeys": "((a.int4, b.int4, c.int4, d.int4))",
+            "join": {
+              "clauses": "a.int4 = b.int4",
+              "mergejoin_info": {
+                "outerkeys_exist": "0",
+                "innerkeys_exist": "1",
+                "m_inner_exist": "0"
+              },
+              "outer": {
+                "node": "IdxScan",
+                "relid": "a",
+                "rows": 1000,
+                "startup_cost": 0.28,
+                "total_cost": 66.94,
+                "pathkeys": "((a.int4, b.int4, c.int4, d.int4))"
+              },
+              "inner": {
+                "node": "HashJoin",
+                "relid": "b c",
+                "rows": 1518,
+                "startup_cost": 30.5,
+                "total_cost": 72.43,
+                "join": {
+                  "clauses": "b.int4 = c.int4",
+                  "outer": {
+                    "node": "SeqScan",
+                    "relid": "b",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 18.0
+                  },
+                  "inner": {
+                    "node": "SeqScan",
+                    "relid": "c",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 18.0
+                  }
+                }
+              }
+            }
+          },
+          {
+            "node": "MergeJoin",
+            "relid": "a b c",
+            "rows": 2325,
+            "startup_cost": 135.95,
+            "total_cost": 266.14,
+            "pathkeys": "((a.int4, b.int4, c.int4, d.int4))",
+            "join": {
+              "clauses": "a.int4 = b.int4",
+              "mergejoin_info": {
+                "outerkeys_exist": "0",
+                "innerkeys_exist": "1",
+                "m_inner_exist": "0"
+              },
+              "outer": {
+                "node": "MergeJoin",
+                "relid": "a c",
+                "rows": 1507,
+                "startup_cost": 68.12,
+                "total_cost": 159.67,
+                "pathkeys": "((a.int4, b.int4, c.int4, d.int4))",
+                "join": {
+                  "clauses": "a.int4 = c.int4",
+                  "mergejoin_info": {
+                    "outerkeys_exist": "0",
+                    "innerkeys_exist": "1",
+                    "m_inner_exist": "0"
+                  },
+                  "outer": {
+                    "node": "IdxScan",
+                    "relid": "a",
+                    "rows": 1000,
+                    "startup_cost": 0.28,
+                    "total_cost": 66.94,
+                    "pathkeys": "((a.int4, b.int4, c.int4, d.int4))"
+                  },
+                  "inner": {
+                    "node": "SeqScan",
+                    "relid": "c",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 18.0
+                  }
+                }
+              },
+              "inner": {
+                "node": "SeqScan",
+                "relid": "b",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 18.0
+              }
+            }
+          },
+          {
+            "node": "NestLoop",
+            "relid": "a b c",
+            "rows": 2325,
+            "startup_cost": 30.79,
+            "total_cost": 358.34,
+            "join": {
+              "clauses": "",
+              "outer": {
+                "node": "HashJoin",
+                "relid": "b c",
+                "rows": 1518,
+                "startup_cost": 30.5,
+                "total_cost": 72.43,
+                "join": {
+                  "clauses": "b.int4 = c.int4",
+                  "outer": {
+                    "node": "SeqScan",
+                    "relid": "b",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 18.0
+                  },
+                  "inner": {
+                    "node": "SeqScan",
+                    "relid": "c",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 18.0
+                  }
+                }
+              },
+              "inner": {
+                "node": "Memoize",
+                "relid": "a",
+                "ro_relid": "b",
+                "rows": 2,
+                "startup_cost": 0.29,
+                "total_cost": 0.37,
+                "pathkeys": "((a.int4, b.int4, c.int4, d.int4))",
+                "sub": {
+                  "node": "IdxScan",
+                  "relid": "a",
+                  "ro_relid": "b",
+                  "rows": 2,
+                  "startup_cost": 0.28,
+                  "total_cost": 0.36,
+                  "pathkeys": "((a.int4, b.int4, c.int4, d.int4))"
+                }
+              }
+            }
+          },
+          {
+            "node": "MergeJoin",
+            "relid": "a b c",
+            "rows": 2325,
+            "startup_cost": 68.13,
+            "total_cost": 15154.87,
+            "pathkeys": "((a.int4, b.int4, c.int4, d.int4))",
+            "join": {
+              "clauses": "a.int4 = c.int4",
+              "mergejoin_info": {
+                "outerkeys_exist": "0",
+                "innerkeys_exist": "1",
+                "m_inner_exist": "0"
+              },
+              "outer": {
+                "node": "NestLoop",
+                "relid": "a b",
+                "rows": 1543,
+                "startup_cost": 0.28,
+                "total_cost": 15087.44,
+                "pathkeys": "((a.int4, b.int4, c.int4, d.int4))",
+                "join": {
+                  "clauses": "a.int4 = b.int4",
+                  "outer": {
+                    "node": "IdxScan",
+                    "relid": "a",
+                    "rows": 1000,
+                    "startup_cost": 0.28,
+                    "total_cost": 66.94,
+                    "pathkeys": "((a.int4, b.int4, c.int4, d.int4))"
+                  },
+                  "inner": {
+                    "node": "Material",
+                    "relid": "b",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 23.0,
+                    "sub": {
+                      "node": "SeqScan",
+                      "relid": "b",
+                      "rows": 1000,
+                      "startup_cost": 0.0,
+                      "total_cost": 18.0
+                    }
+                  }
+                }
+              },
+              "inner": {
+                "node": "SeqScan",
+                "relid": "c",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 18.0
+              }
+            }
+          },
+          {
+            "node": "NestLoop",
+            "relid": "a b c",
+            "rows": 2325,
+            "startup_cost": 0.29,
+            "total_cost": 15324.41,
+            "join": {
+              "clauses": "",
+              "outer": {
+                "node": "NestLoop",
+                "relid": "b c",
+                "rows": 1518,
+                "startup_cost": 0.0,
+                "total_cost": 15038.5,
+                "join": {
+                  "clauses": "b.int4 = c.int4",
+                  "outer": {
+                    "node": "SeqScan",
+                    "relid": "b",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 18.0
+                  },
+                  "inner": {
+                    "node": "Material",
+                    "relid": "c",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 23.0,
+                    "sub": {
+                      "node": "SeqScan",
+                      "relid": "c",
+                      "rows": 1000,
+                      "startup_cost": 0.0,
+                      "total_cost": 18.0
+                    }
+                  }
+                }
+              },
+              "inner": {
+                "node": "Memoize",
+                "relid": "a",
+                "ro_relid": "b",
+                "rows": 2,
+                "startup_cost": 0.29,
+                "total_cost": 0.37,
+                "pathkeys": "((a.int4, b.int4, c.int4, d.int4))",
+                "sub": {
+                  "node": "IdxScan",
+                  "relid": "a",
+                  "ro_relid": "b",
+                  "rows": 2,
+                  "startup_cost": 0.28,
+                  "total_cost": 0.36,
+                  "pathkeys": "((a.int4, b.int4, c.int4, d.int4))"
+                }
+              }
+            }
+          },
+          {
+            "node": "NestLoop",
+            "relid": "a b c",
+            "rows": 2325,
+            "startup_cost": 0.28,
+            "total_cost": 15618.38,
+            "join": {
+              "clauses": "",
+              "outer": {
+                "node": "NestLoop",
+                "relid": "b c",
+                "rows": 1518,
+                "startup_cost": 0.0,
+                "total_cost": 15038.5,
+                "join": {
+                  "clauses": "b.int4 = c.int4",
+                  "outer": {
+                    "node": "SeqScan",
+                    "relid": "b",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 18.0
+                  },
+                  "inner": {
+                    "node": "Material",
+                    "relid": "c",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 23.0,
+                    "sub": {
+                      "node": "SeqScan",
+                      "relid": "c",
+                      "rows": 1000,
+                      "startup_cost": 0.0,
+                      "total_cost": 18.0
+                    }
+                  }
+                }
+              },
+              "inner": {
+                "node": "IdxScan",
+                "relid": "a",
+                "ro_relid": "b",
+                "rows": 2,
+                "startup_cost": 0.28,
+                "total_cost": 0.36,
+                "pathkeys": "((a.int4, b.int4, c.int4, d.int4))"
+              }
+            }
+          },
+          {
+            "node": "NestLoop",
+            "relid": "a b c",
+            "rows": 2325,
+            "startup_cost": 30.77,
+            "total_cost": 22913.17,
+            "pathkeys": "((a.int4, b.int4, c.int4, d.int4))",
+            "join": {
+              "clauses": "a.int4 = b.int4",
+              "outer": {
+                "node": "IdxScan",
+                "relid": "a",
+                "rows": 1000,
+                "startup_cost": 0.28,
+                "total_cost": 66.94,
+                "pathkeys": "((a.int4, b.int4, c.int4, d.int4))"
+              },
+              "inner": {
+                "node": "Material",
+                "relid": "b c",
+                "rows": 1518,
+                "startup_cost": 30.5,
+                "total_cost": 80.02,
+                "sub": {
+                  "node": "HashJoin",
+                  "relid": "b c",
+                  "rows": 1518,
+                  "startup_cost": 30.5,
+                  "total_cost": 72.43,
+                  "join": {
+                    "clauses": "b.int4 = c.int4",
+                    "outer": {
+                      "node": "SeqScan",
+                      "relid": "b",
+                      "rows": 1000,
+                      "startup_cost": 0.0,
+                      "total_cost": 18.0
+                    },
+                    "inner": {
+                      "node": "SeqScan",
+                      "relid": "c",
+                      "rows": 1000,
+                      "startup_cost": 0.0,
+                      "total_cost": 18.0
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "node": "NestLoop",
+            "relid": "a b c",
+            "rows": 2325,
+            "startup_cost": 0.0,
+            "total_cost": 37664.0,
+            "join": {
+              "clauses": "a.int4 = b.int4",
+              "outer": {
+                "node": "NestLoop",
+                "relid": "a c",
+                "rows": 1507,
+                "startup_cost": 0.0,
+                "total_cost": 15038.5,
+                "join": {
+                  "clauses": "a.int4 = c.int4",
+                  "outer": {
+                    "node": "SeqScan",
+                    "relid": "a",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 18.0
+                  },
+                  "inner": {
+                    "node": "Material",
+                    "relid": "c",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 23.0,
+                    "sub": {
+                      "node": "SeqScan",
+                      "relid": "c",
+                      "rows": 1000,
+                      "startup_cost": 0.0,
+                      "total_cost": 18.0
+                    }
+                  }
+                }
+              },
+              "inner": {
+                "node": "Material",
+                "relid": "b",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 23.0,
+                "sub": {
+                  "node": "SeqScan",
+                  "relid": "b",
+                  "rows": 1000,
+                  "startup_cost": 0.0,
+                  "total_cost": 18.0
+                }
+              }
+            }
+          },
+          {
+            "node": "NestLoop",
+            "relid": "a b c",
+            "rows": 2325,
+            "startup_cost": 0.28,
+            "total_cost": 37712.94,
+            "pathkeys": "((a.int4, b.int4, c.int4, d.int4))",
+            "join": {
+              "clauses": "a.int4 = b.int4",
+              "outer": {
+                "node": "NestLoop",
+                "relid": "a c",
+                "rows": 1507,
+                "startup_cost": 0.28,
+                "total_cost": 15087.44,
+                "pathkeys": "((a.int4, b.int4, c.int4, d.int4))",
+                "join": {
+                  "clauses": "a.int4 = c.int4",
+                  "outer": {
+                    "node": "IdxScan",
+                    "relid": "a",
+                    "rows": 1000,
+                    "startup_cost": 0.28,
+                    "total_cost": 66.94,
+                    "pathkeys": "((a.int4, b.int4, c.int4, d.int4))"
+                  },
+                  "inner": {
+                    "node": "Material",
+                    "relid": "c",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 23.0,
+                    "sub": {
+                      "node": "SeqScan",
+                      "relid": "c",
+                      "rows": 1000,
+                      "startup_cost": 0.0,
+                      "total_cost": 18.0
+                    }
+                  }
+                }
+              },
+              "inner": {
+                "node": "Material",
+                "relid": "b",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 23.0,
+                "sub": {
+                  "node": "SeqScan",
+                  "relid": "b",
+                  "rows": 1000,
+                  "startup_cost": 0.0,
+                  "total_cost": 18.0
+                }
+              }
+            }
+          }
+        ],
+        "cheapest_param_paths": [
+          {
+            "node": "HashJoin",
+            "relid": "a b c",
+            "rows": 2325,
+            "startup_cost": 61.0,
+            "total_cost": 139.63,
+            "join": {
+              "clauses": "a.int4 = b.int4",
+              "outer": {
+                "node": "HashJoin",
+                "relid": "b c",
+                "rows": 1518,
+                "startup_cost": 30.5,
+                "total_cost": 72.43,
+                "join": {
+                  "clauses": "b.int4 = c.int4",
+                  "outer": {
+                    "node": "SeqScan",
+                    "relid": "b",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 18.0
+                  },
+                  "inner": {
+                    "node": "SeqScan",
+                    "relid": "c",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 18.0
+                  }
+                }
+              },
+              "inner": {
+                "node": "SeqScan",
+                "relid": "a",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 18.0
+              }
+            }
+          }
+        ],
+        "cheapest_startup_paths": {
+          "node": "NestLoop",
+          "relid": "a b c",
+          "rows": 2325,
+          "startup_cost": 0.0,
+          "total_cost": 37664.0,
+          "join": {
+            "clauses": "a.int4 = b.int4",
+            "outer": {
+              "node": "NestLoop",
+              "relid": "a c",
+              "rows": 1507,
+              "startup_cost": 0.0,
+              "total_cost": 15038.5,
+              "join": {
+                "clauses": "a.int4 = c.int4",
+                "outer": {
+                  "node": "SeqScan",
+                  "relid": "a",
+                  "rows": 1000,
+                  "startup_cost": 0.0,
+                  "total_cost": 18.0
+                },
+                "inner": {
+                  "node": "Material",
+                  "relid": "c",
+                  "rows": 1000,
+                  "startup_cost": 0.0,
+                  "total_cost": 23.0,
+                  "sub": {
+                    "node": "SeqScan",
+                    "relid": "c",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 18.0
+                  }
+                }
+              }
+            },
+            "inner": {
+              "node": "Material",
+              "relid": "b",
+              "rows": 1000,
+              "startup_cost": 0.0,
+              "total_cost": 23.0,
+              "sub": {
+                "node": "SeqScan",
+                "relid": "b",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 18.0
+              }
+            }
+          }
+        },
+        "cheapest_total_paths": {
+          "node": "HashJoin",
+          "relid": "a b c",
+          "rows": 2325,
+          "startup_cost": 61.0,
+          "total_cost": 139.63,
+          "join": {
+            "clauses": "a.int4 = b.int4",
+            "outer": {
+              "node": "HashJoin",
+              "relid": "b c",
+              "rows": 1518,
+              "startup_cost": 30.5,
+              "total_cost": 72.43,
+              "join": {
+                "clauses": "b.int4 = c.int4",
+                "outer": {
+                  "node": "SeqScan",
+                  "relid": "b",
+                  "rows": 1000,
+                  "startup_cost": 0.0,
+                  "total_cost": 18.0
+                },
+                "inner": {
+                  "node": "SeqScan",
+                  "relid": "c",
+                  "rows": 1000,
+                  "startup_cost": 0.0,
+                  "total_cost": 18.0
+                }
+              }
+            },
+            "inner": {
+              "node": "SeqScan",
+              "relid": "a",
+              "rows": 1000,
+              "startup_cost": 0.0,
+              "total_cost": 18.0
+            }
+          }
+        }
+      },
+      {
+        "relid": "a b d",
+        "rows": 2328,
+        "width": 12,
+        "paths": [
+          {
+            "node": "HashJoin",
+            "relid": "a b d",
+            "rows": 2328,
+            "startup_cost": 61.0,
+            "total_cost": 139.22,
+            "join": {
+              "clauses": "a.int4 = b.int4",
+              "outer": {
+                "node": "HashJoin",
+                "relid": "b d",
+                "rows": 1506,
+                "startup_cost": 30.5,
+                "total_cost": 72.31,
+                "join": {
+                  "clauses": "b.int4 = d.int4",
+                  "outer": {
+                    "node": "SeqScan",
+                    "relid": "b",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 18.0
+                  },
+                  "inner": {
+                    "node": "SeqScan",
+                    "relid": "d",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 18.0
+                  }
+                }
+              },
+              "inner": {
+                "node": "SeqScan",
+                "relid": "a",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 18.0
+              }
+            }
+          },
+          {
+            "node": "MergeJoin",
+            "relid": "a b d",
+            "rows": 2328,
+            "startup_cost": 152.08,
+            "total_cost": 256.09,
+            "pathkeys": "((a.int4, b.int4, c.int4, d.int4))",
+            "join": {
+              "clauses": "a.int4 = b.int4",
+              "mergejoin_info": {
+                "outerkeys_exist": "0",
+                "innerkeys_exist": "1",
+                "m_inner_exist": "0"
+              },
+              "outer": {
+                "node": "IdxScan",
+                "relid": "a",
+                "rows": 1000,
+                "startup_cost": 0.28,
+                "total_cost": 66.94,
+                "pathkeys": "((a.int4, b.int4, c.int4, d.int4))"
+              },
+              "inner": {
+                "node": "HashJoin",
+                "relid": "b d",
+                "rows": 1506,
+                "startup_cost": 30.5,
+                "total_cost": 72.31,
+                "join": {
+                  "clauses": "b.int4 = d.int4",
+                  "outer": {
+                    "node": "SeqScan",
+                    "relid": "b",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 18.0
+                  },
+                  "inner": {
+                    "node": "SeqScan",
+                    "relid": "d",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 18.0
+                  }
+                }
+              }
+            }
+          },
+          {
+            "node": "MergeJoin",
+            "relid": "a b d",
+            "rows": 2328,
+            "startup_cost": 135.93,
+            "total_cost": 266.43,
+            "pathkeys": "((a.int4, b.int4, c.int4, d.int4))",
+            "join": {
+              "clauses": "a.int4 = b.int4",
+              "mergejoin_info": {
+                "outerkeys_exist": "0",
+                "innerkeys_exist": "1",
+                "m_inner_exist": "0"
+              },
+              "outer": {
+                "node": "MergeJoin",
+                "relid": "a d",
+                "rows": 1509,
+                "startup_cost": 68.1,
+                "total_cost": 159.91,
+                "pathkeys": "((a.int4, b.int4, c.int4, d.int4))",
+                "join": {
+                  "clauses": "a.int4 = d.int4",
+                  "mergejoin_info": {
+                    "outerkeys_exist": "0",
+                    "innerkeys_exist": "1",
+                    "m_inner_exist": "0"
+                  },
+                  "outer": {
+                    "node": "IdxScan",
+                    "relid": "a",
+                    "rows": 1000,
+                    "startup_cost": 0.28,
+                    "total_cost": 66.94,
+                    "pathkeys": "((a.int4, b.int4, c.int4, d.int4))"
+                  },
+                  "inner": {
+                    "node": "SeqScan",
+                    "relid": "d",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 18.0
+                  }
+                }
+              },
+              "inner": {
+                "node": "SeqScan",
+                "relid": "b",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 18.0
+              }
+            }
+          },
+          {
+            "node": "NestLoop",
+            "relid": "a b d",
+            "rows": 2328,
+            "startup_cost": 30.79,
+            "total_cost": 357.77,
+            "join": {
+              "clauses": "",
+              "outer": {
+                "node": "HashJoin",
+                "relid": "b d",
+                "rows": 1506,
+                "startup_cost": 30.5,
+                "total_cost": 72.31,
+                "join": {
+                  "clauses": "b.int4 = d.int4",
+                  "outer": {
+                    "node": "SeqScan",
+                    "relid": "b",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 18.0
+                  },
+                  "inner": {
+                    "node": "SeqScan",
+                    "relid": "d",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 18.0
+                  }
+                }
+              },
+              "inner": {
+                "node": "Memoize",
+                "relid": "a",
+                "ro_relid": "b",
+                "rows": 2,
+                "startup_cost": 0.29,
+                "total_cost": 0.37,
+                "pathkeys": "((a.int4, b.int4, c.int4, d.int4))",
+                "sub": {
+                  "node": "IdxScan",
+                  "relid": "a",
+                  "ro_relid": "b",
+                  "rows": 2,
+                  "startup_cost": 0.28,
+                  "total_cost": 0.36,
+                  "pathkeys": "((a.int4, b.int4, c.int4, d.int4))"
+                }
+              }
+            }
+          },
+          {
+            "node": "MergeJoin",
+            "relid": "a b d",
+            "rows": 2328,
+            "startup_cost": 68.1,
+            "total_cost": 15193.96,
+            "pathkeys": "((a.int4, b.int4, c.int4, d.int4))",
+            "join": {
+              "clauses": "a.int4 = b.int4",
+              "mergejoin_info": {
+                "outerkeys_exist": "0",
+                "innerkeys_exist": "1",
+                "m_inner_exist": "0"
+              },
+              "outer": {
+                "node": "NestLoop",
+                "relid": "a d",
+                "rows": 1509,
+                "startup_cost": 0.28,
+                "total_cost": 15087.44,
+                "pathkeys": "((a.int4, b.int4, c.int4, d.int4))",
+                "join": {
+                  "clauses": "a.int4 = d.int4",
+                  "outer": {
+                    "node": "IdxScan",
+                    "relid": "a",
+                    "rows": 1000,
+                    "startup_cost": 0.28,
+                    "total_cost": 66.94,
+                    "pathkeys": "((a.int4, b.int4, c.int4, d.int4))"
+                  },
+                  "inner": {
+                    "node": "Material",
+                    "relid": "d",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 23.0,
+                    "sub": {
+                      "node": "SeqScan",
+                      "relid": "d",
+                      "rows": 1000,
+                      "startup_cost": 0.0,
+                      "total_cost": 18.0
+                    }
+                  }
+                }
+              },
+              "inner": {
+                "node": "SeqScan",
+                "relid": "b",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 18.0
+              }
+            }
+          },
+          {
+            "node": "NestLoop",
+            "relid": "a b d",
+            "rows": 2328,
+            "startup_cost": 0.29,
+            "total_cost": 15323.96,
+            "join": {
+              "clauses": "",
+              "outer": {
+                "node": "NestLoop",
+                "relid": "b d",
+                "rows": 1506,
+                "startup_cost": 0.0,
+                "total_cost": 15038.5,
+                "join": {
+                  "clauses": "b.int4 = d.int4",
+                  "outer": {
+                    "node": "SeqScan",
+                    "relid": "b",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 18.0
+                  },
+                  "inner": {
+                    "node": "Material",
+                    "relid": "d",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 23.0,
+                    "sub": {
+                      "node": "SeqScan",
+                      "relid": "d",
+                      "rows": 1000,
+                      "startup_cost": 0.0,
+                      "total_cost": 18.0
+                    }
+                  }
+                }
+              },
+              "inner": {
+                "node": "Memoize",
+                "relid": "a",
+                "ro_relid": "b",
+                "rows": 2,
+                "startup_cost": 0.29,
+                "total_cost": 0.37,
+                "pathkeys": "((a.int4, b.int4, c.int4, d.int4))",
+                "sub": {
+                  "node": "IdxScan",
+                  "relid": "a",
+                  "ro_relid": "b",
+                  "rows": 2,
+                  "startup_cost": 0.28,
+                  "total_cost": 0.36,
+                  "pathkeys": "((a.int4, b.int4, c.int4, d.int4))"
+                }
+              }
+            }
+          },
+          {
+            "node": "NestLoop",
+            "relid": "a b d",
+            "rows": 2328,
+            "startup_cost": 0.28,
+            "total_cost": 15613.79,
+            "join": {
+              "clauses": "",
+              "outer": {
+                "node": "NestLoop",
+                "relid": "b d",
+                "rows": 1506,
+                "startup_cost": 0.0,
+                "total_cost": 15038.5,
+                "join": {
+                  "clauses": "b.int4 = d.int4",
+                  "outer": {
+                    "node": "SeqScan",
+                    "relid": "b",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 18.0
+                  },
+                  "inner": {
+                    "node": "Material",
+                    "relid": "d",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 23.0,
+                    "sub": {
+                      "node": "SeqScan",
+                      "relid": "d",
+                      "rows": 1000,
+                      "startup_cost": 0.0,
+                      "total_cost": 18.0
+                    }
+                  }
+                }
+              },
+              "inner": {
+                "node": "IdxScan",
+                "relid": "a",
+                "ro_relid": "b",
+                "rows": 2,
+                "startup_cost": 0.28,
+                "total_cost": 0.36,
+                "pathkeys": "((a.int4, b.int4, c.int4, d.int4))"
+              }
+            }
+          },
+          {
+            "node": "NestLoop",
+            "relid": "a b d",
+            "rows": 2328,
+            "startup_cost": 30.77,
+            "total_cost": 22733.02,
+            "pathkeys": "((a.int4, b.int4, c.int4, d.int4))",
+            "join": {
+              "clauses": "a.int4 = b.int4",
+              "outer": {
+                "node": "IdxScan",
+                "relid": "a",
+                "rows": 1000,
+                "startup_cost": 0.28,
+                "total_cost": 66.94,
+                "pathkeys": "((a.int4, b.int4, c.int4, d.int4))"
+              },
+              "inner": {
+                "node": "Material",
+                "relid": "b d",
+                "rows": 1506,
+                "startup_cost": 30.5,
+                "total_cost": 79.84,
+                "sub": {
+                  "node": "HashJoin",
+                  "relid": "b d",
+                  "rows": 1506,
+                  "startup_cost": 30.5,
+                  "total_cost": 72.31,
+                  "join": {
+                    "clauses": "b.int4 = d.int4",
+                    "outer": {
+                      "node": "SeqScan",
+                      "relid": "b",
+                      "rows": 1000,
+                      "startup_cost": 0.0,
+                      "total_cost": 18.0
+                    },
+                    "inner": {
+                      "node": "SeqScan",
+                      "relid": "d",
+                      "rows": 1000,
+                      "startup_cost": 0.0,
+                      "total_cost": 18.0
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "node": "NestLoop",
+            "relid": "a b d",
+            "rows": 2328,
+            "startup_cost": 0.0,
+            "total_cost": 37649.0,
+            "join": {
+              "clauses": "a.int4 = b.int4",
+              "outer": {
+                "node": "NestLoop",
+                "relid": "b d",
+                "rows": 1506,
+                "startup_cost": 0.0,
+                "total_cost": 15038.5,
+                "join": {
+                  "clauses": "b.int4 = d.int4",
+                  "outer": {
+                    "node": "SeqScan",
+                    "relid": "b",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 18.0
+                  },
+                  "inner": {
+                    "node": "Material",
+                    "relid": "d",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 23.0,
+                    "sub": {
+                      "node": "SeqScan",
+                      "relid": "d",
+                      "rows": 1000,
+                      "startup_cost": 0.0,
+                      "total_cost": 18.0
+                    }
+                  }
+                }
+              },
+              "inner": {
+                "node": "Material",
+                "relid": "a",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 23.0,
+                "sub": {
+                  "node": "SeqScan",
+                  "relid": "a",
+                  "rows": 1000,
+                  "startup_cost": 0.0,
+                  "total_cost": 18.0
+                }
+              }
+            }
+          },
+          {
+            "node": "NestLoop",
+            "relid": "a b d",
+            "rows": 2328,
+            "startup_cost": 0.28,
+            "total_cost": 37742.94,
+            "pathkeys": "((a.int4, b.int4, c.int4, d.int4))",
+            "join": {
+              "clauses": "a.int4 = b.int4",
+              "outer": {
+                "node": "NestLoop",
+                "relid": "a d",
+                "rows": 1509,
+                "startup_cost": 0.28,
+                "total_cost": 15087.44,
+                "pathkeys": "((a.int4, b.int4, c.int4, d.int4))",
+                "join": {
+                  "clauses": "a.int4 = d.int4",
+                  "outer": {
+                    "node": "IdxScan",
+                    "relid": "a",
+                    "rows": 1000,
+                    "startup_cost": 0.28,
+                    "total_cost": 66.94,
+                    "pathkeys": "((a.int4, b.int4, c.int4, d.int4))"
+                  },
+                  "inner": {
+                    "node": "Material",
+                    "relid": "d",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 23.0,
+                    "sub": {
+                      "node": "SeqScan",
+                      "relid": "d",
+                      "rows": 1000,
+                      "startup_cost": 0.0,
+                      "total_cost": 18.0
+                    }
+                  }
+                }
+              },
+              "inner": {
+                "node": "Material",
+                "relid": "b",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 23.0,
+                "sub": {
+                  "node": "SeqScan",
+                  "relid": "b",
+                  "rows": 1000,
+                  "startup_cost": 0.0,
+                  "total_cost": 18.0
+                }
+              }
+            }
+          }
+        ],
+        "cheapest_param_paths": [
+          {
+            "node": "HashJoin",
+            "relid": "a b d",
+            "rows": 2328,
+            "startup_cost": 61.0,
+            "total_cost": 139.22,
+            "join": {
+              "clauses": "a.int4 = b.int4",
+              "outer": {
+                "node": "HashJoin",
+                "relid": "b d",
+                "rows": 1506,
+                "startup_cost": 30.5,
+                "total_cost": 72.31,
+                "join": {
+                  "clauses": "b.int4 = d.int4",
+                  "outer": {
+                    "node": "SeqScan",
+                    "relid": "b",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 18.0
+                  },
+                  "inner": {
+                    "node": "SeqScan",
+                    "relid": "d",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 18.0
+                  }
+                }
+              },
+              "inner": {
+                "node": "SeqScan",
+                "relid": "a",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 18.0
+              }
+            }
+          }
+        ],
+        "cheapest_startup_paths": {
+          "node": "NestLoop",
+          "relid": "a b d",
+          "rows": 2328,
+          "startup_cost": 0.0,
+          "total_cost": 37649.0,
+          "join": {
+            "clauses": "a.int4 = b.int4",
+            "outer": {
+              "node": "NestLoop",
+              "relid": "b d",
+              "rows": 1506,
+              "startup_cost": 0.0,
+              "total_cost": 15038.5,
+              "join": {
+                "clauses": "b.int4 = d.int4",
+                "outer": {
+                  "node": "SeqScan",
+                  "relid": "b",
+                  "rows": 1000,
+                  "startup_cost": 0.0,
+                  "total_cost": 18.0
+                },
+                "inner": {
+                  "node": "Material",
+                  "relid": "d",
+                  "rows": 1000,
+                  "startup_cost": 0.0,
+                  "total_cost": 23.0,
+                  "sub": {
+                    "node": "SeqScan",
+                    "relid": "d",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 18.0
+                  }
+                }
+              }
+            },
+            "inner": {
+              "node": "Material",
+              "relid": "a",
+              "rows": 1000,
+              "startup_cost": 0.0,
+              "total_cost": 23.0,
+              "sub": {
+                "node": "SeqScan",
+                "relid": "a",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 18.0
+              }
+            }
+          }
+        },
+        "cheapest_total_paths": {
+          "node": "HashJoin",
+          "relid": "a b d",
+          "rows": 2328,
+          "startup_cost": 61.0,
+          "total_cost": 139.22,
+          "join": {
+            "clauses": "a.int4 = b.int4",
+            "outer": {
+              "node": "HashJoin",
+              "relid": "b d",
+              "rows": 1506,
+              "startup_cost": 30.5,
+              "total_cost": 72.31,
+              "join": {
+                "clauses": "b.int4 = d.int4",
+                "outer": {
+                  "node": "SeqScan",
+                  "relid": "b",
+                  "rows": 1000,
+                  "startup_cost": 0.0,
+                  "total_cost": 18.0
+                },
+                "inner": {
+                  "node": "SeqScan",
+                  "relid": "d",
+                  "rows": 1000,
+                  "startup_cost": 0.0,
+                  "total_cost": 18.0
+                }
+              }
+            },
+            "inner": {
+              "node": "SeqScan",
+              "relid": "a",
+              "rows": 1000,
+              "startup_cost": 0.0,
+              "total_cost": 18.0
+            }
+          }
+        }
+      },
+      {
+        "relid": "a c d",
+        "rows": 2273,
+        "width": 12,
+        "paths": [
+          {
+            "node": "HashJoin",
+            "relid": "a c d",
+            "rows": 2273,
+            "startup_cost": 61.0,
+            "total_cost": 138.57,
+            "join": {
+              "clauses": "a.int4 = c.int4",
+              "outer": {
+                "node": "HashJoin",
+                "relid": "c d",
+                "rows": 1503,
+                "startup_cost": 30.5,
+                "total_cost": 72.28,
+                "join": {
+                  "clauses": "c.int4 = d.int4",
+                  "outer": {
+                    "node": "SeqScan",
+                    "relid": "c",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 18.0
+                  },
+                  "inner": {
+                    "node": "SeqScan",
+                    "relid": "d",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 18.0
+                  }
+                }
+              },
+              "inner": {
+                "node": "SeqScan",
+                "relid": "a",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 18.0
+              }
+            }
+          },
+          {
+            "node": "MergeJoin",
+            "relid": "a c d",
+            "rows": 2273,
+            "startup_cost": 151.89,
+            "total_cost": 254.78,
+            "pathkeys": "((a.int4, b.int4, c.int4, d.int4))",
+            "join": {
+              "clauses": "a.int4 = c.int4",
+              "mergejoin_info": {
+                "outerkeys_exist": "0",
+                "innerkeys_exist": "1",
+                "m_inner_exist": "0"
+              },
+              "outer": {
+                "node": "IdxScan",
+                "relid": "a",
+                "rows": 1000,
+                "startup_cost": 0.28,
+                "total_cost": 66.94,
+                "pathkeys": "((a.int4, b.int4, c.int4, d.int4))"
+              },
+              "inner": {
+                "node": "HashJoin",
+                "relid": "c d",
+                "rows": 1503,
+                "startup_cost": 30.5,
+                "total_cost": 72.28,
+                "join": {
+                  "clauses": "c.int4 = d.int4",
+                  "outer": {
+                    "node": "SeqScan",
+                    "relid": "c",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 18.0
+                  },
+                  "inner": {
+                    "node": "SeqScan",
+                    "relid": "d",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 18.0
+                  }
+                }
+              }
+            }
+          },
+          {
+            "node": "MergeJoin",
+            "relid": "a c d",
+            "rows": 2273,
+            "startup_cost": 135.95,
+            "total_cost": 265.36,
+            "pathkeys": "((a.int4, b.int4, c.int4, d.int4))",
+            "join": {
+              "clauses": "a.int4 = d.int4",
+              "mergejoin_info": {
+                "outerkeys_exist": "0",
+                "innerkeys_exist": "1",
+                "m_inner_exist": "0"
+              },
+              "outer": {
+                "node": "MergeJoin",
+                "relid": "a c",
+                "rows": 1507,
+                "startup_cost": 68.12,
+                "total_cost": 159.67,
+                "pathkeys": "((a.int4, b.int4, c.int4, d.int4))",
+                "join": {
+                  "clauses": "a.int4 = c.int4",
+                  "mergejoin_info": {
+                    "outerkeys_exist": "0",
+                    "innerkeys_exist": "1",
+                    "m_inner_exist": "0"
+                  },
+                  "outer": {
+                    "node": "IdxScan",
+                    "relid": "a",
+                    "rows": 1000,
+                    "startup_cost": 0.28,
+                    "total_cost": 66.94,
+                    "pathkeys": "((a.int4, b.int4, c.int4, d.int4))"
+                  },
+                  "inner": {
+                    "node": "SeqScan",
+                    "relid": "c",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 18.0
+                  }
+                }
+              },
+              "inner": {
+                "node": "SeqScan",
+                "relid": "d",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 18.0
+              }
+            }
+          },
+          {
+            "node": "NestLoop",
+            "relid": "a c d",
+            "rows": 2273,
+            "startup_cost": 30.79,
+            "total_cost": 360.16,
+            "join": {
+              "clauses": "",
+              "outer": {
+                "node": "HashJoin",
+                "relid": "c d",
+                "rows": 1503,
+                "startup_cost": 30.5,
+                "total_cost": 72.28,
+                "join": {
+                  "clauses": "c.int4 = d.int4",
+                  "outer": {
+                    "node": "SeqScan",
+                    "relid": "c",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 18.0
+                  },
+                  "inner": {
+                    "node": "SeqScan",
+                    "relid": "d",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 18.0
+                  }
+                }
+              },
+              "inner": {
+                "node": "Memoize",
+                "relid": "a",
+                "ro_relid": "c",
+                "rows": 2,
+                "startup_cost": 0.29,
+                "total_cost": 0.37,
+                "pathkeys": "((a.int4, b.int4, c.int4, d.int4))",
+                "sub": {
+                  "node": "IdxScan",
+                  "relid": "a",
+                  "ro_relid": "c",
+                  "rows": 2,
+                  "startup_cost": 0.28,
+                  "total_cost": 0.36,
+                  "pathkeys": "((a.int4, b.int4, c.int4, d.int4))"
+                }
+              }
+            }
+          },
+          {
+            "node": "MergeJoin",
+            "relid": "a c d",
+            "rows": 2273,
+            "startup_cost": 68.1,
+            "total_cost": 15193.13,
+            "pathkeys": "((a.int4, b.int4, c.int4, d.int4))",
+            "join": {
+              "clauses": "a.int4 = d.int4",
+              "mergejoin_info": {
+                "outerkeys_exist": "0",
+                "innerkeys_exist": "1",
+                "m_inner_exist": "0"
+              },
+              "outer": {
+                "node": "NestLoop",
+                "relid": "a c",
+                "rows": 1507,
+                "startup_cost": 0.28,
+                "total_cost": 15087.44,
+                "pathkeys": "((a.int4, b.int4, c.int4, d.int4))",
+                "join": {
+                  "clauses": "a.int4 = c.int4",
+                  "outer": {
+                    "node": "IdxScan",
+                    "relid": "a",
+                    "rows": 1000,
+                    "startup_cost": 0.28,
+                    "total_cost": 66.94,
+                    "pathkeys": "((a.int4, b.int4, c.int4, d.int4))"
+                  },
+                  "inner": {
+                    "node": "Material",
+                    "relid": "c",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 23.0,
+                    "sub": {
+                      "node": "SeqScan",
+                      "relid": "c",
+                      "rows": 1000,
+                      "startup_cost": 0.0,
+                      "total_cost": 18.0
+                    }
+                  }
+                }
+              },
+              "inner": {
+                "node": "SeqScan",
+                "relid": "d",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 18.0
+              }
+            }
+          },
+          {
+            "node": "NestLoop",
+            "relid": "a c d",
+            "rows": 2273,
+            "startup_cost": 0.29,
+            "total_cost": 15326.38,
+            "join": {
+              "clauses": "",
+              "outer": {
+                "node": "NestLoop",
+                "relid": "c d",
+                "rows": 1503,
+                "startup_cost": 0.0,
+                "total_cost": 15038.5,
+                "join": {
+                  "clauses": "c.int4 = d.int4",
+                  "outer": {
+                    "node": "SeqScan",
+                    "relid": "c",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 18.0
+                  },
+                  "inner": {
+                    "node": "Material",
+                    "relid": "d",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 23.0,
+                    "sub": {
+                      "node": "SeqScan",
+                      "relid": "d",
+                      "rows": 1000,
+                      "startup_cost": 0.0,
+                      "total_cost": 18.0
+                    }
+                  }
+                }
+              },
+              "inner": {
+                "node": "Memoize",
+                "relid": "a",
+                "ro_relid": "c",
+                "rows": 2,
+                "startup_cost": 0.29,
+                "total_cost": 0.37,
+                "pathkeys": "((a.int4, b.int4, c.int4, d.int4))",
+                "sub": {
+                  "node": "IdxScan",
+                  "relid": "a",
+                  "ro_relid": "c",
+                  "rows": 2,
+                  "startup_cost": 0.28,
+                  "total_cost": 0.36,
+                  "pathkeys": "((a.int4, b.int4, c.int4, d.int4))"
+                }
+              }
+            }
+          },
+          {
+            "node": "NestLoop",
+            "relid": "a c d",
+            "rows": 2273,
+            "startup_cost": 0.28,
+            "total_cost": 15612.65,
+            "join": {
+              "clauses": "",
+              "outer": {
+                "node": "NestLoop",
+                "relid": "c d",
+                "rows": 1503,
+                "startup_cost": 0.0,
+                "total_cost": 15038.5,
+                "join": {
+                  "clauses": "c.int4 = d.int4",
+                  "outer": {
+                    "node": "SeqScan",
+                    "relid": "c",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 18.0
+                  },
+                  "inner": {
+                    "node": "Material",
+                    "relid": "d",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 23.0,
+                    "sub": {
+                      "node": "SeqScan",
+                      "relid": "d",
+                      "rows": 1000,
+                      "startup_cost": 0.0,
+                      "total_cost": 18.0
+                    }
+                  }
+                }
+              },
+              "inner": {
+                "node": "IdxScan",
+                "relid": "a",
+                "ro_relid": "c",
+                "rows": 2,
+                "startup_cost": 0.28,
+                "total_cost": 0.36,
+                "pathkeys": "((a.int4, b.int4, c.int4, d.int4))"
+              }
+            }
+          },
+          {
+            "node": "NestLoop",
+            "relid": "a c d",
+            "rows": 2273,
+            "startup_cost": 30.77,
+            "total_cost": 22687.98,
+            "pathkeys": "((a.int4, b.int4, c.int4, d.int4))",
+            "join": {
+              "clauses": "a.int4 = c.int4",
+              "outer": {
+                "node": "IdxScan",
+                "relid": "a",
+                "rows": 1000,
+                "startup_cost": 0.28,
+                "total_cost": 66.94,
+                "pathkeys": "((a.int4, b.int4, c.int4, d.int4))"
+              },
+              "inner": {
+                "node": "Material",
+                "relid": "c d",
+                "rows": 1503,
+                "startup_cost": 30.5,
+                "total_cost": 79.8,
+                "sub": {
+                  "node": "HashJoin",
+                  "relid": "c d",
+                  "rows": 1503,
+                  "startup_cost": 30.5,
+                  "total_cost": 72.28,
+                  "join": {
+                    "clauses": "c.int4 = d.int4",
+                    "outer": {
+                      "node": "SeqScan",
+                      "relid": "c",
+                      "rows": 1000,
+                      "startup_cost": 0.0,
+                      "total_cost": 18.0
+                    },
+                    "inner": {
+                      "node": "SeqScan",
+                      "relid": "d",
+                      "rows": 1000,
+                      "startup_cost": 0.0,
+                      "total_cost": 18.0
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "node": "NestLoop",
+            "relid": "a c d",
+            "rows": 2273,
+            "startup_cost": 0.0,
+            "total_cost": 37604.0,
+            "join": {
+              "clauses": "a.int4 = c.int4",
+              "outer": {
+                "node": "NestLoop",
+                "relid": "c d",
+                "rows": 1503,
+                "startup_cost": 0.0,
+                "total_cost": 15038.5,
+                "join": {
+                  "clauses": "c.int4 = d.int4",
+                  "outer": {
+                    "node": "SeqScan",
+                    "relid": "c",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 18.0
+                  },
+                  "inner": {
+                    "node": "Material",
+                    "relid": "d",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 23.0,
+                    "sub": {
+                      "node": "SeqScan",
+                      "relid": "d",
+                      "rows": 1000,
+                      "startup_cost": 0.0,
+                      "total_cost": 18.0
+                    }
+                  }
+                }
+              },
+              "inner": {
+                "node": "Material",
+                "relid": "a",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 23.0,
+                "sub": {
+                  "node": "SeqScan",
+                  "relid": "a",
+                  "rows": 1000,
+                  "startup_cost": 0.0,
+                  "total_cost": 18.0
+                }
+              }
+            }
+          },
+          {
+            "node": "NestLoop",
+            "relid": "a c d",
+            "rows": 2273,
+            "startup_cost": 0.28,
+            "total_cost": 37712.94,
+            "pathkeys": "((a.int4, b.int4, c.int4, d.int4))",
+            "join": {
+              "clauses": "a.int4 = d.int4",
+              "outer": {
+                "node": "NestLoop",
+                "relid": "a c",
+                "rows": 1507,
+                "startup_cost": 0.28,
+                "total_cost": 15087.44,
+                "pathkeys": "((a.int4, b.int4, c.int4, d.int4))",
+                "join": {
+                  "clauses": "a.int4 = c.int4",
+                  "outer": {
+                    "node": "IdxScan",
+                    "relid": "a",
+                    "rows": 1000,
+                    "startup_cost": 0.28,
+                    "total_cost": 66.94,
+                    "pathkeys": "((a.int4, b.int4, c.int4, d.int4))"
+                  },
+                  "inner": {
+                    "node": "Material",
+                    "relid": "c",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 23.0,
+                    "sub": {
+                      "node": "SeqScan",
+                      "relid": "c",
+                      "rows": 1000,
+                      "startup_cost": 0.0,
+                      "total_cost": 18.0
+                    }
+                  }
+                }
+              },
+              "inner": {
+                "node": "Material",
+                "relid": "d",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 23.0,
+                "sub": {
+                  "node": "SeqScan",
+                  "relid": "d",
+                  "rows": 1000,
+                  "startup_cost": 0.0,
+                  "total_cost": 18.0
+                }
+              }
+            }
+          }
+        ],
+        "cheapest_param_paths": [
+          {
+            "node": "HashJoin",
+            "relid": "a c d",
+            "rows": 2273,
+            "startup_cost": 61.0,
+            "total_cost": 138.57,
+            "join": {
+              "clauses": "a.int4 = c.int4",
+              "outer": {
+                "node": "HashJoin",
+                "relid": "c d",
+                "rows": 1503,
+                "startup_cost": 30.5,
+                "total_cost": 72.28,
+                "join": {
+                  "clauses": "c.int4 = d.int4",
+                  "outer": {
+                    "node": "SeqScan",
+                    "relid": "c",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 18.0
+                  },
+                  "inner": {
+                    "node": "SeqScan",
+                    "relid": "d",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 18.0
+                  }
+                }
+              },
+              "inner": {
+                "node": "SeqScan",
+                "relid": "a",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 18.0
+              }
+            }
+          }
+        ],
+        "cheapest_startup_paths": {
+          "node": "NestLoop",
+          "relid": "a c d",
+          "rows": 2273,
+          "startup_cost": 0.0,
+          "total_cost": 37604.0,
+          "join": {
+            "clauses": "a.int4 = c.int4",
+            "outer": {
+              "node": "NestLoop",
+              "relid": "c d",
+              "rows": 1503,
+              "startup_cost": 0.0,
+              "total_cost": 15038.5,
+              "join": {
+                "clauses": "c.int4 = d.int4",
+                "outer": {
+                  "node": "SeqScan",
+                  "relid": "c",
+                  "rows": 1000,
+                  "startup_cost": 0.0,
+                  "total_cost": 18.0
+                },
+                "inner": {
+                  "node": "Material",
+                  "relid": "d",
+                  "rows": 1000,
+                  "startup_cost": 0.0,
+                  "total_cost": 23.0,
+                  "sub": {
+                    "node": "SeqScan",
+                    "relid": "d",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 18.0
+                  }
+                }
+              }
+            },
+            "inner": {
+              "node": "Material",
+              "relid": "a",
+              "rows": 1000,
+              "startup_cost": 0.0,
+              "total_cost": 23.0,
+              "sub": {
+                "node": "SeqScan",
+                "relid": "a",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 18.0
+              }
+            }
+          }
+        },
+        "cheapest_total_paths": {
+          "node": "HashJoin",
+          "relid": "a c d",
+          "rows": 2273,
+          "startup_cost": 61.0,
+          "total_cost": 138.57,
+          "join": {
+            "clauses": "a.int4 = c.int4",
+            "outer": {
+              "node": "HashJoin",
+              "relid": "c d",
+              "rows": 1503,
+              "startup_cost": 30.5,
+              "total_cost": 72.28,
+              "join": {
+                "clauses": "c.int4 = d.int4",
+                "outer": {
+                  "node": "SeqScan",
+                  "relid": "c",
+                  "rows": 1000,
+                  "startup_cost": 0.0,
+                  "total_cost": 18.0
+                },
+                "inner": {
+                  "node": "SeqScan",
+                  "relid": "d",
+                  "rows": 1000,
+                  "startup_cost": 0.0,
+                  "total_cost": 18.0
+                }
+              }
+            },
+            "inner": {
+              "node": "SeqScan",
+              "relid": "a",
+              "rows": 1000,
+              "startup_cost": 0.0,
+              "total_cost": 18.0
+            }
+          }
+        }
+      },
+      {
+        "relid": "b c d",
+        "rows": 2286,
+        "width": 12,
+        "paths": [
+          {
+            "node": "HashJoin",
+            "relid": "b c d",
+            "rows": 2286,
+            "startup_cost": 61.0,
+            "total_cost": 138.85,
+            "join": {
+              "clauses": "b.int4 = c.int4",
+              "outer": {
+                "node": "HashJoin",
+                "relid": "b d",
+                "rows": 1506,
+                "startup_cost": 30.5,
+                "total_cost": 72.31,
+                "join": {
+                  "clauses": "b.int4 = d.int4",
+                  "outer": {
+                    "node": "SeqScan",
+                    "relid": "b",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 18.0
+                  },
+                  "inner": {
+                    "node": "SeqScan",
+                    "relid": "d",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 18.0
+                  }
+                }
+              },
+              "inner": {
+                "node": "SeqScan",
+                "relid": "c",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 18.0
+              }
+            }
+          },
+          {
+            "node": "MergeJoin",
+            "relid": "b c d",
+            "rows": 2286,
+            "startup_cost": 219.44,
+            "total_cost": 258.64,
+            "pathkeys": "((a.int4, b.int4, c.int4, d.int4))",
+            "join": {
+              "clauses": "b.int4 = c.int4",
+              "mergejoin_info": {
+                "outerkeys_exist": "1",
+                "innerkeys_exist": "1",
+                "m_inner_exist": "0"
+              },
+              "outer": {
+                "node": "SeqScan",
+                "relid": "b",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 18.0
+              },
+              "inner": {
+                "node": "HashJoin",
+                "relid": "c d",
+                "rows": 1503,
+                "startup_cost": 30.5,
+                "total_cost": 72.28,
+                "join": {
+                  "clauses": "c.int4 = d.int4",
+                  "outer": {
+                    "node": "SeqScan",
+                    "relid": "c",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 18.0
+                  },
+                  "inner": {
+                    "node": "SeqScan",
+                    "relid": "d",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 18.0
+                  }
+                }
+              }
+            }
+          },
+          {
+            "node": "MergeJoin",
+            "relid": "b c d",
+            "rows": 2286,
+            "startup_cost": 203.51,
+            "total_cost": 269.33,
+            "pathkeys": "((a.int4, b.int4, c.int4, d.int4))",
+            "join": {
+              "clauses": "b.int4 = d.int4",
+              "mergejoin_info": {
+                "outerkeys_exist": "0",
+                "innerkeys_exist": "1",
+                "m_inner_exist": "0"
+              },
+              "outer": {
+                "node": "MergeJoin",
+                "relid": "b c",
+                "rows": 1518,
+                "startup_cost": 135.68,
+                "total_cost": 163.42,
+                "pathkeys": "((a.int4, b.int4, c.int4, d.int4))",
+                "join": {
+                  "clauses": "b.int4 = c.int4",
+                  "mergejoin_info": {
+                    "outerkeys_exist": "1",
+                    "innerkeys_exist": "1",
+                    "m_inner_exist": "0"
+                  },
+                  "outer": {
+                    "node": "SeqScan",
+                    "relid": "b",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 18.0
+                  },
+                  "inner": {
+                    "node": "SeqScan",
+                    "relid": "c",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 18.0
+                  }
+                }
+              },
+              "inner": {
+                "node": "SeqScan",
+                "relid": "d",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 18.0
+              }
+            }
+          },
+          {
+            "node": "HashJoin",
+            "relid": "b c d",
+            "rows": 2286,
+            "startup_cost": 30.5,
+            "total_cost": 15105.04,
+            "join": {
+              "clauses": "b.int4 = c.int4",
+              "outer": {
+                "node": "NestLoop",
+                "relid": "b d",
+                "rows": 1506,
+                "startup_cost": 0.0,
+                "total_cost": 15038.5,
+                "join": {
+                  "clauses": "b.int4 = d.int4",
+                  "outer": {
+                    "node": "SeqScan",
+                    "relid": "b",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 18.0
+                  },
+                  "inner": {
+                    "node": "Material",
+                    "relid": "d",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 23.0,
+                    "sub": {
+                      "node": "SeqScan",
+                      "relid": "d",
+                      "rows": 1000,
+                      "startup_cost": 0.0,
+                      "total_cost": 18.0
+                    }
+                  }
+                }
+              },
+              "inner": {
+                "node": "SeqScan",
+                "relid": "c",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 18.0
+              }
+            }
+          },
+          {
+            "node": "NestLoop",
+            "relid": "b c d",
+            "rows": 2286,
+            "startup_cost": 135.66,
+            "total_cost": 22773.75,
+            "pathkeys": "((a.int4, b.int4, c.int4, d.int4))",
+            "join": {
+              "clauses": "b.int4 = c.int4",
+              "outer": {
+                "node": "MergeJoin",
+                "relid": "b d",
+                "rows": 1506,
+                "startup_cost": 135.66,
+                "total_cost": 163.25,
+                "pathkeys": "((a.int4, b.int4, c.int4, d.int4))",
+                "join": {
+                  "clauses": "b.int4 = d.int4",
+                  "mergejoin_info": {
+                    "outerkeys_exist": "1",
+                    "innerkeys_exist": "1",
+                    "m_inner_exist": "0"
+                  },
+                  "outer": {
+                    "node": "SeqScan",
+                    "relid": "b",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 18.0
+                  },
+                  "inner": {
+                    "node": "SeqScan",
+                    "relid": "d",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 18.0
+                  }
+                }
+              },
+              "inner": {
+                "node": "Material",
+                "relid": "c",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 23.0,
+                "sub": {
+                  "node": "SeqScan",
+                  "relid": "c",
+                  "rows": 1000,
+                  "startup_cost": 0.0,
+                  "total_cost": 18.0
+                }
+              }
+            }
+          },
+          {
+            "node": "NestLoop",
+            "relid": "b c d",
+            "rows": 2286,
+            "startup_cost": 0.0,
+            "total_cost": 37604.0,
+            "join": {
+              "clauses": "b.int4 = c.int4",
+              "outer": {
+                "node": "NestLoop",
+                "relid": "c d",
+                "rows": 1503,
+                "startup_cost": 0.0,
+                "total_cost": 15038.5,
+                "join": {
+                  "clauses": "c.int4 = d.int4",
+                  "outer": {
+                    "node": "SeqScan",
+                    "relid": "c",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 18.0
+                  },
+                  "inner": {
+                    "node": "Material",
+                    "relid": "d",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 23.0,
+                    "sub": {
+                      "node": "SeqScan",
+                      "relid": "d",
+                      "rows": 1000,
+                      "startup_cost": 0.0,
+                      "total_cost": 18.0
+                    }
+                  }
+                }
+              },
+              "inner": {
+                "node": "Material",
+                "relid": "b",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 23.0,
+                "sub": {
+                  "node": "SeqScan",
+                  "relid": "b",
+                  "rows": 1000,
+                  "startup_cost": 0.0,
+                  "total_cost": 18.0
+                }
+              }
+            }
+          }
+        ],
+        "cheapest_param_paths": [
+          {
+            "node": "HashJoin",
+            "relid": "b c d",
+            "rows": 2286,
+            "startup_cost": 61.0,
+            "total_cost": 138.85,
+            "join": {
+              "clauses": "b.int4 = c.int4",
+              "outer": {
+                "node": "HashJoin",
+                "relid": "b d",
+                "rows": 1506,
+                "startup_cost": 30.5,
+                "total_cost": 72.31,
+                "join": {
+                  "clauses": "b.int4 = d.int4",
+                  "outer": {
+                    "node": "SeqScan",
+                    "relid": "b",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 18.0
+                  },
+                  "inner": {
+                    "node": "SeqScan",
+                    "relid": "d",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 18.0
+                  }
+                }
+              },
+              "inner": {
+                "node": "SeqScan",
+                "relid": "c",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 18.0
+              }
+            }
+          }
+        ],
+        "cheapest_startup_paths": {
+          "node": "NestLoop",
+          "relid": "b c d",
+          "rows": 2286,
+          "startup_cost": 0.0,
+          "total_cost": 37604.0,
+          "join": {
+            "clauses": "b.int4 = c.int4",
+            "outer": {
+              "node": "NestLoop",
+              "relid": "c d",
+              "rows": 1503,
+              "startup_cost": 0.0,
+              "total_cost": 15038.5,
+              "join": {
+                "clauses": "c.int4 = d.int4",
+                "outer": {
+                  "node": "SeqScan",
+                  "relid": "c",
+                  "rows": 1000,
+                  "startup_cost": 0.0,
+                  "total_cost": 18.0
+                },
+                "inner": {
+                  "node": "Material",
+                  "relid": "d",
+                  "rows": 1000,
+                  "startup_cost": 0.0,
+                  "total_cost": 23.0,
+                  "sub": {
+                    "node": "SeqScan",
+                    "relid": "d",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 18.0
+                  }
+                }
+              }
+            },
+            "inner": {
+              "node": "Material",
+              "relid": "b",
+              "rows": 1000,
+              "startup_cost": 0.0,
+              "total_cost": 23.0,
+              "sub": {
+                "node": "SeqScan",
+                "relid": "b",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 18.0
+              }
+            }
+          }
+        },
+        "cheapest_total_paths": {
+          "node": "HashJoin",
+          "relid": "b c d",
+          "rows": 2286,
+          "startup_cost": 61.0,
+          "total_cost": 138.85,
+          "join": {
+            "clauses": "b.int4 = c.int4",
+            "outer": {
+              "node": "HashJoin",
+              "relid": "b d",
+              "rows": 1506,
+              "startup_cost": 30.5,
+              "total_cost": 72.31,
+              "join": {
+                "clauses": "b.int4 = d.int4",
+                "outer": {
+                  "node": "SeqScan",
+                  "relid": "b",
+                  "rows": 1000,
+                  "startup_cost": 0.0,
+                  "total_cost": 18.0
+                },
+                "inner": {
+                  "node": "SeqScan",
+                  "relid": "d",
+                  "rows": 1000,
+                  "startup_cost": 0.0,
+                  "total_cost": 18.0
+                }
+              }
+            },
+            "inner": {
+              "node": "SeqScan",
+              "relid": "c",
+              "rows": 1000,
+              "startup_cost": 0.0,
+              "total_cost": 18.0
+            }
+          }
+        }
+      },
+      {
+        "relid": "a b c d",
+        "rows": 3507,
+        "width": 16,
+        "paths": [
+          {
+            "node": "HashJoin",
+            "relid": "a b c d",
+            "rows": 3507,
+            "startup_cost": 121.57,
+            "total_cost": 217.97,
+            "join": {
+              "clauses": "a.int4 = c.int4",
+              "outer": {
+                "node": "HashJoin",
+                "relid": "a b",
+                "rows": 1543,
+                "startup_cost": 30.5,
+                "total_cost": 72.68,
+                "join": {
+                  "clauses": "a.int4 = b.int4",
+                  "outer": {
+                    "node": "SeqScan",
+                    "relid": "b",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 18.0
+                  },
+                  "inner": {
+                    "node": "SeqScan",
+                    "relid": "a",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 18.0
+                  }
+                }
+              },
+              "inner": {
+                "node": "HashJoin",
+                "relid": "c d",
+                "rows": 1503,
+                "startup_cost": 30.5,
+                "total_cost": 72.28,
+                "join": {
+                  "clauses": "c.int4 = d.int4",
+                  "outer": {
+                    "node": "SeqScan",
+                    "relid": "c",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 18.0
+                  },
+                  "inner": {
+                    "node": "SeqScan",
+                    "relid": "d",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 18.0
+                  }
+                }
+              }
+            }
+          },
+          {
+            "node": "HashJoin",
+            "relid": "a b c d",
+            "rows": 3507,
+            "startup_cost": 91.5,
+            "total_cost": 224.61,
+            "join": {
+              "clauses": "a.int4 = b.int4",
+              "outer": {
+                "node": "HashJoin",
+                "relid": "b c d",
+                "rows": 2286,
+                "startup_cost": 61.0,
+                "total_cost": 138.85,
+                "join": {
+                  "clauses": "b.int4 = c.int4",
+                  "outer": {
+                    "node": "HashJoin",
+                    "relid": "b d",
+                    "rows": 1506,
+                    "startup_cost": 30.5,
+                    "total_cost": 72.31,
+                    "join": {
+                      "clauses": "b.int4 = d.int4",
+                      "outer": {
+                        "node": "SeqScan",
+                        "relid": "b",
+                        "rows": 1000,
+                        "startup_cost": 0.0,
+                        "total_cost": 18.0
+                      },
+                      "inner": {
+                        "node": "SeqScan",
+                        "relid": "d",
+                        "rows": 1000,
+                        "startup_cost": 0.0,
+                        "total_cost": 18.0
+                      }
+                    }
+                  },
+                  "inner": {
+                    "node": "SeqScan",
+                    "relid": "c",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 18.0
+                  }
+                }
+              },
+              "inner": {
+                "node": "SeqScan",
+                "relid": "a",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 18.0
+              }
+            }
+          },
+          {
+            "node": "NestLoop",
+            "relid": "a b c d",
+            "rows": 3507,
+            "startup_cost": 61.28,
+            "total_cost": 453.61,
+            "join": {
+              "clauses": "",
+              "outer": {
+                "node": "HashJoin",
+                "relid": "b c d",
+                "rows": 2286,
+                "startup_cost": 61.0,
+                "total_cost": 138.85,
+                "join": {
+                  "clauses": "b.int4 = c.int4",
+                  "outer": {
+                    "node": "HashJoin",
+                    "relid": "b d",
+                    "rows": 1506,
+                    "startup_cost": 30.5,
+                    "total_cost": 72.31,
+                    "join": {
+                      "clauses": "b.int4 = d.int4",
+                      "outer": {
+                        "node": "SeqScan",
+                        "relid": "b",
+                        "rows": 1000,
+                        "startup_cost": 0.0,
+                        "total_cost": 18.0
+                      },
+                      "inner": {
+                        "node": "SeqScan",
+                        "relid": "d",
+                        "rows": 1000,
+                        "startup_cost": 0.0,
+                        "total_cost": 18.0
+                      }
+                    }
+                  },
+                  "inner": {
+                    "node": "SeqScan",
+                    "relid": "c",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 18.0
+                  }
+                }
+              },
+              "inner": {
+                "node": "Memoize",
+                "relid": "a",
+                "ro_relid": "b",
+                "rows": 2,
+                "startup_cost": 0.29,
+                "total_cost": 0.37,
+                "pathkeys": "((a.int4, b.int4, c.int4, d.int4))",
+                "sub": {
+                  "node": "IdxScan",
+                  "relid": "a",
+                  "ro_relid": "b",
+                  "rows": 2,
+                  "startup_cost": 0.28,
+                  "total_cost": 0.36,
+                  "pathkeys": "((a.int4, b.int4, c.int4, d.int4))"
+                }
+              }
+            }
+          },
+          {
+            "node": "NestLoop",
+            "relid": "a b c d",
+            "rows": 3507,
+            "startup_cost": 30.79,
+            "total_cost": 15419.8,
+            "join": {
+              "clauses": "",
+              "outer": {
+                "node": "HashJoin",
+                "relid": "b c d",
+                "rows": 2286,
+                "startup_cost": 30.5,
+                "total_cost": 15105.04,
+                "join": {
+                  "clauses": "b.int4 = c.int4",
+                  "outer": {
+                    "node": "NestLoop",
+                    "relid": "b d",
+                    "rows": 1506,
+                    "startup_cost": 0.0,
+                    "total_cost": 15038.5,
+                    "join": {
+                      "clauses": "b.int4 = d.int4",
+                      "outer": {
+                        "node": "SeqScan",
+                        "relid": "b",
+                        "rows": 1000,
+                        "startup_cost": 0.0,
+                        "total_cost": 18.0
+                      },
+                      "inner": {
+                        "node": "Material",
+                        "relid": "d",
+                        "rows": 1000,
+                        "startup_cost": 0.0,
+                        "total_cost": 23.0,
+                        "sub": {
+                          "node": "SeqScan",
+                          "relid": "d",
+                          "rows": 1000,
+                          "startup_cost": 0.0,
+                          "total_cost": 18.0
+                        }
+                      }
+                    }
+                  },
+                  "inner": {
+                    "node": "SeqScan",
+                    "relid": "c",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 18.0
+                  }
+                }
+              },
+              "inner": {
+                "node": "Memoize",
+                "relid": "a",
+                "ro_relid": "b",
+                "rows": 2,
+                "startup_cost": 0.29,
+                "total_cost": 0.37,
+                "pathkeys": "((a.int4, b.int4, c.int4, d.int4))",
+                "sub": {
+                  "node": "IdxScan",
+                  "relid": "a",
+                  "ro_relid": "b",
+                  "rows": 2,
+                  "startup_cost": 0.28,
+                  "total_cost": 0.36,
+                  "pathkeys": "((a.int4, b.int4, c.int4, d.int4))"
+                }
+              }
+            }
+          },
+          {
+            "node": "NestLoop",
+            "relid": "a b c d",
+            "rows": 3507,
+            "startup_cost": 0.29,
+            "total_cost": 37918.76,
+            "join": {
+              "clauses": "",
+              "outer": {
+                "node": "NestLoop",
+                "relid": "b c d",
+                "rows": 2286,
+                "startup_cost": 0.0,
+                "total_cost": 37604.0,
+                "join": {
+                  "clauses": "b.int4 = c.int4",
+                  "outer": {
+                    "node": "NestLoop",
+                    "relid": "c d",
+                    "rows": 1503,
+                    "startup_cost": 0.0,
+                    "total_cost": 15038.5,
+                    "join": {
+                      "clauses": "c.int4 = d.int4",
+                      "outer": {
+                        "node": "SeqScan",
+                        "relid": "c",
+                        "rows": 1000,
+                        "startup_cost": 0.0,
+                        "total_cost": 18.0
+                      },
+                      "inner": {
+                        "node": "Material",
+                        "relid": "d",
+                        "rows": 1000,
+                        "startup_cost": 0.0,
+                        "total_cost": 23.0,
+                        "sub": {
+                          "node": "SeqScan",
+                          "relid": "d",
+                          "rows": 1000,
+                          "startup_cost": 0.0,
+                          "total_cost": 18.0
+                        }
+                      }
+                    }
+                  },
+                  "inner": {
+                    "node": "Material",
+                    "relid": "b",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 23.0,
+                    "sub": {
+                      "node": "SeqScan",
+                      "relid": "b",
+                      "rows": 1000,
+                      "startup_cost": 0.0,
+                      "total_cost": 18.0
+                    }
+                  }
+                }
+              },
+              "inner": {
+                "node": "Memoize",
+                "relid": "a",
+                "ro_relid": "b",
+                "rows": 2,
+                "startup_cost": 0.29,
+                "total_cost": 0.37,
+                "pathkeys": "((a.int4, b.int4, c.int4, d.int4))",
+                "sub": {
+                  "node": "IdxScan",
+                  "relid": "a",
+                  "ro_relid": "b",
+                  "rows": 2,
+                  "startup_cost": 0.28,
+                  "total_cost": 0.36,
+                  "pathkeys": "((a.int4, b.int4, c.int4, d.int4))"
+                }
+              }
+            }
+          },
+          {
+            "node": "NestLoop",
+            "relid": "a b c d",
+            "rows": 3507,
+            "startup_cost": 0.28,
+            "total_cost": 38477.25,
+            "join": {
+              "clauses": "",
+              "outer": {
+                "node": "NestLoop",
+                "relid": "b c d",
+                "rows": 2286,
+                "startup_cost": 0.0,
+                "total_cost": 37604.0,
+                "join": {
+                  "clauses": "b.int4 = c.int4",
+                  "outer": {
+                    "node": "NestLoop",
+                    "relid": "c d",
+                    "rows": 1503,
+                    "startup_cost": 0.0,
+                    "total_cost": 15038.5,
+                    "join": {
+                      "clauses": "c.int4 = d.int4",
+                      "outer": {
+                        "node": "SeqScan",
+                        "relid": "c",
+                        "rows": 1000,
+                        "startup_cost": 0.0,
+                        "total_cost": 18.0
+                      },
+                      "inner": {
+                        "node": "Material",
+                        "relid": "d",
+                        "rows": 1000,
+                        "startup_cost": 0.0,
+                        "total_cost": 23.0,
+                        "sub": {
+                          "node": "SeqScan",
+                          "relid": "d",
+                          "rows": 1000,
+                          "startup_cost": 0.0,
+                          "total_cost": 18.0
+                        }
+                      }
+                    }
+                  },
+                  "inner": {
+                    "node": "Material",
+                    "relid": "b",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 23.0,
+                    "sub": {
+                      "node": "SeqScan",
+                      "relid": "b",
+                      "rows": 1000,
+                      "startup_cost": 0.0,
+                      "total_cost": 18.0
+                    }
+                  }
+                }
+              },
+              "inner": {
+                "node": "IdxScan",
+                "relid": "a",
+                "ro_relid": "b",
+                "rows": 2,
+                "startup_cost": 0.28,
+                "total_cost": 0.36,
+                "pathkeys": "((a.int4, b.int4, c.int4, d.int4))"
+              }
+            }
+          },
+          {
+            "node": "NestLoop",
+            "relid": "a b c d",
+            "rows": 3507,
+            "startup_cost": 0.0,
+            "total_cost": 71719.5,
+            "join": {
+              "clauses": "a.int4 = b.int4",
+              "outer": {
+                "node": "NestLoop",
+                "relid": "a c d",
+                "rows": 2273,
+                "startup_cost": 0.0,
+                "total_cost": 37604.0,
+                "join": {
+                  "clauses": "a.int4 = c.int4",
+                  "outer": {
+                    "node": "NestLoop",
+                    "relid": "c d",
+                    "rows": 1503,
+                    "startup_cost": 0.0,
+                    "total_cost": 15038.5,
+                    "join": {
+                      "clauses": "c.int4 = d.int4",
+                      "outer": {
+                        "node": "SeqScan",
+                        "relid": "c",
+                        "rows": 1000,
+                        "startup_cost": 0.0,
+                        "total_cost": 18.0
+                      },
+                      "inner": {
+                        "node": "Material",
+                        "relid": "d",
+                        "rows": 1000,
+                        "startup_cost": 0.0,
+                        "total_cost": 23.0,
+                        "sub": {
+                          "node": "SeqScan",
+                          "relid": "d",
+                          "rows": 1000,
+                          "startup_cost": 0.0,
+                          "total_cost": 18.0
+                        }
+                      }
+                    }
+                  },
+                  "inner": {
+                    "node": "Material",
+                    "relid": "a",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 23.0,
+                    "sub": {
+                      "node": "SeqScan",
+                      "relid": "a",
+                      "rows": 1000,
+                      "startup_cost": 0.0,
+                      "total_cost": 18.0
+                    }
+                  }
+                }
+              },
+              "inner": {
+                "node": "Material",
+                "relid": "b",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 23.0,
+                "sub": {
+                  "node": "SeqScan",
+                  "relid": "b",
+                  "rows": 1000,
+                  "startup_cost": 0.0,
+                  "total_cost": 18.0
+                }
+              }
+            }
+          }
+        ],
+        "cheapest_param_paths": [
+          {
+            "node": "HashJoin",
+            "relid": "a b c d",
+            "rows": 3507,
+            "startup_cost": 121.57,
+            "total_cost": 217.97,
+            "join": {
+              "clauses": "a.int4 = c.int4",
+              "outer": {
+                "node": "HashJoin",
+                "relid": "a b",
+                "rows": 1543,
+                "startup_cost": 30.5,
+                "total_cost": 72.68,
+                "join": {
+                  "clauses": "a.int4 = b.int4",
+                  "outer": {
+                    "node": "SeqScan",
+                    "relid": "b",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 18.0
+                  },
+                  "inner": {
+                    "node": "SeqScan",
+                    "relid": "a",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 18.0
+                  }
+                }
+              },
+              "inner": {
+                "node": "HashJoin",
+                "relid": "c d",
+                "rows": 1503,
+                "startup_cost": 30.5,
+                "total_cost": 72.28,
+                "join": {
+                  "clauses": "c.int4 = d.int4",
+                  "outer": {
+                    "node": "SeqScan",
+                    "relid": "c",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 18.0
+                  },
+                  "inner": {
+                    "node": "SeqScan",
+                    "relid": "d",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 18.0
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "cheapest_startup_paths": {
+          "node": "NestLoop",
+          "relid": "a b c d",
+          "rows": 3507,
+          "startup_cost": 0.0,
+          "total_cost": 71719.5,
+          "join": {
+            "clauses": "a.int4 = b.int4",
+            "outer": {
+              "node": "NestLoop",
+              "relid": "a c d",
+              "rows": 2273,
+              "startup_cost": 0.0,
+              "total_cost": 37604.0,
+              "join": {
+                "clauses": "a.int4 = c.int4",
+                "outer": {
+                  "node": "NestLoop",
+                  "relid": "c d",
+                  "rows": 1503,
+                  "startup_cost": 0.0,
+                  "total_cost": 15038.5,
+                  "join": {
+                    "clauses": "c.int4 = d.int4",
+                    "outer": {
+                      "node": "SeqScan",
+                      "relid": "c",
+                      "rows": 1000,
+                      "startup_cost": 0.0,
+                      "total_cost": 18.0
+                    },
+                    "inner": {
+                      "node": "Material",
+                      "relid": "d",
+                      "rows": 1000,
+                      "startup_cost": 0.0,
+                      "total_cost": 23.0,
+                      "sub": {
+                        "node": "SeqScan",
+                        "relid": "d",
+                        "rows": 1000,
+                        "startup_cost": 0.0,
+                        "total_cost": 18.0
+                      }
+                    }
+                  }
+                },
+                "inner": {
+                  "node": "Material",
+                  "relid": "a",
+                  "rows": 1000,
+                  "startup_cost": 0.0,
+                  "total_cost": 23.0,
+                  "sub": {
+                    "node": "SeqScan",
+                    "relid": "a",
+                    "rows": 1000,
+                    "startup_cost": 0.0,
+                    "total_cost": 18.0
+                  }
+                }
+              }
+            },
+            "inner": {
+              "node": "Material",
+              "relid": "b",
+              "rows": 1000,
+              "startup_cost": 0.0,
+              "total_cost": 23.0,
+              "sub": {
+                "node": "SeqScan",
+                "relid": "b",
+                "rows": 1000,
+                "startup_cost": 0.0,
+                "total_cost": 18.0
+              }
+            }
+          }
+        },
+        "cheapest_total_paths": {
+          "node": "HashJoin",
+          "relid": "a b c d",
+          "rows": 3507,
+          "startup_cost": 121.57,
+          "total_cost": 217.97,
+          "join": {
+            "clauses": "a.int4 = c.int4",
+            "outer": {
+              "node": "HashJoin",
+              "relid": "a b",
+              "rows": 1543,
+              "startup_cost": 30.5,
+              "total_cost": 72.68,
+              "join": {
+                "clauses": "a.int4 = b.int4",
+                "outer": {
+                  "node": "SeqScan",
+                  "relid": "b",
+                  "rows": 1000,
+                  "startup_cost": 0.0,
+                  "total_cost": 18.0
+                },
+                "inner": {
+                  "node": "SeqScan",
+                  "relid": "a",
+                  "rows": 1000,
+                  "startup_cost": 0.0,
+                  "total_cost": 18.0
+                }
+              }
+            },
+            "inner": {
+              "node": "HashJoin",
+              "relid": "c d",
+              "rows": 1503,
+              "startup_cost": 30.5,
+              "total_cost": 72.28,
+              "join": {
+                "clauses": "c.int4 = d.int4",
+                "outer": {
+                  "node": "SeqScan",
+                  "relid": "c",
+                  "rows": 1000,
+                  "startup_cost": 0.0,
+                  "total_cost": 18.0
+                },
+                "inner": {
+                  "node": "SeqScan",
+                  "relid": "d",
+                  "rows": 1000,
+                  "startup_cost": 0.0,
+                  "total_cost": 18.0
+                }
+              }
+            }
+          }
+        }
+      }
+    ]
+  }
+}
