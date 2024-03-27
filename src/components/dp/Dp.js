@@ -11,16 +11,19 @@ const Dp = (props) => {
     const dagSvg = useRef(null);
     const sliderRef = useRef(null);
    
-    const svgHeight = 1280;
-    const svgWidth = document.body.clientWidth;
+    const svgHeight = 500;
+    const svgWidth = 2048;
+   
     const sliderWidth = 300;
     const sliderHeight = 100; 
     const sliderMargin = { top: 20, right: 50, bottom: 20, left: 50 };
     
+    const marginX = 50;
     const marginY = 35;
     
     const query = dp.query;
     const queryResult = dp.result;
+
 
     const targetEntry = dp.optimizer.dp[dp.optimizer.dp.length - 1];
     const totalCost = targetEntry ? targetEntry.cheapest_total_paths.total_cost : "N/A"; 
@@ -29,8 +32,8 @@ const Dp = (props) => {
     useEffect(() => {
       const result = parseDp(dp);
       setResults(result);
+      console.log("Parsed data", results)
       }, [])
-
 
     // --------- //
     // Rendering //
@@ -45,6 +48,7 @@ const Dp = (props) => {
         // -------------- //
         // Compute Layout //
         // -------------- //
+
         // set the layout functions
         const nodeRadius = 25;
         const nodeSize = [nodeRadius * 2, nodeRadius * 2];
@@ -67,18 +71,26 @@ const Dp = (props) => {
 
         // actually perform the layout and get the final size
         const { width, height } = layout(graph);
+
       
         // color
         const colorMap = new Map();
         const nodesArray = Array.from(graph.nodes());
         
         const nodeTypes = [...new Set(nodesArray.map(node => {
-            const parts = node.data.id.split(" - ");
-            return parts.length > 1 ? parts[1] : node.data.id; 
+          const parts = node.data.id.split(" - ");
+          if (parts.length > 1) {
+              const subParts = parts[1].split(" ");
+              return subParts.slice(0, subParts.length - 1).join(" ");
+          }
+          return parts[1];
         }))];
-                nodeTypes.forEach((type, i) => {
+        console.log("node type", nodeTypes)
+        
+        nodeTypes.forEach((type, i) => {
             colorMap.set(type, d3.interpolateRainbow(i / nodeTypes.length));
         });
+        
 
         // create graph
         const svg = d3
@@ -86,8 +98,9 @@ const Dp = (props) => {
 
         svg
         .append("svg")
-        .attr("width", width)
-        .attr("height", height + 2 * marginY)
+        .attr("width", svgWidth)
+        .attr("height", svgHeight)
+        .style("fill", "#F5F5F2")
         .append("g") // 그룹으로 묶어서
         .attr('transform', `scale(1, -1) translate(0, -${height})`, {marginY})
         .call(
@@ -98,7 +111,7 @@ const Dp = (props) => {
         .append("g");
 
         // create links
-        svg
+        const linkLine = svg
         .append("g")
         .selectAll("path")
         .data(graph.links())
@@ -110,6 +123,8 @@ const Dp = (props) => {
         .attr("stroke", "lightgrey")
         .attr("g")
 
+        
+
         // create nodes
         const nodes = svg
         .append("g")
@@ -118,13 +133,25 @@ const Dp = (props) => {
         .enter()
         .append("g")
         .attr("transform", ({ x, y }) => `translate(${x}, ${y})`);
-        
+
+        // apply colors to nodes
         nodes.each(function(d) {
           const node = d3.select(this);
           const parts = d.data.id.split(" - ");
-          const nodeType = parts.length > 1 ? parts[1] : parts[0];
-      
-          if (d.data.id.includes(" - ")) { 
+          
+          let nodeType;
+          if (parts.length > 1) {
+              const subParts = parts[1].split(" ");
+              if (!isNaN(subParts[subParts.length - 1])) {
+                  nodeType = subParts.slice(0, -1).join(" ");
+              } else {
+                  nodeType = parts[1];
+              }
+          } else {
+              nodeType = parts[0]; 
+          }
+
+          if (d.data.id.includes(" - ")) {
               node.append("rect")
                   .attr("width", d.data.id.length * 6 + 20)
                   .attr("height", 30)
@@ -134,10 +161,10 @@ const Dp = (props) => {
                   .attr("stroke", "black");
           } else {
               node.append("circle")
-                  .attr("r", nodeRadius) 
+                  .attr("r", nodeRadius)
                   .attr("fill", colorMap.get(nodeType));
           }
-      });
+        });
       
       // text 
       nodes.append("text")
@@ -150,7 +177,7 @@ const Dp = (props) => {
         const arrowSize = (nodeRadius * nodeRadius) / 20.0;
         const arrowLen = Math.sqrt((4 * arrowSize) / Math.sqrt(3));
         const arrow = d3.symbol().type(d3.symbolTriangle).size(arrowSize);
-        
+
         svg
           .append("g")
           .selectAll("path")
@@ -205,11 +232,10 @@ const Dp = (props) => {
                 <svg className="slider" ref={sliderRef} width={sliderWidth} height={sliderHeight}></svg>
           </div>
           <svg
-          className="node-label"
-          ref={dagSvg}
-          width={svgWidth}
-          height={svgHeight}>
-          </svg>
+              ref={dagSvg}
+              width={svgWidth + marginX}
+              height={svgHeight + marginY}>
+            </svg>
         </div>
     );
 }
