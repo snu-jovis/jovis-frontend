@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useRef } from "react";
 import * as d3 from "d3";
-import { GeqoContext } from "../../contexts/GeqoContext";
+import { GeqoContext } from "../providers/GeqoProvider";
 import "../../assets/stylesheets/RecombProcess.css";
 
 function preprocessData(relMap, data) {
@@ -59,27 +59,26 @@ function addColor(momData, dadData, childData) {
   });
 }
 
-const RecombProcess = () => {
+const RecombProcess = ({ width, height }) => {
   const { relMap, mom, dad, child } = useContext(GeqoContext);
 
   const momRef = useRef();
   const dadRef = useRef();
   const childRef = useRef();
 
+  const subHeight = height / 3;
   const margin = { top: 10, right: 0, bottom: 10, left: 20 };
-  const width = 200;
-  const height = 200;
 
   function drawGraph(svgRef, data) {
     const domain = Object.keys(relMap).map(Number); // [1, 2, 3, 4, 5]
-    const y = d3.scalePoint(domain, [0, height]);
+    const y = d3.scalePoint(domain, [0, subHeight]);
 
     const svg = d3.select(svgRef.current);
     svg.selectAll("*").remove(); // clear
 
     svg
       .attr("width", width + margin.left + margin.right)
-      .attr("height", height + margin.top + margin.bottom)
+      .attr("height", subHeight + margin.top + margin.bottom)
       .append("g");
     // .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
 

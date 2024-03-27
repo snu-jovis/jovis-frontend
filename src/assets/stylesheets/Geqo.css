@@ -1,19 +1,25 @@
-.geqo-container {
-  display: flex;
+.vis-title {
+  font-family: "NanumSquareEB";
+  color: black;
+  text-align: left;
 }
 
-.chart-container {
-  width: 400px;
-  display: grid;
-  place-content: center;
+.focus-gen {
+  font-family: "NanumSquareB";
+  font-size: 12px;
 }
 
-.full-container {
-  width: 800px;
-  /* display: grid; */
-  /* place-content: center; */
+.focus-cost {
+  font-family: "NanumSquareB";
+  font-size: 10px;
 }
 
-.indiv-container {
-  width: 400px;
+.gene-tooltip {
+  position: absolute;
+  visibility: hidden;
+  font-family: "NanumSquareR";
+  font-size: 12px;
+  border: 1px dashed #809fff;
+  background-color: white;
+  padding: 5px;
 }

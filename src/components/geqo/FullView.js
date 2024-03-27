@@ -2,10 +2,11 @@ import { useEffect, useState, useRef, useContext } from "react";
 import * as d3 from "d3";
 import { sliderHorizontal, sliderVertical } from "d3-simple-slider";
 import data from "../../data/geqo.json";
-import "../../assets/stylesheets/GeneticAlgo.css";
-import { GeqoContext } from "../../contexts/GeqoContext";
+import { GeqoContext } from "../providers/GeqoProvider";
 
-const GeneticAlgo = () => {
+import "../../assets/stylesheets/Geqo.css";
+
+const FullView = ({ width, height }) => {
   const geqoData = data.optimizer.geqo.gen;
   const numGen = geqoData.length;
   const numGene = geqoData[0].pool.length;
@@ -24,8 +25,6 @@ const GeneticAlgo = () => {
   const horizRef = useRef(null);
   const vertRef = useRef(null);
 
-  const width = 800;
-  const height = 800;
   const margin = { x: 0, y: 0 };
 
   const [rectWidth, setRectWidth] = useState((width - 2 * margin.x) / numGen);
@@ -149,8 +148,20 @@ const GeneticAlgo = () => {
         }
       });
     });
-  }, [geqoData, selectedGen, selectedGene]);
+  }, [
+    width,
+    height,
+    handleClick,
+    isRecomb,
+    margin,
+    rectHeight,
+    rectWidth,
+    geqoData,
+    selectedGen,
+    selectedGene,
+  ]);
 
+  // range slider
   useEffect(() => {
     const horizSvg = d3.select(horizRef.current);
     var horizSlider = sliderHorizontal()
@@ -181,7 +192,7 @@ const GeneticAlgo = () => {
 
     var vRange = vertSvg.append("g").attr("transform", `translate(50, 0)`);
     vRange.call(vertSlider);
-  }, []);
+  }, [width, height]);
 
   return (
     <div>
@@ -194,4 +205,4 @@ const GeneticAlgo = () => {
   );
 };
 
-export default GeneticAlgo;
+export default FullView;

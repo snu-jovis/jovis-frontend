@@ -1,7 +1,8 @@
 import { createContext, useState } from "react";
 
 export const GeqoContext = createContext();
-const GeqoContextProvider = (props) => {
+
+export function GeqoProvider({ children }) {
   const [relMap, setRelMap] = useState({});
 
   const [chosen, setChosen] = useState("");
@@ -25,9 +26,7 @@ const GeqoContextProvider = (props) => {
         setChild,
       }}
     >
-      {props.children}
+      {children}
     </GeqoContext.Provider>
   );
-};
-
-export default GeqoContextProvider;
+}

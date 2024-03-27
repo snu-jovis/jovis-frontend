@@ -3,17 +3,15 @@ import * as d3 from "d3";
 import { nodeColor } from "./tree";
 import "../../assets/stylesheets/QueryPlanTree.css";
 
-const QueryPlanTree = (props) => {
+const QueryPlanTree = ({ width, height, plan }) => {
   const treeSvg = useRef(null);
   const minimapSvg = useRef(null);
 
-  const width = 400;
-  const height = 400;
   const marginY = 0;
   const defaultRadius = 8;
 
   // data를 d3의 계층 구조로 바꾸어주기
-  const root = d3.hierarchy(props.plan);
+  const root = d3.hierarchy(plan);
 
   const dx = width / 5;
   const dy = 30;
@@ -311,12 +309,12 @@ const QueryPlanTree = (props) => {
     }
 
     update(null, root);
-  }, [props.plan]);
+  }, [width, height, plan]);
 
   return (
     <div>
       <svg ref={treeSvg} width={width} height={height + 2 * marginY} />
-      <svg ref={minimapSvg} />
+      {/* <svg ref={minimapSvg} /> */}
     </div>
   );
 };

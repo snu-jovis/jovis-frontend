@@ -1,6 +1,6 @@
 import { useEffect, useRef, useContext } from "react";
 import * as d3 from "d3";
-import { GeqoContext } from "../../contexts/GeqoContext";
+import { GeqoContext } from "../providers/GeqoProvider";
 
 const JoinOrderTree = () => {
   const { relMap, chosen } = useContext(GeqoContext);
@@ -20,7 +20,7 @@ const JoinOrderTree = () => {
   // rest of the tree
   let currentNode = rootNode;
   for (let i = chosenArray.length - 1; i > 0; i--) {
-    if (i == 1) {
+    if (i === 1) {
       const leftNode = {
         id: chosenArray[i],
         parent: currentNode,

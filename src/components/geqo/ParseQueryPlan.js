@@ -30,7 +30,7 @@ function parseExpPostgreSQL(content, isCmp, fileIndex) {
   return plans;
 }
 
-const ParseQueryPlan = () => {
+const ParseQueryPlan = ({ width, height }) => {
   const [queryPlans, setQueryPlans] = useState([]);
 
   useEffect(() => {
@@ -50,12 +50,14 @@ const ParseQueryPlan = () => {
     loadFiles(data);
   }, []);
 
-  console.log(queryPlans);
-
   return (
     <>
       {queryPlans.length > 0 ? (
-        <QueryPlanTree plan={queryPlans[0][0].Plan} />
+        <QueryPlanTree
+          plan={queryPlans[0][0].Plan}
+          width={width}
+          height={height}
+        />
       ) : null}
     </>
   );
