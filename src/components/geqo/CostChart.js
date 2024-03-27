@@ -273,6 +273,7 @@ const CostChart = ({ width, height }) => {
         .append("circle")
         .attr("id", `focus-circle-${metric}`)
         .style("fill", lineColor(metric))
+        .style("opacity", 0)
         .attr("r", 3);
 
       svg
