@@ -4,10 +4,9 @@
 
 export function parseDp(data) {
     const { optimizer } = data;
-    const result = [];
     const uniqueNodeMap = new Map();
 
-    const generateUniquePathNodeId = (baseId) => {
+    const generateId = (baseId) => {
         let counter = 1;
         let newId = `${baseId} ${counter}`;
         while (uniqueNodeMap.has(newId)) {
@@ -17,7 +16,7 @@ export function parseDp(data) {
         return newId;
     };
 
-    const addNodeIfNotExist = (nodeId) => {
+    const addNode = (nodeId) => {
         if (!uniqueNodeMap.has(nodeId)) {
             uniqueNodeMap.set(nodeId, { id: nodeId, parentIds: [], labels: [] });
         }
@@ -28,31 +27,30 @@ export function parseDp(data) {
     };
 
     [...optimizer.base, ...optimizer.dp].forEach(entry => {
-        addNodeIfNotExist(entry.relid);
+        addNode(entry.relid);
 
         entry.paths?.forEach(path => {
-            let pathNodeId = generateUniquePathNodeId(`${entry.relid} - ${path.node}`);
-            addNodeIfNotExist(pathNodeId);
+            let pathNodeId = generateId(`${entry.relid} - ${path.node}`);
+            addNode(pathNodeId);
 
             uniqueNodeMap.get(entry.relid).parentIds.push(pathNodeId);
             
             if(path.join){
-            const processJoinSide = (side, sideType) => {
+            const processJoin = (side, sideType) => {
                 if (side) {
-                    addNodeIfNotExist(side.relid);
+                    addNode(side.relid);
                     uniqueNodeMap.get(pathNodeId).parentIds.push(side.relid);
-                    // check for Material or Memoize nodes and add labels
                     if (side.node === "Material" || side.node === "Memoize") {
                         addLabel(pathNodeId, `${side.node}`);
                     }
                     if (side.sub) {
-                        processJoinSide(side.sub, sideType);
+                        processJoin(side.sub, sideType);
                     }
                 }
             };
 
-            processJoinSide(path.join.outer, "outer");
-            processJoinSide(path.join.inner, "inner");
+            processJoin(path.join.outer, "outer");
+            processJoin(path.join.inner, "inner");
             }
         });
     });
