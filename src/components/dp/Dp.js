@@ -108,8 +108,22 @@ const Dp = (props) => {
         )
         .append("g");
 
+        const links = graph.links();
+
+        links.forEach(link => {
+        
+        const sourceId = link.source.data.id;
+        const targetId = link.target.data.id;
+        
+        const matchingEntry = results.find(entry => entry.id === sourceId && entry.parentIds.includes(targetId));
+        
+        if (matchingEntry && matchingEntry.labels) {
+          link.label = matchingEntry.labels.join(", ");
+        }
+      });
+              
         // create links
-        const linkLine = svg
+        svg
         .append("g")
         .selectAll("path")
         .data(graph.links())
@@ -120,8 +134,6 @@ const Dp = (props) => {
         .attr("stroke-width", 3)
         .attr("stroke", "lightgrey")
         .attr("g")
-
-        
 
         // create nodes
         const nodes = svg

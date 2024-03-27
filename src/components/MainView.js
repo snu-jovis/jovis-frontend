@@ -5,7 +5,6 @@ import { Button } from "@material-tailwind/react";
 
 import Dp from "./dp/Dp";
 import Geqo from "./geqo/Geqo";
-import SQLEditor from "./SQLEditor";
 
 import { HistoryContext } from "./providers/HistoryProvider";
 import axios from 'axios';
