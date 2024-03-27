@@ -32,7 +32,6 @@ const Dp = (props) => {
     useEffect(() => {
       const result = parseDp(dp);
       setResults(result);
-      console.log("Parsed data", results)
       }, [])
 
     // --------- //
@@ -85,7 +84,6 @@ const Dp = (props) => {
           }
           return parts[1];
         }))];
-        console.log("node type", nodeTypes)
         
         nodeTypes.forEach((type, i) => {
             colorMap.set(type, d3.interpolateRainbow(i / nodeTypes.length));
