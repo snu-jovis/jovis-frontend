@@ -90,7 +90,7 @@ const QueryPlanTree = ({ width, height, plan }) => {
       .append("g")
       .attr("id", "g-link")
       .attr("fill", "none")
-      .attr("stroke", "lightgrey");
+      .attr("stroke", "lightgray");
 
     // create nodes
     const gNode = svg.append("g").attr("id", "g-node");
@@ -117,7 +117,7 @@ const QueryPlanTree = ({ width, height, plan }) => {
       .append("g")
       .attr("id", "m-link")
       .attr("fill", "none")
-      .attr("stroke", "lightgrey");
+      .attr("stroke", "lightgray");
 
     // create nodes
     const mNode = minimap.append("g").attr("id", "m-node");
@@ -146,7 +146,6 @@ const QueryPlanTree = ({ width, height, plan }) => {
 
     const gBrush = minimap.append("g").attr("id", "minimap-brush").call(brush);
 
-    console.log(root);
     gBrush.call(brush.move, [
       [root.x - 150, root.y],
       [root.x + 150, root.y + 300],

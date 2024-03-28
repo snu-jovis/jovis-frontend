@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useRef } from "react";
 import * as d3 from "d3";
 import { GeqoContext } from "../providers/GeqoProvider";
-import "../../assets/stylesheets/RecombProcess.css";
+import data from "../../data/geqo.json";
 
 function preprocessData(relMap, data) {
   const numbers = data.split(" ").map(Number);
@@ -19,80 +19,147 @@ function preprocessData(relMap, data) {
   return { nodes, links };
 }
 
+function addColorToLinks(parentData, childData, color) {
+  parentData.links.forEach((parentLink) => {
+    const childLink = childData.links.find(
+      (link) =>
+        (link.source === parentLink.source &&
+          link.target === parentLink.target) ||
+        (link.source === parentLink.target && link.target === parentLink.source)
+    );
+
+    if (childLink) {
+      parentLink.color = [color];
+      childLink.color = childLink.color || [];
+      childLink.color.push(color);
+    } else {
+      parentLink.color = ["lightgray"];
+    }
+  });
+}
+
 function addColor(momData, dadData, childData) {
-  momData.links.forEach((momLink) => {
-    const childLink = childData.links.find(
-      (link) =>
-        (link.source === momLink.source && link.target === momLink.target) ||
-        (link.source === momLink.target && link.target === momLink.source)
-    );
-
-    if (childLink) {
-      const color = "red";
-      momLink.color = [color];
-      childLink.color = childLink.color || [];
-      childLink.color.push(color);
-    } else {
-      momLink.color = ["lightgrey"];
-    }
-  });
-
-  dadData.links.forEach((dadLink) => {
-    const childLink = childData.links.find(
-      (link) =>
-        (link.source === dadLink.source && link.target === dadLink.target) ||
-        (link.source === dadLink.target && link.target === dadLink.source)
-    );
-
-    if (childLink) {
-      const color = "blue";
-      dadLink.color = [color];
-      childLink.color = childLink.color || [];
-      childLink.color.push(color);
-    } else {
-      dadLink.color = ["lightgrey"];
-    }
-  });
+  addColorToLinks(momData, childData, "red");
+  addColorToLinks(dadData, childData, "blue");
 
   childData.links.forEach((link) => {
     if (!link.color) link.color = ["green"];
   });
 }
 
+function handleHover(n, d, selectedPath) {
+  if (n.source === d.id || n.target === d.id) {
+    if (n.color[0] === "red" || n.color[0] === "blue") {
+      selectedPath.push(n);
+
+      if (n.color.length === 2) {
+        return `url(#gradient)`;
+      } else {
+        return n.color[0];
+      }
+    }
+    return "gray";
+  }
+  return "lightgray";
+}
+
+function handleChildHover(childRef, selectedPath) {
+  const childPath = d3.select(childRef.current).selectAll("path");
+  childPath.attr("stroke", function (l) {
+    let color = "lightgray";
+    selectedPath.some((p) => {
+      if (
+        (l.source === p.source && l.target === p.target) ||
+        (l.target === p.source && l.source === p.target)
+      ) {
+        color = p.color[0];
+        return true;
+      }
+      return false;
+    });
+    return color;
+  });
+}
+
+function handleParentHover(momRef, dadRef, selectedPath) {
+  const momPath = d3.select(momRef.current).selectAll("path");
+  const dadPath = d3.select(dadRef.current).selectAll("path");
+
+  momPath.attr("stroke", function (l) {
+    let color = "lightgray";
+    selectedPath.some((p) => {
+      if (
+        (l.source === p.source && l.target === p.target) ||
+        (l.target === p.source && l.source === p.target)
+      ) {
+        color = "red";
+        return true;
+      }
+      return false;
+    });
+    return color;
+  });
+
+  dadPath.attr("stroke", function (l) {
+    let color = "lightgray";
+    selectedPath.some((p) => {
+      if (
+        (l.source === p.source && l.target === p.target) ||
+        (l.target === p.source && l.source === p.target)
+      ) {
+        color = "blue";
+        return true;
+      }
+      return false;
+    });
+    return color;
+  });
+}
+
 const EdgeRecomb = ({ width, height }) => {
-  const { relMap, mom, dad, child } = useContext(GeqoContext);
+  const relMap = data.optimizer.geqo.map;
 
-  const momRef = useRef();
-  const dadRef = useRef();
-  const childRef = useRef();
+  const { mom, dad, child } = useContext(GeqoContext);
 
-  const subHeight = height / 3;
-  const margin = { top: 10, right: 0, bottom: 10, left: 20 };
+  const momRef = useRef(null);
+  const dadRef = useRef(null);
+  const childRef = useRef(null);
 
-  function drawGraph(svgRef, data) {
-    const domain = Object.keys(relMap).map(Number); // [1, 2, 3, 4, 5]
-    const y = d3.scalePoint(domain, [0, subHeight]);
+  function drawGraph(svgRef, data, type) {
+    const subWidth = type === "c" ? width : width / 2;
+    const subHeight = height / 2;
+    const margin = { x: type === "c" ? subWidth / 2 : subWidth / 4, y: 10 };
 
-    const svg = d3.select(svgRef.current);
-    svg.selectAll("*").remove(); // clear
+    const domain = Object.keys(relMap).map(Number);
+    const y = d3.scalePoint(domain, [0, subHeight - 2 * margin.y]);
 
-    svg
-      .attr("width", width + margin.left + margin.right)
-      .attr("height", subHeight + margin.top + margin.bottom)
+    d3.select(svgRef.current).selectAll("*").remove(); // clear
+
+    const svg = d3
+      .select(svgRef.current)
+      .append("svg")
+      .attr("width", subWidth)
+      .attr("height", subHeight)
+      .append("g")
+      .call(
+        d3.zoom().on("zoom", (event) => {
+          svg.attr("transform", event.transform);
+        })
+      )
       .append("g");
-    // .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
 
-    // Add a circle for each node.
+    // add a circle for each node
     svg
       .selectAll("circle")
       .data(data.nodes)
       .join("circle")
-      .attr("cx", margin.left)
-      .attr("cy", (d) => y(d.id) + margin.top)
-      .attr("r", 4);
+      .attr("cx", margin.x)
+      .attr("cy", (d) => y(d.id) + margin.y)
+      .attr("r", 3);
 
-    // Define the gradients
+    // define the gradients
     var defs = svg.append("defs");
+
     var gradient = defs
       .append("linearGradient")
       .attr("id", "gradient")
@@ -118,36 +185,18 @@ const EdgeRecomb = ({ width, height }) => {
       .attr("offset", 100 + "%")
       .attr("stop-color", "blue");
 
-    // svg
-    //   .append("defs")
-    //   .selectAll("linearGradient")
-    //   .data(data.links)
-    //   .join("linearGradient")
-    //   .attr("id", (d, i) => `gradient-${i}`)
-    //   .selectAll("stop")
-    //   .data((d) => d.color)
-    //   .join("stop")
-    //   .attr("offset", function (d, i, n) {
-    //     console.log(d, i, n);
-    //     return `${(i + 1) * 50}%`;
-    //   })
-    //   .attr("stop-color", function (d) {
-    //     console.log(d);
-    //     return d;
-    //   });
-
-    // Add an arc for each link.
-    svg
+    // add an arc for each link
+    const path = svg
       .selectAll("path")
       .data(data.links)
       .join("path")
       .attr("d", (d) => {
-        const y1 = y(d.source) + margin.top;
-        const y2 = y(d.target) + margin.top;
+        const y1 = y(d.source) + margin.y;
+        const y2 = y(d.target) + margin.y;
         const r = Math.abs(y2 - y1) / 2;
 
-        return `M${margin.left},${y1}A${r},${r} 0,0,${y1 < y2 ? 1 : 0} ${
-          margin.left
+        return `M${margin.x},${y1}A${r},${r} 0,0,${y1 < y2 ? 1 : 0} ${
+          margin.x
         },${y2}`;
       })
       .attr("fill", "none")
@@ -160,18 +209,16 @@ const EdgeRecomb = ({ width, height }) => {
         }
       });
 
-    // Add a text label and a dot for each node.
-    svg
+    // append relation name
+    const label = svg
       .append("g")
       .attr("font-size", 10)
       .attr("text-anchor", "end")
       .selectAll("g")
       .data(data.nodes)
       .join("g")
-      .attr(
-        "transform",
-        (d) => `translate(${margin.left},${y(d.id) + margin.top})`
-      )
+      .attr("id", (d, i) => `label-${i}`)
+      .attr("transform", (d) => `translate(${margin.x},${y(d.id) + margin.y})`)
       .call((g) =>
         g
           .append("text")
@@ -179,37 +226,89 @@ const EdgeRecomb = ({ width, height }) => {
           .attr("dy", "0.35em")
           .text((d) => d.name)
       );
+
+    // add invisible rects for mouseover
+    label
+      .append("rect")
+      .attr("fill", "none")
+      .attr("width", 20)
+      .attr("height", 20)
+      .attr("x", -20)
+      .attr("y", -10)
+      .attr("fill", "none")
+      .attr("pointer-events", "all")
+      .on("pointerenter", (event, d) => {
+        var selectedPath = [];
+
+        label.attr("font-weight", (n) => (n === d ? "bold" : null));
+        path.attr("stroke", (n) => handleHover(n, d, selectedPath));
+
+        if (type !== "c") return handleChildHover(childRef, selectedPath);
+        else return handleParentHover(momRef, dadRef, selectedPath);
+      })
+      .on("pointerout", () => {
+        label.attr("font-weight", null);
+        path.attr("stroke", function (d, i) {
+          if (d.color.length === 2) {
+            return `url(#gradient)`;
+          } else {
+            return d.color[0];
+          }
+        });
+
+        if (type !== "c") {
+          const childPath = d3.select(childRef.current).selectAll("path");
+          childPath.attr("stroke", function (d, i) {
+            if (d.color.length === 2) {
+              return `url(#gradient)`;
+            } else {
+              return d.color[0];
+            }
+          });
+        } else {
+          const momPath = d3.select(momRef.current).selectAll("path");
+          const dadPath = d3.select(dadRef.current).selectAll("path");
+
+          momPath.attr("stroke", (d) => d.color[0]);
+          dadPath.attr("stroke", (d) => d.color[0]);
+        }
+      });
   }
 
   useEffect(() => {
-    if ((mom !== "") & (dad !== "") & (child !== "")) {
+    if (mom !== "" && dad !== "" && child !== "") {
       const momData = preprocessData(relMap, mom);
       const dadData = preprocessData(relMap, dad);
       const childData = preprocessData(relMap, child);
 
       addColor(momData, dadData, childData);
 
-      drawGraph(momRef, momData);
-      drawGraph(dadRef, dadData);
-      drawGraph(childRef, childData);
+      drawGraph(momRef, momData, "m");
+      drawGraph(dadRef, dadData, "d");
+      drawGraph(childRef, childData, "c");
     }
-  });
+  }, [mom, dad, child]);
 
   return (
     <>
-      <div className="flex justify-between px-4 pt-2">
-        <p className="vis-title pt-2">Edge Recombination Crossover</p>
+      <div className="flex justify-between px-4 py-2">
+        <p className="vis-title py-2">Edge Recombination Crossover (ERX)</p>
       </div>
       {mom && dad && child ? (
         <div>
-          <div className="parents-container">
-            <svg ref={momRef} />
-            <h1 className="sign">+</h1>
-            <svg ref={dadRef} />
+          <div className="flex justify-center justify-items-center items-center">
+            <svg ref={momRef} width={width / 2} height={height / 2} />
+            <h1 className="erx-sign mx-2">+</h1>
+            <svg ref={dadRef} width={width / 2} height={height / 2} />
           </div>
-          <h1 className="sign">=</h1>
-          <div className="child-container">
-            <svg ref={childRef} />
+          <div
+            style={{ width: `${width}px`, height: `20px` }}
+            className="erx-sign flex justify-center items-center mb-4"
+          >
+            =
+          </div>
+          <div className="flex justify-center justify-items-center items-center">
+            <svg ref={childRef} width={width} height={height / 2} />
           </div>
         </div>
       ) : (

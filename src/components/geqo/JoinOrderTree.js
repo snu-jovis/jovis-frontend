@@ -1,7 +1,7 @@
 import { useEffect, useRef, useContext, useState } from "react";
-import data from "../../data/geqo.json";
 import * as d3 from "d3";
 import { GeqoContext } from "../providers/GeqoProvider";
+import data from "../../data/geqo.json";
 
 const JoinOrderTree = ({ width, height }) => {
   const { chosen } = useContext(GeqoContext);
@@ -105,7 +105,7 @@ const JoinOrderTree = ({ width, height }) => {
       .append("g")
       .attr("id", "g-link")
       .attr("fill", "none")
-      .attr("stroke", "lightgrey");
+      .attr("stroke", "lightgray");
 
     const gNode = svg.append("g").attr("id", "g-node");
 

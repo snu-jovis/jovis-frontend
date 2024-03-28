@@ -1,8 +1,8 @@
 import { useEffect, useState, useRef, useContext } from "react";
-import data from "../../data/geqo.json";
 import * as d3 from "d3";
 import { sliderHorizontal, sliderVertical } from "d3-simple-slider";
 import { GeqoContext } from "../providers/GeqoProvider";
+import data from "../../data/geqo.json";
 
 const FullView = ({ width, height }) => {
   const { setChosen, setMom, setDad, setChild } = useContext(GeqoContext);
@@ -50,6 +50,10 @@ const FullView = ({ width, height }) => {
       setMom(geqoData[gen - 1].pool[gene.parents[0]].gene);
       setDad(geqoData[gen - 1].pool[gene.parents[1]].gene);
       setChild(gene.gene);
+    } else {
+      setMom("");
+      setDad("");
+      setChild("");
     }
   };
 
@@ -90,7 +94,7 @@ const FullView = ({ width, height }) => {
           .attr("width", isRecomb ? rectWidth / 2 : rectWidth)
           .attr("height", rectHeight)
           .attr("fill", gene.color)
-          .attr("stroke", "lightgrey")
+          .attr("stroke", "lightgray")
           .attr("stroke-width", 0.1)
           .attr("transform", `translate(${margin.x},${margin.y})`)
           .on("mouseover", function (event, d) {
@@ -161,7 +165,7 @@ const FullView = ({ width, height }) => {
       .max(selectedGen[1])
       .step(1)
       .default(selectedGen)
-      .fill("grey")
+      .fill("gray")
       .width(width)
       .on("onchange", (val) => {
         setSelectedGen(val);
@@ -176,7 +180,7 @@ const FullView = ({ width, height }) => {
       .max(selectedGene[1])
       .step(1)
       .default(selectedGene)
-      .fill("grey")
+      .fill("gray")
       .height(height)
       .on("onchange", (val) => {
         setSelectedGene([numGene - val[1], numGene - val[0]]);

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
-import data from "../../data/geqo.json";
 import { Checkbox } from "@material-tailwind/react";
+import data from "../../data/geqo.json";
 
 const CostChart = ({ width, height }) => {
   const geqoData = data.optimizer.geqo.gen; // TODO
