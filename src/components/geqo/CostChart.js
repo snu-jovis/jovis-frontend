@@ -20,13 +20,13 @@ const CostChart = ({ width, height }) => {
     avg: "average",
   };
 
-  const legendSvg = useRef(null);
+  const legendRef = useRef(null);
   const legendWidth = 230;
   const legendHeight = 20;
   const legendMargin = { x: 25, y: 6, r: 5 };
 
   const chartSvg = useRef(null);
-  const chartHeight = height - legendHeight;
+  const chartHeight = height ? height - legendHeight : 300; // rect -20 에러 임시 수정
   const chartMargin = { top: 10, right: 40, bottom: 20, left: 50 };
 
   const lineColor = d3
@@ -143,7 +143,7 @@ const CostChart = ({ width, height }) => {
 
   /* draw legend */
   useEffect(() => {
-    const svg = d3.select(legendSvg.current);
+    const svg = d3.select(legendRef.current);
     svg.selectAll("*").remove(); // clear
 
     drawLegend(svg);
@@ -349,17 +349,17 @@ const CostChart = ({ width, height }) => {
   return (
     <div>
       <div className="flex justify-between px-4 pt-2">
-        <p className="vis-title pt-2">Cost</p>
+        <p className="vis-title pt-2">Cost Chart</p>
         <Checkbox
           className="h-4 w-4 rounded-full border-gray-900/20 bg-gray-900/10 transition-all hover:scale-105 hover:before:opacity-0"
           checked={logScale}
-          label={<p className="text">Log Scale</p>}
-          onClick={handleCheckboxChange}
+          label={<p className="text">Log scale</p>}
+          onChange={handleCheckboxChange}
         />
       </div>
       <svg ref={chartSvg} width={width} height={chartHeight} />
       <div className="flex justify-center py-2">
-        <svg ref={legendSvg} width={legendWidth} height={legendHeight} />
+        <svg ref={legendRef} width={legendWidth} height={legendHeight} />
       </div>
     </div>
   );

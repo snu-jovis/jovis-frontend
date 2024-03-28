@@ -3,8 +3,6 @@ import { createContext, useState } from "react";
 export const GeqoContext = createContext();
 
 export function GeqoProvider({ children }) {
-  const [relMap, setRelMap] = useState({});
-
   const [chosen, setChosen] = useState("");
 
   const [mom, setMom] = useState("");
@@ -14,8 +12,6 @@ export function GeqoProvider({ children }) {
   return (
     <GeqoContext.Provider
       value={{
-        relMap,
-        setRelMap,
         chosen,
         setChosen,
         mom,

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import CostChart from "./CostChart";
 import FullView from "./FullView";
 import ParseQueryPlan from "./ParseQueryPlan";
-import RecombProcess from "./RecombProcess";
+import EdgeRecomb from "./EdgeRecomb";
 import JoinOrderTree from "./JoinOrderTree";
 import { Card } from "@material-tailwind/react";
 
@@ -48,12 +48,12 @@ const GeqoMain = () => {
       <div ref={fullRef} className="w-1/2">
         <FullView width={fullSize} height={fullSize} />
       </div>
-      <div ref={indivRef} className="w-1/4 grid grid-cols-1 gap-2">
+      <div ref={indivRef} className="w-1/4 grid grid-cols-1 gap-2 mr-4">
         <Card>
           <ParseQueryPlan width={indivSize} height={indivSize} />
         </Card>
         <Card>
-          <RecombProcess width={indivSize} height={indivSize} />
+          <EdgeRecomb width={indivSize} height={indivSize} />
         </Card>
       </div>
     </div>

@@ -59,7 +59,7 @@ function addColor(momData, dadData, childData) {
   });
 }
 
-const RecombProcess = ({ width, height }) => {
+const EdgeRecomb = ({ width, height }) => {
   const { relMap, mom, dad, child } = useContext(GeqoContext);
 
   const momRef = useRef();
@@ -197,8 +197,11 @@ const RecombProcess = ({ width, height }) => {
 
   return (
     <>
+      <div className="flex justify-between px-4 pt-2">
+        <p className="vis-title pt-2">Edge Recombination Crossover</p>
+      </div>
       {mom && dad && child ? (
-        <>
+        <div>
           <div className="parents-container">
             <svg ref={momRef} />
             <h1 className="sign">+</h1>
@@ -208,10 +211,19 @@ const RecombProcess = ({ width, height }) => {
           <div className="child-container">
             <svg ref={childRef} />
           </div>
-        </>
-      ) : null}
+        </div>
+      ) : (
+        <div
+          style={{ width: `${width}px`, height: `${height}px` }}
+          className="flex items-center justify-center"
+        >
+          <span className="font-[NanumSquareB] text-base">
+            Choose a gene to see the ERX process.
+          </span>
+        </div>
+      )}
     </>
   );
 };
 
-export default RecombProcess;
+export default EdgeRecomb;

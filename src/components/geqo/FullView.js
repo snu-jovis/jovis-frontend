@@ -1,20 +1,15 @@
 import { useEffect, useState, useRef, useContext } from "react";
+import data from "../../data/geqo.json";
 import * as d3 from "d3";
 import { sliderHorizontal, sliderVertical } from "d3-simple-slider";
-import data from "../../data/geqo.json";
 import { GeqoContext } from "../providers/GeqoProvider";
 
-import "../../assets/stylesheets/Geqo.css";
-
 const FullView = ({ width, height }) => {
+  const { setChosen, setMom, setDad, setChild } = useContext(GeqoContext);
+
   const geqoData = data.optimizer.geqo.gen;
   const numGen = geqoData.length;
   const numGene = geqoData[0].pool.length;
-
-  const { setRelMap, setChosen, setMom, setDad, setChild } =
-    useContext(GeqoContext);
-
-  setRelMap(data.optimizer.geqo.map);
 
   const [isRecomb, setIsRecomb] = useState(false);
 
@@ -95,10 +90,6 @@ const FullView = ({ width, height }) => {
           .attr("width", isRecomb ? rectWidth / 2 : rectWidth)
           .attr("height", rectHeight)
           .attr("fill", gene.color)
-          // .attr("fill", function () {
-          //   if (gene.parents) return gene.color;
-          //   else return "ghostwhite";
-          // })
           .attr("stroke", "lightgrey")
           .attr("stroke-width", 0.1)
           .attr("transform", `translate(${margin.x},${margin.y})`)
@@ -107,7 +98,7 @@ const FullView = ({ width, height }) => {
 
             tooltip
               .html(
-                `Gen num: ${gen.gen_num}<br>Pop num: ${gene.population_num}<br>Gene: ${gene.gene}<br>Fitness: ${gene.fitness}`
+                `Generation: ${gen.gen_num}<br>Population: ${gene.population_num}<br>Fitness: ${gene.fitness}<br>Gene: ${gene.gene}`
               )
               .style("visibility", "visible");
           })
@@ -123,6 +114,7 @@ const FullView = ({ width, height }) => {
           });
 
         rect.on("click", (event, d) => {
+          tooltip.html(``).style("visibility", "hidden");
           handleClick(i, gene);
         });
 

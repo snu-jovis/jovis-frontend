@@ -1,85 +1,99 @@
-import { useEffect, useRef, useContext } from "react";
+import { useEffect, useRef, useContext, useState } from "react";
+import data from "../../data/geqo.json";
 import * as d3 from "d3";
 import { GeqoContext } from "../providers/GeqoProvider";
 
-const JoinOrderTree = () => {
-  const { relMap, chosen } = useContext(GeqoContext);
+const JoinOrderTree = ({ width, height }) => {
+  const { chosen } = useContext(GeqoContext);
+  const costHeight = 30;
+  const svgHeight = height - costHeight;
+  const [fitness, setFitness] = useState(0);
+  const [selectedCost, setSelectedCost] = useState("");
 
-  // Convert the string of integers into an array of integers
-  const chosenArray = chosen.split(" ").map(Number);
-
-  let joinId = chosenArray.length + 1;
-
-  // root node
-  const rootNode = {
-    id: joinId,
-    parent: null,
-    name: "Join",
-  };
-
-  // rest of the tree
-  let currentNode = rootNode;
-  for (let i = chosenArray.length - 1; i > 0; i--) {
-    if (i === 1) {
-      const leftNode = {
-        id: chosenArray[i],
-        parent: currentNode,
-        name: relMap[chosenArray[i]],
-      };
-      const rightNode = {
-        id: chosenArray[i - 1],
-        parent: currentNode,
-        name: relMap[chosenArray[i - 1]],
-      };
-
-      currentNode.children = [leftNode, rightNode];
-      break;
-    }
-
-    joinId += 1;
-    const leftNode = { id: joinId, parent: currentNode, name: "Join" };
-    const rightNode = {
-      id: chosenArray[i],
-      parent: currentNode,
-      name: relMap[chosenArray[i]],
+  var nodeId = 0;
+  function convertPath(node, parent = null) {
+    const newNode = {
+      id: nodeId++,
+      name: node.node,
+      parent,
+      children: [],
+      relid: node.relid,
+      rows: node.rows,
+      startup_cost: node.startup_cost,
+      total_cost: node.total_cost,
     };
 
-    currentNode.children = [leftNode, rightNode];
-    currentNode = leftNode;
+    if (node.join) {
+      if (node.join.outer) {
+        newNode.children.push(convertPath(node.join.outer, newNode));
+      }
+      if (node.join.inner) {
+        newNode.children.push(convertPath(node.join.inner, newNode));
+      }
+    }
+
+    return newNode;
   }
 
-  const treeSvg = useRef(null);
+  // total cost = startup cost + run cost
+  function flatten(root, all) {
+    const nodes = [];
 
-  const width = 400;
-  const height = 400;
-  const marginY = 0;
-  const defaultRadius = 8;
+    function recurse(node) {
+      if (node.children) node.children.forEach(recurse);
 
-  // data를 d3의 계층 구조로 바꾸어주기
-  const root = d3.hierarchy(rootNode);
-  console.log(root);
+      if (all) nodes.push(node);
+      else nodes.push(node.data.total_cost - node.data.startup_cost);
+    }
+    recurse(root);
 
-  const dx = width / 5;
-  const dy = 30;
+    return nodes;
+  }
+
+  const relOptInfo = data.optimizer.geqo.reloptinfo;
+
+  const treeRef = useRef(null);
+  const barRef = useRef(null);
+
+  const treeWidth = (width * 3) / 4;
+  const barWidth = width / 4;
+  const relRadius = 12;
+  const opRadius = 8;
+
+  const dx = treeWidth / 5;
+  const dy = 40;
+  const margin = { x: 20, top: 30, bottom: 50 };
+  const barMargin = { x: 35, y: 20 };
 
   const treeLayout = d3.tree().nodeSize([dx, dy]);
-  const treeData = treeLayout(root);
+
   const diagonal = d3
     .linkVertical()
     .x((d) => d.x)
     .y((d) => d.y);
 
   useEffect(() => {
-    d3.select(treeSvg.current).selectAll("*").remove(); // clear
+    if (!relOptInfo[chosen]) return;
 
-    // create tree
+    setFitness(relOptInfo[chosen].cheapest_total_paths.total_cost);
+
+    /* Tree */
+    const treeData = convertPath(relOptInfo[chosen].cheapest_total_paths);
+    const root = d3.hierarchy(treeData);
+    treeLayout(root);
+
+    d3.select(treeRef.current).selectAll("*").remove(); // clear
+
     const svg = d3
-      .select(treeSvg.current)
+      .select(treeRef.current)
       .append("svg")
-      .attr("width", width)
-      .attr("height", height + 2 * marginY)
-      .append("g") // 그룹으로 묶어서
-      .attr("transform", `translate(${width / 2}, ${marginY})`) // margin 적용
+      .attr("width", treeWidth - margin.x)
+      .attr("height", svgHeight)
+      .append("g")
+      .attr(
+        "transform",
+        `translate(${treeWidth - treeWidth / 3}, ${margin.top})`
+      )
       .call(
         d3.zoom().on("zoom", (event) => {
           svg.attr("transform", event.transform);
@@ -87,14 +101,12 @@ const JoinOrderTree = () => {
       )
       .append("g");
 
-    // create links
     const gLink = svg
       .append("g")
       .attr("id", "g-link")
       .attr("fill", "none")
       .attr("stroke", "lightgrey");
 
-    // create nodes
     const gNode = svg.append("g").attr("id", "g-node");
 
     function update(event, source) {
@@ -102,51 +114,45 @@ const JoinOrderTree = () => {
       const links = root.links();
       const transition = svg.transition().duration(500);
 
-      // update nodes
       const node = gNode.selectAll("g").data(nodes, (d) => d.id);
+      const nodeEnter = node.enter().append("g");
 
-      // enter any new nodes at the parent's previous position.
-      const nodeEnter = node
-        .enter()
-        .append("g")
-        .attr("transform", (d) => `translate(${source.x0},${source.y0})`)
-        .attr("fill-opacity", 0)
-        .attr("stroke-opacity", 0)
-        .on("click", (event, d) => {
-          d.children = d.children ? null : d._children;
-          update(event, d);
-        });
-
-      // append circles
       nodeEnter
         .append("circle")
-        .attr("id", "node-circle")
-        // .attr("fill", (d) => nodeColor(d.data["Node Type"]))
-        .attr("fill", "lightgrey")
-        .attr("r", defaultRadius);
+        .attr("id", (d) => {
+          return `node-circle-${d.data.id}`;
+        })
+        .attr("fill", (d) =>
+          d.children ? d3.schemePastel2[2] : d3.schemePastel1[0]
+        )
+        .attr("r", (d) => (d.children ? opRadius : relRadius));
 
-      // append node type
       nodeEnter
         .append("text")
         .attr("id", "node-type")
-        .attr("class", "node-type")
-        .attr("text-anchor", "start")
+        .attr("class", "node-type-op")
+        .attr("dy", (d) => (d.children ? "0.3em" : "-0.8em"))
+        .attr("text-anchor", "middle")
         .text((d) => d.data.name);
 
-      // append relation name
       nodeEnter
         .append("text")
-        .attr("id", "relation-name")
-        .attr("class", "relation-name")
-        .attr("dy", 12)
+        .attr("id", "node-type")
+        .attr("class", "node-type-rel")
+        .attr("dy", function (d) {
+          if (
+            d.depth === root.height &&
+            d.parent.children[0].data.relid.length > 8
+          ) {
+            if (d.data.relid === d.parent.children[0].data.relid)
+              return "1.2em";
+            else return "0.3em";
+          } else return "0.4em";
+        })
         .attr("text-anchor", "start")
-        .text((d) =>
-          d.data["Relation Name"]
-            ? d.data["Relation Name"].toUpperCase()
-            : d.data.table_name
-            ? d.data.table_name.toUpperCase()
-            : null
-        );
+        .text(function (d) {
+          if (!d.children) return d.data.relid;
+        });
 
       node
         .merge(nodeEnter)
@@ -155,18 +161,7 @@ const JoinOrderTree = () => {
         .attr("fill-opacity", 1)
         .attr("stroke-opacity", 1);
 
-      node
-        .exit()
-        .transition(transition)
-        .remove()
-        .attr("transform", (d) => `translate(${source.x},${source.y})`)
-        .attr("fill-opacity", 0)
-        .attr("stroke-opacity", 0);
-
-      // update links
       const link = gLink.selectAll("path").data(links, (d) => d.target.id);
-
-      // enter any new links at the parent's previous position.
       const linkEnter = link
         .enter()
         .append("path")
@@ -177,36 +172,152 @@ const JoinOrderTree = () => {
         });
 
       link.merge(linkEnter).transition(transition).attr("d", diagonal);
-
-      link
-        .exit()
-        .transition(transition)
-        .remove()
-        .attr("d", (d) => {
-          const o = { x: source.x, y: source.y };
-          return diagonal({ source: o, target: o });
-        });
-
-      root.eachBefore((d) => {
-        d.x0 = d.x;
-        d.y0 = d.y;
-      });
     }
 
     root.x0 = 0;
     root.y0 = dy / 2;
 
-    root.descendants().forEach((d, i) => {
-      d.id = i;
-      d._children = d.children;
+    update(null, root);
+
+    /* Stacked Bar Chart */
+    const barSvg = d3.select(barRef.current);
+    barSvg.selectAll("*").remove(); // clear
+
+    const runCost = flatten(root, false);
+    const stackedData = runCost.reduce((acc, curr, i) => {
+      acc[i] = curr;
+      return acc;
+    }, {});
+    const stack = d3.stack().keys(Object.keys(stackedData));
+    const series = stack([stackedData]);
+
+    // calculate the sum of values for each group
+    const groupSums = series[0].map((_, i) =>
+      d3.sum(series.map((layer) => layer[i][1] - layer[i][0]))
+    );
+
+    // normalize the data
+    series.forEach((layer) => {
+      layer.forEach((d, i) => {
+        d[0] = d[0] / groupSums[i];
+        d[1] = d[1] / groupSums[i];
+      });
     });
 
-    update(null, root);
+    const barYScale = d3
+      .scaleLinear()
+      .domain([0, 1])
+      .range([svgHeight - 2 * barMargin.y, 0]);
+    const barYAxis = d3.axisLeft(barYScale).tickFormat(d3.format(".0%"));
+
+    barSvg
+      .append("g")
+      .attr("class", "y-axis")
+      .attr("transform", `translate(${barMargin.x}, ${barMargin.y})`)
+      .transition()
+      .duration(1000)
+      .call(barYAxis);
+
+    // create stack rect
+    const rect = barSvg
+      .selectAll()
+      .data(series)
+      .enter()
+      .append("g")
+      .attr("fill", (d, i) => d3.schemeSet3[i % 12]);
+
+    // stack rect for each data value
+    rect
+      .selectAll("rect")
+      .data((d) => d)
+      .enter()
+      .append("rect")
+      .attr("x", barMargin.x + 2)
+      .attr("y", svgHeight - barMargin.y)
+      .attr("height", 0)
+      .attr("width", barWidth / 3)
+      .transition()
+      .duration(1000)
+      .attr("y", (d) => barYScale(d[1]) + barMargin.y)
+      .attr("height", (d) => barYScale(d[0]) - barYScale(d[1]));
+
+    /* Mapping with Tree */
+    const flatTree = flatten(root, true);
+
+    var prev = -1;
+    rect.selectAll("rect").on("click", function (event, d) {
+      const i = series.findIndex((element) => element[0] === d);
+      const clickedNode = flatTree[i].data.id;
+
+      if (clickedNode === prev) {
+        setSelectedCost("");
+
+        svg
+          .selectAll("circle")
+          .transition()
+          .duration(500)
+          .attr("fill", (d) =>
+            d.children ? d3.schemePastel2[2] : d3.schemePastel1[0]
+          );
+
+        prev = -1;
+
+        return;
+      }
+
+      const percent = (d[1] - d[0]).toLocaleString("en-US", {
+        style: "percent",
+        minimumFractionDigits: 2,
+      });
+
+      setSelectedCost(`Run Cost: ${flatTree[i].data.total_cost} (${percent})`);
+
+      svg
+        .selectAll("circle")
+        .transition()
+        .duration(500)
+        .attr("fill", "ghostwhite");
+
+      svg
+        .select(`#node-circle-${clickedNode}`)
+        .transition()
+        .duration(500)
+        .attr("fill", d3.schemeSet3[3]);
+
+      prev = clickedNode;
+    });
   }, [chosen]);
 
   return (
     <div>
-      <svg ref={treeSvg} width={width} height={height + 2 * marginY}></svg>
+      <div className="flex justify-between px-4 pt-2">
+        <p className="vis-title pt-2">Join Order Tree</p>
+      </div>
+      {relOptInfo[chosen] ? (
+        <div>
+          <div className="flex">
+            <svg ref={treeRef} width={treeWidth} height={svgHeight} />
+            <svg ref={barRef} width={barWidth} height={svgHeight} />
+          </div>
+          <hr className="w-48 h-1 mx-auto bg-gray-100 border-0 rounded md:mb-2 dark:bg-gray-700" />
+          <div
+            style={{ width: `${width}}px`, height: `${costHeight}px` }}
+            className="flex justify-center cost-text gap-6"
+          >
+            <p>Fitness: {fitness}</p>
+            <p>{selectedCost}</p>
+          </div>
+        </div>
+      ) : (
+        <div
+          style={{ width: `${width}}px`, height: `${height}px` }}
+          className="flex items-center justify-center"
+        >
+          <span className="font-[NanumSquareB] text-base">
+            Choose a gene to see the join order.
+          </span>
+        </div>
+      )}
     </div>
   );
 };

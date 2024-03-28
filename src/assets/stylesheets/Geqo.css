@@ -23,3 +23,19 @@
   background-color: white;
   padding: 5px;
 }
+
+.node-type-op {
+  font-size: 10px;
+}
+
+.node-type-rel {
+  font-size: 12px;
+}
+
+.relation-name {
+  font-size: 10px;
+}
+
+.cost-text {
+  font-size: 15px;
+}
