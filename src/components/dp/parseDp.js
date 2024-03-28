@@ -4,26 +4,26 @@
 
 export function parseDp(data) {
     const { optimizer } = data;
-    const uniqueNodeMap = new Map();
+    const nodeMap = new Map();
 
-    const generateId = (baseId) => {
+    const generateId = baseId => {
         let counter = 1;
         let newId = `${baseId} ${counter}`;
-        while (uniqueNodeMap.has(newId)) {
+        while (nodeMap.has(newId)) {
             counter++;
             newId = `${baseId} ${counter}`;
         }
         return newId;
     };
 
-    const addNode = (nodeId) => {
-        if (!uniqueNodeMap.has(nodeId)) {
-            uniqueNodeMap.set(nodeId, { id: nodeId, parentIds: [], labels: [] });
+    const addNode = nodeId => {
+        if (!nodeMap.has(nodeId)) {
+            nodeMap.set(nodeId, { id: nodeId, parentIds: [], labels: [] });
         }
     };
 
     const addLabel = (pathNodeId, label) => {
-        uniqueNodeMap.get(pathNodeId).labels.push(label);
+        nodeMap.get(pathNodeId).labels.push(label);
     };
 
     [...optimizer.base, ...optimizer.dp].forEach(entry => {
@@ -33,32 +33,29 @@ export function parseDp(data) {
             let pathNodeId = generateId(`${entry.relid} - ${path.node}`);
             addNode(pathNodeId);
 
-            uniqueNodeMap.get(entry.relid).parentIds.push(pathNodeId);
-            
-            if(path.join){
-            const processJoin = (side, sideType) => {
-                if (side) {
-                    addNode(side.relid);
-                    uniqueNodeMap.get(pathNodeId).parentIds.push(side.relid);
-                    if (side.node === "Material" || side.node === "Memoize") {
-                        addLabel(pathNodeId, `${side.node}`);
-                    }
-                    if (side.sub) {
-                        processJoin(side.sub, sideType);
-                    }
-                }
-            };
+            nodeMap.get(entry.relid).parentIds.push(pathNodeId);
 
-            processJoin(path.join.outer, "outer");
-            processJoin(path.join.inner, "inner");
+            if (path.join) {
+                const processJoin = (side, sideType) => {
+                    if (side) {
+                        addNode(side.relid);
+                        nodeMap.get(pathNodeId).parentIds.push(side.relid);
+                        if (side.node === 'Material' || side.node === 'Memoize') {
+                            addLabel(pathNodeId, `${side.node}`);
+                        }
+                    }
+                };
+
+                processJoin(path.join.outer, 'outer');
+                processJoin(path.join.inner, 'inner');
             }
         });
     });
 
-    return Array.from(uniqueNodeMap.values()).map(node => ({
+    return Array.from(nodeMap.values()).map(node => ({
         id: node.id,
         parentIds: node.parentIds,
         // only include labels if they exist
-        ...(node.labels.length > 0 && { labels: node.labels })
+        ...(node.labels.length > 0 && { labels: node.labels }),
     }));
 }
