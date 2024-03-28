@@ -25,6 +25,7 @@ const GraphView = props => {
     useEffect(() => {
         const dpData = parseDp(dp);
         setResults(dpData);
+        console.log(results);
     }, []);
 
     /* draw a graph */

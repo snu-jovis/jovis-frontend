@@ -7,6 +7,7 @@ export function parseDp(data) {
     const nodeMap = new Map();
     const nodeSet = new Set();
 
+    // path node 동일한 경우 처리
     const generateId = baseId => {
         let counter = 1;
         let newId = `${baseId} ${counter}`;
@@ -17,6 +18,7 @@ export function parseDp(data) {
         return newId;
     };
 
+    // id, parentIds 만들기
     const addNode = (relid, parentRelid = null) => {
         if (!nodeMap.has(relid)) {
             nodeMap.set(relid, { id: relid, parentIds: [] });
@@ -26,7 +28,7 @@ export function parseDp(data) {
         }
     };
 
-    // Material/Memoize 노드 추가
+    // Material/Memoize 처리
     const addSpecialNode = (pathNode, relid, parentRelid) => {
         const specialRelid = `${relid} - ${pathNode}`;
         addNode(specialRelid);
@@ -40,6 +42,7 @@ export function parseDp(data) {
         addNode(entry.relid);
 
         entry.paths?.forEach(path => {
+            // path node
             let pathRelid = generateId(`${entry.relid} - ${path.node}`);
             addNode(pathRelid);
             addNode(entry.relid, pathRelid);
@@ -49,7 +52,7 @@ export function parseDp(data) {
                     if (side) {
                         if (side.node === 'Material' || side.node === 'Memoize') {
                             addSpecialNode(side.node, side.relid, pathRelid);
-                        } else if (!nodeSet.has(side.relid)) {
+                        } else {
                             addNode(pathRelid, side.relid);
                         }
                     }
