@@ -5,6 +5,7 @@
 export function parseDp(data) {
     const { optimizer } = data;
     const nodeMap = new Map();
+    const nodeSet = new Set();
 
     const generateId = baseId => {
         let counter = 1;
@@ -16,32 +17,40 @@ export function parseDp(data) {
         return newId;
     };
 
-    const addNode = nodeId => {
-        if (!nodeMap.has(nodeId)) {
-            nodeMap.set(nodeId, { id: nodeId, parentIds: [], labels: [] });
+    const addNode = (relid, parentRelid = null) => {
+        if (!nodeMap.has(relid)) {
+            nodeMap.set(relid, { id: relid, parentIds: [] });
+        }
+        if (parentRelid && !nodeMap.get(relid).parentIds.includes(parentRelid)) {
+            nodeMap.get(relid).parentIds.push(parentRelid);
         }
     };
 
-    const addLabel = (pathNodeId, label) => {
-        nodeMap.get(pathNodeId).labels.push(label);
+    // Material/Memoize 노드 추가
+    const addSpecialNode = (pathNode, relid, parentRelid) => {
+        const specialRelid = `${relid} - ${pathNode}`;
+        addNode(specialRelid);
+        addNode(specialRelid, relid);
+        addNode(parentRelid, specialRelid);
+
+        nodeSet.add(relid);
     };
 
     [...optimizer.base, ...optimizer.dp].forEach(entry => {
         addNode(entry.relid);
 
         entry.paths?.forEach(path => {
-            let pathNodeId = generateId(`${entry.relid} - ${path.node}`);
-            addNode(pathNodeId);
-
-            nodeMap.get(entry.relid).parentIds.push(pathNodeId);
+            let pathRelid = generateId(`${entry.relid} - ${path.node}`);
+            addNode(pathRelid);
+            addNode(entry.relid, pathRelid);
 
             if (path.join) {
-                const processJoin = (side, sideType) => {
+                const processJoin = side => {
                     if (side) {
-                        addNode(side.relid);
-                        nodeMap.get(pathNodeId).parentIds.push(side.relid);
                         if (side.node === 'Material' || side.node === 'Memoize') {
-                            addLabel(pathNodeId, `${side.node}`);
+                            addSpecialNode(side.node, side.relid, pathRelid);
+                        } else if (!nodeSet.has(side.relid)) {
+                            addNode(pathRelid, side.relid);
                         }
                     }
                 };
@@ -55,7 +64,5 @@ export function parseDp(data) {
     return Array.from(nodeMap.values()).map(node => ({
         id: node.id,
         parentIds: node.parentIds,
-        // only include labels if they exist
-        ...(node.labels.length > 0 && { labels: node.labels }),
     }));
 }
