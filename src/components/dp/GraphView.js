@@ -1,8 +1,9 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { parseDp } from './parseDp';
+import { parseDp, parseOptimalOne } from './parseDp';
 import dp from '../../data/dp/dp.json';
 import * as d3 from 'd3';
 import * as d3dag from 'https://cdn.skypack.dev/d3-dag@1.0.0-1';
+import { Checkbox } from '@material-tailwind/react';
 
 import '../../assets/stylesheets/Dp.css';
 
@@ -16,25 +17,45 @@ const GraphView = props => {
     const query = dp.query;
     const queryResult = dp.result;
 
-    const targetEntry = dp.optimizer.dp[dp.optimizer.dp.length - 1];
-    const totalCost = targetEntry ? targetEntry.cheapest_total_paths.total_cost : 'N/A';
+    const target = dp.optimizer.dp[dp.optimizer.dp.length - 1];
+    const totalCost = target ? target.cheapest_total_paths.total_cost : 'N/A';
 
     const [results, setResults] = useState([]);
+    const [optimalData, setOptimalData] = useState([]);
+    const [showOptimalOne, setShowOptimalOne] = useState(false);
+
+    const handleCheckboxChange = () => {
+        setShowOptimalOne(prev => !prev);
+    };
 
     /* process data */
     useEffect(() => {
         const dpData = parseDp(dp);
         setResults(dpData);
-        console.log(results);
     }, []);
+
+    /* process cheapest path data */
+    useEffect(() => {
+        const opData = parseOptimalOne(dp);
+        setOptimalData(opData);
+        console.log('Optimal data', optimalData);
+    }, []);
+    console.log('무엇이 문제인가?');
 
     /* draw a graph */
     useEffect(() => {
-        drawGraph({
-            graphSvg: dagSvg,
-            data: results,
-        });
-    });
+        if (showOptimalOne) {
+            drawGraph({
+                graphSvg: dagSvg,
+                data: optimalData,
+            });
+        } else {
+            drawGraph({
+                graphSvg: dagSvg,
+                data: results,
+            });
+        }
+    }, [results, dagSvg, showOptimalOne, optimalData]);
 
     function drawGraph(props) {
         const { graphSvg, data } = props;
@@ -220,6 +241,15 @@ const GraphView = props => {
             <h2>Total Cost</h2>
             <p>{totalCost}</p>
             <svg ref={dagSvg} width={svgWidth} height={svgHeight}></svg>
+            <div className='checkbox-container'>
+                <Checkbox
+                    color='blue'
+                    className='h-4 w-4 rounded-full border-gray-900/20 bg-gray-900/10 transition-all hover:scale-105 hover:before:opacity-0'
+                    checked={showOptimalOne}
+                    label={<p className='text'>Show Optimized One</p>}
+                    onClick={handleCheckboxChange}
+                />
+            </div>
         </div>
     );
 };
