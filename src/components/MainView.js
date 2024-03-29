@@ -1,13 +1,13 @@
-import { useRef, useContext } from 'react';
+import { useRef, useContext, useEffect } from 'react';
 
 import Editor, { DiffEditor, useMonaco, loader } from '@monaco-editor/react';
 import { Button } from "@material-tailwind/react";
 
 import Dp from "./dp/Dp";
 import Geqo from "./geqo/Geqo";
-import SQLEditor from "./SQLEditor";
 
 import { HistoryContext } from "./providers/HistoryProvider";
+import { SqlToEditorContext } from "./providers/SqlToEditorProvider";
 import axios from 'axios';
 
 
@@ -15,6 +15,7 @@ export default function MainView() {
 
     const editorRef = useRef(null);
     const { addHistory } = useContext(HistoryContext);
+    const { setCallback } = useContext(SqlToEditorContext);
 
     const handleEditorDidMount = (editor, monaco) => {
         editorRef.current = editor;
@@ -36,6 +37,14 @@ export default function MainView() {
     const onClickClear = () => {
         editorRef.current.setValue("");
     }
+
+    const onSidebarSignal = (sql) => {
+        editorRef.current.setValue(sql);
+    };
+
+    useEffect(() => {
+        setCallback(onSidebarSignal);
+    }, []);
 
     return (
         <div className="view-container grow">
