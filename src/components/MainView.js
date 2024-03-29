@@ -1,61 +1,86 @@
-import { useRef, useContext } from 'react';
+import { useRef, useContext, useState } from "react";
 
-import Editor, { DiffEditor, useMonaco, loader } from '@monaco-editor/react';
+import DpMain from "./dp/DpMain";
+import GeqoMain from "./geqo/GeqoMain";
+
+import Editor, { DiffEditor, useMonaco, loader } from "@monaco-editor/react";
 import { Button } from "@material-tailwind/react";
 
-import Dp from "./dp/Dp";
-import Geqo from "./geqo/Geqo";
-
 import { HistoryContext } from "./providers/HistoryProvider";
-import axios from 'axios';
+import axios from "axios";
 
+import responseData from "../data/geqo.json";
+import GraphView from "./dp/GraphView";
 
 export default function MainView() {
+  const editorRef = useRef(null);
+  const { addHistory } = useContext(HistoryContext);
+  const [queryRes, setQueryRes] = useState({});
 
-    const editorRef = useRef(null);
-    const { addHistory } = useContext(HistoryContext);
+  const handleEditorDidMount = (editor, monaco) => {
+    editorRef.current = editor;
+  };
 
-    const handleEditorDidMount = (editor, monaco) => {
-        editorRef.current = editor;
-    }
+  const submitQuery = (sql) => {
+    const res = responseData;
+    setQueryRes(res);
+    return;
+    // TODO:
+    axios
+      .post("http://localhost:8000/query/", {
+        query: sql,
+      })
+      .then((response) => {
+        console.log(response);
+        setQueryRes(response.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
 
-    const onClickSubmit = () => {
-        const sql = editorRef.current.getValue();
-        addHistory(sql);
+  const onClickSubmit = () => {
+    const sql = editorRef.current.getValue();
+    addHistory(sql);
+    submitQuery(sql);
+  };
 
-        axios.post("http://localhost:8000/query/", {
-            query: sql
-        }).then((response) => {
-            console.log(response);
-        }).catch((error) => {
-            console.log(error);
-        });
-    }
+  const onClickClear = () => {
+    editorRef.current.setValue("");
+  };
 
-    const onClickClear = () => {
-        editorRef.current.setValue("");
-    }
-
-    return (
-        <div className="view-container grow flex flex-col">
-            <div className="border-2 border-solid flex flex-col">
-                <Editor height="20vh" 
-                    defaultLanguage="sql" 
-                    defaultValue="/* Type your query here */" 
-                    // theme="vs-dark" 
-                    onMount={handleEditorDidMount}
-                    options={{
-                        minimap: { enabled: false },
-                    }}/>
-                <div className="flex flex-row-reverse gap-2 m-4">
-                    <Button variant="outlined" ripple={false} onClick={onClickClear}>Clear</Button>
-                    <Button ripple={false} onClick={onClickSubmit}>Submit</Button>
-                </div>
-            </div>
-            <div className="grow overflow-auto">
-                <Dp />
-                <Geqo />
-            </div>
+  return (
+    <div className="view-container grow">
+      <div className="border-2 border-solid flex flex-col mb-2">
+        <Editor
+          height="20vh"
+          defaultLanguage="sql"
+          defaultValue="/* Type your query here */"
+          // theme="vs-dark"
+          onMount={handleEditorDidMount}
+          options={{
+            minimap: { enabled: false },
+          }}
+        />
+        <div className="flex flex-row-reverse gap-2 mx-4 my-2">
+          <Button
+            className="px-2 py-2"
+            variant="outlined"
+            ripple={false}
+            onClick={onClickClear}
+          >
+            Clear
+          </Button>
+          <Button className="px-2 py-2" ripple={false} onClick={onClickSubmit}>
+            Submit
+          </Button>
         </div>
-    )
+      </div>
+      <div>
+        {/* DP or GEQO here */}
+        <DpMain />
+        <GeqoMain data={queryRes} />
+      </div>
+    </div>
+  );
 }

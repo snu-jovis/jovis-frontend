@@ -3,69 +3,109 @@
  */
 
 export function parseDp(data) {
-    const { optimizer } = data;
-    const nodeMap = new Map();
-    const nodeSet = new Set();
+  const { optimizer } = data;
+  const nodeMap = new Map();
 
-    // path node 동일한 경우 처리
-    const generateId = baseId => {
-        let counter = 1;
-        let newId = `${baseId} ${counter}`;
-        while (nodeMap.has(newId)) {
-            counter++;
-            newId = `${baseId} ${counter}`;
-        }
-        return newId;
-    };
+  // id, parentIds 만들기
+  const addNode = (node, level, relid, parentRelid = null) => {
+    if (!nodeMap.has(relid)) {
+      nodeMap.set(relid, { id: relid, parentIds: [], level, ...node });
+    }
+    if (parentRelid && !nodeMap.get(relid).parentIds.includes(parentRelid)) {
+      nodeMap.get(relid).parentIds.push(parentRelid);
+    }
+  };
 
-    // id, parentIds 만들기
-    const addNode = (relid, parentRelid = null) => {
-        if (!nodeMap.has(relid)) {
-            nodeMap.set(relid, { id: relid, parentIds: [] });
-        }
-        if (parentRelid && !nodeMap.get(relid).parentIds.includes(parentRelid)) {
-            nodeMap.get(relid).parentIds.push(parentRelid);
-        }
-    };
+  // Material / Memoize 처리
+  const addSpecialNode = (node, pathNode, relid, parentRelid) => {
+    const level = relid.split(" ").length;
+    const specialRelid = `${relid} - ${pathNode}`;
 
-    // Material/Memoize 처리
-    const addSpecialNode = (pathNode, relid, parentRelid) => {
-        const specialRelid = `${relid} - ${pathNode}`;
-        addNode(specialRelid);
-        addNode(specialRelid, relid);
-        addNode(parentRelid, specialRelid);
+    addNode(node, level * 2 - 0.5, specialRelid);
+    addNode(node, level * 2 - 0.5, specialRelid, relid);
+    addNode(node, level * 2 - 0.5, parentRelid, specialRelid);
+  };
 
-        nodeSet.add(relid);
-    };
+  // process SCAN
+  [...optimizer.base].forEach((entry) => {
+    entry.paths?.forEach((path) => {
+      const pathRelid = `${path.relid} - ${path.node}`;
 
-    [...optimizer.base, ...optimizer.dp].forEach(entry => {
-        addNode(entry.relid);
-
-        entry.paths?.forEach(path => {
-            // path node
-            let pathRelid = generateId(`${entry.relid} - ${path.node}`);
-            addNode(pathRelid);
-            addNode(entry.relid, pathRelid);
-
-            if (path.join) {
-                const processJoin = side => {
-                    if (side) {
-                        if (side.node === 'Material' || side.node === 'Memoize') {
-                            addSpecialNode(side.node, side.relid, pathRelid);
-                        } else {
-                            addNode(pathRelid, side.relid);
-                        }
-                    }
-                };
-
-                processJoin(path.join.outer, 'outer');
-                processJoin(path.join.inner, 'inner');
-            }
-        });
+      addNode(path, 0, pathRelid);
+      addNode(entry, 1, entry.relid, pathRelid);
     });
+  });
 
-    return Array.from(nodeMap.values()).map(node => ({
-        id: node.id,
-        parentIds: node.parentIds,
-    }));
+  // process JOIN
+  [...optimizer.dp].forEach((entry) => {
+    const level = entry.relid.split(" ").length;
+    entry.paths?.forEach((path) => {
+      let pathRelid = `${entry.relid} - ${path.node}`;
+
+      addNode(path, 2 * level - 2, pathRelid);
+      addNode(entry, 2 * level - 1, entry.relid, pathRelid);
+
+      if (path.join) {
+        const processJoin = (side) => {
+          if (side) {
+            // if (side.node === "Material" || side.node === "Memoize") {
+            // addSpecialNode(side, side.node, side.relid, pathRelid);
+            // } else {
+            addNode(path, level, pathRelid, side.relid);
+            // }
+          }
+        };
+
+        processJoin(path.join.outer);
+        processJoin(path.join.inner);
+      }
+    });
+  });
+
+  return Array.from(nodeMap.values()).map((node) => ({
+    ...node,
+  }));
+}
+
+export function parseOptimalOne(data) {
+  const { optimizer } = data;
+  const nodeMap = new Map();
+
+  const addNode = (id, parentId) => {
+    let node;
+    if (nodeMap.has(id)) {
+      node = nodeMap.get(id);
+    } else {
+      node = { id: id, parentIds: [] };
+      nodeMap.set(id, node);
+    }
+    if (parentId && !node.parentIds.includes(parentId)) {
+      if (id !== parentId) {
+        node.parentIds.push(parentId);
+      }
+    }
+  };
+
+  [...optimizer.base, ...optimizer.dp].forEach((entry) => {
+    if (entry.cheapest_total_paths) {
+      const node = entry.cheapest_total_paths;
+      const nodeId = `${entry.relid} - ${node.node}`;
+      const parentId = entry.relid;
+
+      addNode(nodeId, null);
+      addNode(parentId, nodeId);
+      if (node.join) {
+        const processJoin = (side) => {
+          if (side) {
+            addNode(nodeId, side.relid);
+          }
+        };
+
+        processJoin(node.join.outer, "outer");
+        processJoin(node.join.inner, "inner");
+      }
+    }
+  });
+
+  return Array.from(nodeMap.values());
 }

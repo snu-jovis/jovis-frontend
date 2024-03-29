@@ -1,0 +1,56 @@
+.vis-title {
+  font-family: "NanumSquareEB";
+  color: black;
+  text-align: left;
+}
+
+.focus-gen {
+  font-family: "NanumSquareB";
+  font-size: 12px;
+}
+
+.focus-cost {
+  font-family: "NanumSquareB";
+  font-size: 10px;
+}
+
+.node-type-op {
+  font-family: "NanumSquareB";
+  font-size: 10px;
+}
+
+.node-type-rel {
+  font-family: "NanumSquareR";
+  font-size: 12px;
+}
+
+.node-type {
+  font-family: "NanumSquareR";
+  font-size: 14px;
+}
+
+.relation-name {
+  font-family: "NanumSquareR";
+  font-size: 10px;
+}
+
+.cost-text {
+  font-size: 15px;
+  font-family: "NanumSquareR";
+}
+
+.erx-sign {
+  font-family: "NanumSquareR";
+  font-size: x-large;
+}
+
+.gene-tooltip {
+  position: absolute;
+  visibility: hidden;
+  padding: 3px;
+  font-family: "NanumSquareB";
+  font-size: 11px;
+  color: white;
+  background-color: black;
+  opacity: 0.6;
+}

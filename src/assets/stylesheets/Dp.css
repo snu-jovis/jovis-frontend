@@ -1,25 +1,46 @@
 .html {
-    height: 100%;
+  height: 100%;
 }
 
 .body {
-    margin: 0;
-    height: 100%;
-    overflow-y: clip;
+  margin: 0;
+  height: 100%;
+  overflow-y: clip;
 }
 
 .svg {
-    position: relative;
-    justify-content: center;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
+  position: relative;
+  justify-content: center;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
 }
 
 .svg-container {
-    width: 800px;
-    height: 500px;
-    overflow-x: scroll;
-    overflow-y: scroll;
-    border: 1px solid #ccc;
+  width: 800px;
+  height: 500px;
+  overflow-x: scroll;
+  overflow-y: scroll;
+  border: 1px solid #ccc;
+}
+
+.dp-text {
+  font-family: "NanumSquareEB";
+  font-size: 16px;
+}
+
+.dp-node-text {
+  font-family: "NanumSquareB";
+  font-size: 14px;
+}
+
+.dp-tooltip {
+  position: absolute;
+  visibility: hidden;
+  padding: 3px;
+  font-family: "NanumSquareB";
+  font-size: 11px;
+  color: white;
+  background-color: black;
+  opacity: 0.6;
 }
