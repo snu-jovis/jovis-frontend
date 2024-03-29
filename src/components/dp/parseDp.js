@@ -5,7 +5,6 @@
 export function parseDp(data) {
     const { optimizer } = data;
     const nodeMap = new Map();
-    const nodeSet = new Set();
 
     // path node 동일한 경우 처리
     const generateId = baseId => {
@@ -34,8 +33,6 @@ export function parseDp(data) {
         addNode(specialRelid);
         addNode(specialRelid, relid);
         addNode(parentRelid, specialRelid);
-
-        nodeSet.add(relid);
     };
 
     [...optimizer.base, ...optimizer.dp].forEach(entry => {
@@ -68,4 +65,47 @@ export function parseDp(data) {
         id: node.id,
         parentIds: node.parentIds,
     }));
+}
+
+export function parseOptimalOne(data) {
+    const { optimizer } = data;
+    const nodeMap = new Map();
+
+    const addNode = (id, parentId) => {
+        let node;
+        if (nodeMap.has(id)) {
+            node = nodeMap.get(id);
+        } else {
+            node = { id: id, parentIds: [] };
+            nodeMap.set(id, node);
+        }
+        if (parentId && !node.parentIds.includes(parentId)) {
+            if (id !== parentId) {
+                node.parentIds.push(parentId);
+            }
+        }
+    };
+
+    [...optimizer.base, ...optimizer.dp].forEach(entry => {
+        if (entry.cheapest_total_paths) {
+            const node = entry.cheapest_total_paths;
+            const nodeId = `${entry.relid} - ${node.node}`;
+            const parentId = entry.relid;
+
+            addNode(nodeId, null);
+            addNode(parentId, nodeId);
+            if (node.join) {
+                const processJoin = side => {
+                    if (side) {
+                        addNode(nodeId, side.relid);
+                    }
+                };
+
+                processJoin(node.join.outer, 'outer');
+                processJoin(node.join.inner, 'inner');
+            }
+        }
+    });
+
+    return Array.from(nodeMap.values());
 }
