@@ -37,7 +37,7 @@ export default function MainView() {
     }
 
     return (
-        <div className="view-container grow">
+        <div className="view-container grow flex flex-col">
             <div className="border-2 border-solid flex flex-col">
                 <Editor height="20vh" 
                     defaultLanguage="sql" 
@@ -52,9 +52,7 @@ export default function MainView() {
                     <Button ripple={false} onClick={onClickSubmit}>Submit</Button>
                 </div>
             </div>
-            <div className="flex justify-center items-center h-60">
-                {/* DP or GEQO here */}
-                <h1>DP or GEQO here!</h1>
+            <div className="grow overflow-auto">
                 <Dp />
                 <Geqo />
             </div>
