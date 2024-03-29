@@ -8,7 +8,7 @@ import { Card } from "@material-tailwind/react";
 
 import "../../assets/stylesheets/Geqo.css";
 
-const GeqoMain = () => {
+const GeqoMain = (props) => {
   const chartRef = useRef(null);
   const [chartSize, setChartSize] = useState(0);
 
