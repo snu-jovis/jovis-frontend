@@ -1,4 +1,4 @@
-import { useRef, useContext } from "react";
+import { useRef, useContext, useState } from "react";
 
 import Dp from "./dp/Dp";
 import GeqoMain from "./geqo/GeqoMain";
@@ -9,28 +9,41 @@ import { Button } from "@material-tailwind/react";
 import { HistoryContext } from "./providers/HistoryProvider";
 import axios from "axios";
 
+import responseData from "../data/geqo.json";
+
+
 export default function MainView() {
+
   const editorRef = useRef(null);
   const { addHistory } = useContext(HistoryContext);
+  const [ queryRes, setQueryRes ] = useState({});
 
   const handleEditorDidMount = (editor, monaco) => {
     editorRef.current = editor;
   };
 
-  const onClickSubmit = () => {
-    const sql = editorRef.current.getValue();
-    addHistory(sql);
-
+  const submitQuery = (sql) => {
+    const res = responseData;
+    setQueryRes(res);
+    return;
+    // TODO:
     axios
       .post("http://localhost:8000/query/", {
         query: sql,
       })
-      .then((response) => {
+      .then((response) =>{
         console.log(response);
+        setQueryRes(response.data);
       })
       .catch((error) => {
         console.log(error);
       });
+  }
+
+  const onClickSubmit = () => {
+    const sql = editorRef.current.getValue();
+    addHistory(sql);
+    submitQuery(sql);
   };
 
   const onClickClear = () => {
@@ -66,7 +79,7 @@ export default function MainView() {
       </div>
       <div>
         {/* DP or GEQO here */}
-        <GeqoMain />
+        <GeqoMain data={queryRes}/>
       </div>
     </div>
   );
