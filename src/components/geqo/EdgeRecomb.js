@@ -292,7 +292,7 @@ const EdgeRecomb = ({ width, height }) => {
   return (
     <>
       <div className="flex justify-between px-4 py-2">
-        <p className="vis-title py-2">Edge Recombination Crossover (ERX)</p>
+        <p className="vis-title py-2">Edge Recombination Crossover</p>
       </div>
       {mom && dad && child ? (
         <div>

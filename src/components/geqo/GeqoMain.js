@@ -37,7 +37,7 @@ const GeqoMain = () => {
 
   return (
     <div className="flex gap-x-2">
-      <div ref={chartRef} className="w-1/4 grid grid-cols-1 gap-2">
+      <div ref={chartRef} className="w-1/4 grid grid-cols-1 gap-2 ml-2 mr-6">
         <Card>
           <CostChart width={chartSize} height={chartSize} />
         </Card>
@@ -45,10 +45,10 @@ const GeqoMain = () => {
           <JoinOrderTree width={chartSize} height={chartSize} />
         </Card>
       </div>
-      <div ref={fullRef} className="w-1/2">
+      <div ref={fullRef} className="w-1/2 flex justify-center">
         <FullView width={fullSize} height={fullSize} />
       </div>
-      <div ref={indivRef} className="w-1/4 grid grid-cols-1 gap-2 mr-4">
+      <div ref={indivRef} className="w-1/4 grid grid-cols-1 gap-2 ml-6 mr-4">
         <Card>
           <ParseQueryPlan width={indivSize} height={indivSize} />
         </Card>
