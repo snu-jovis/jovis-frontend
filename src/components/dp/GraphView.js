@@ -38,9 +38,7 @@ const GraphView = props => {
     useEffect(() => {
         const opData = parseOptimalOne(dp);
         setOptimalData(opData);
-        console.log('Optimal data', optimalData);
     }, []);
-    console.log('무엇이 문제인가?');
 
     /* draw a graph */
     useEffect(() => {
@@ -89,7 +87,6 @@ const GraphView = props => {
             /* color */
             const colorMap = new Map();
             const nodesArray = Array.from(graph.nodes());
-            const linksArray = Array.from(graph.links());
 
             const nodeTypes = [
                 ...new Set(
