@@ -13,11 +13,11 @@ const GraphView = ({ width, height, data }) => {
     const sliderWidth = 300;
     const sliderHeight = 50;
 
-    const target = data.optimizer.dp[data.optimizer.dp.length - 1];
-    const totalCost = target.cheapest_total_paths.total_cost;
     const margin = { x: 0, y: 20 };
 
     const [showOptimalOne, setShowOptimalOne] = useState(false);
+    const [totalCost, setTotalCost] = useState(0);
+
     const handleCheckboxChange = () => {
         setShowOptimalOne(prev => !prev);
     };
@@ -30,7 +30,7 @@ const GraphView = ({ width, height, data }) => {
         var interval;
 
         const levelDepth = data[data.length - 1].level;
-        const tickVale = d3.range(0, (levelDepth + 1) / 2);
+        const tickValue = d3.range(0, (levelDepth + 1) / 2);
         const maxSliderValue = (levelDepth + 1) / 2;
         const svg = d3.select(sliderSvg.current);
 
@@ -40,12 +40,10 @@ const GraphView = ({ width, height, data }) => {
             .max(maxSliderValue)
             .step(1)
             .width(sliderWidth)
-            .tickValues(tickVale)
+            .tickValues(tickValue)
             .default(0)
             .on('onchange', val => {
                 currentValue = val;
-                console.log('Slider value: ', val);
-                updateTotalCost(val);
             });
 
         var sliderRange = svg.append('g');
@@ -75,21 +73,9 @@ const GraphView = ({ width, height, data }) => {
                 }, 1000);
             }
         });
-
-        function updateTotalCost(sliderValue) {
-            const level = (sliderValue - 1) * 2;
-            const filteredData = data.filter(d => d.level === level);
-            filteredData.forEach((d, i) => {
-                svg.append('text')
-                    .attr('class', 'total-cost-text')
-                    .attr('x', 10)
-                    .attr('y', 20 + i * 20)
-                    .text(`Level ${d.level} total cost: ${d.total_cost}`);
-            });
-        }
     }
 
-    function drawGraph({ graphSvg, data }) {
+    function drawGraph({ graphSvg, data, cost }) {
         d3.select(graphSvg.current).selectAll('*').remove(); //clear
 
         // data graph 형태로 변경
@@ -97,7 +83,6 @@ const GraphView = ({ width, height, data }) => {
 
         /* coumput layout */
         const nodeRadius = 25;
-        const nodeSize = [nodeRadius * 2, nodeRadius * 2];
         const dagDepth = data[data.length - 1].level;
 
         const layout = d3dag
@@ -110,7 +95,6 @@ const GraphView = ({ width, height, data }) => {
                 }
             })
             .gap([20, 20]);
-        // .tweaks([shape]);
 
         const { width: dagWidth, height: dagHeight } = layout(graph);
 
@@ -157,31 +141,6 @@ const GraphView = ({ width, height, data }) => {
             .attr('transform', d => {
                 return `translate(${d.x}, ${d.data.level * (dagHeight / dagDepth) + margin.y})`;
             });
-
-        // // create arrows
-        // const arrowSize = (nodeRadius * nodeRadius) / 20.0;
-        // const arrowLen = Math.sqrt((4 * arrowSize) / Math.sqrt(3));
-        // const arrow = d3.symbol().type(d3.symbolTriangle).size(arrowSize);
-
-        // svg
-        //   .append("g")
-        //   .selectAll("path")
-        //   .data(graph.links())
-        //   .enter()
-        //   .append("path")
-        //   .attr("d", arrow)
-        //   .attr("transform", ({ points }) => {
-        //     const [[sx, sy], [ex, ey]] = points.slice(-2);
-        //     const dx = sx - ex;
-        //     const dy = sy - ey;
-        //     // This is the angle of the last line segment
-        //     const angle = (Math.atan2(-dy, -dx) * 180) / Math.PI + 90;
-        //     return `translate(${ex}, ${ey}) rotate(${angle})`;
-        //   })
-        //   .attr("fill", ({ target }) => colorMap[target.data.id])
-        //   .attr("stroke", "white")
-        //   .attr("stroke-width", 1.5)
-        //   .attr("stroke-dasharray", `${arrowLen},${arrowLen}`);
 
         const colorMap = new Map();
         const nodesArray = Array.from(graph.nodes());
@@ -234,6 +193,18 @@ const GraphView = ({ width, height, data }) => {
             })
             .on('mouseout', function () {
                 tooltip.style('visibility', 'hidden');
+            })
+            .on('click', function (event, d) {
+                if (
+                    !d.data.nodeData ||
+                    d.data.nodeData.total_cost === undefined ||
+                    d.data.nodeData.total_cost === null
+                ) {
+                    console.log('click disabled for this node.');
+                    return;
+                }
+
+                setTotalCost(`${d.data.nodeData.total_cost}`);
             });
 
         /* ANIMATION */
@@ -263,7 +234,7 @@ const GraphView = ({ width, height, data }) => {
                     return d.data.level <= level + 1 && d.data.level > level - 1;
                 })
                 .transition()
-                .duration(10)
+                .duration(1000)
                 .style('opacity', 1);
 
             links
@@ -271,7 +242,7 @@ const GraphView = ({ width, height, data }) => {
                     return d.target.data.level === level + 1 || d.target.data.level === level;
                 })
                 .transition()
-                .duration(10)
+                .duration(1000)
                 .style('opacity', 1)
                 .end()
                 .then(() => {
@@ -281,7 +252,7 @@ const GraphView = ({ width, height, data }) => {
                             return d.data.level === level && !cheapestId.includes(`${d.data.id.replace(/\s/g, '')}`);
                         })
                         .transition()
-                        .duration(10)
+                        .duration(1000)
                         .style('opacity', 0);
 
                     links
@@ -295,7 +266,7 @@ const GraphView = ({ width, height, data }) => {
                             );
                         })
                         .transition()
-                        .duration(10)
+                        .duration(1000)
                         .style('opacity', 0)
                         .end()
                         .then(() => {
@@ -329,6 +300,7 @@ const GraphView = ({ width, height, data }) => {
         drawSlider({
             sliderSvg: sliderRef,
             data: dpData,
+            cost: setTotalCost,
         });
     }, [sliderRef]);
 
