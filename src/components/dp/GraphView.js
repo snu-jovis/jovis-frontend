@@ -136,26 +136,7 @@ const GraphView = props => {
                 .attr('stroke-width', 3)
                 .attr('stroke', 'lightgrey');
 
-            linksArray.forEach(d => {
-                svg.append('text')
-                    .text(() => {
-                        if (d.source.data.labels) {
-                            return d.source.data.labels[0];
-                        }
-                        return '';
-                    })
-                    .attr('fill', 'red')
-                    .attr('font-size', '16')
-                    .attr('text-anchor', 'middle')
-                    .attr('x', () => {
-                        // return d.points[0][0];
-                        return d.points[0][0] + (d.points[d.points.length - 1][0] - d.points[0][0]) / 2;
-                    })
-                    .attr('y', () => {
-                        // return d.points[0][1]
-                        return d.points[0][1] + (d.points[d.points.length - 1][1] - d.points[0][1]) / 2;
-                    });
-            });
+            const tooltip = d3.select('body').append('div').attr('class', 'graph-tooltip');
 
             // create nodes
             const nodes = svg
@@ -164,7 +145,18 @@ const GraphView = props => {
                 .data(graph.nodes())
                 .enter()
                 .append('g')
-                .attr('transform', ({ x, y }) => `translate(${x}, ${y})`);
+                .attr('transform', ({ x, y }) => `translate(${x}, ${y})`)
+                .on('mouseover', function (event, d) {
+                    tooltip
+                        .html(`Node ID: ${d.data.id} <br> Parents: ${d.data.parentIds}`)
+                        .style('visibility', 'visible');
+                })
+                .on('mousemove', function (e) {
+                    tooltip.style('top', e.pageY - 10 + 'px').style('left', e.pageX + 10 + 'px');
+                })
+                .on('mouseout', function (d) {
+                    tooltip.html(``).style('visibility', 'hidden');
+                });
 
             // apply colors to nodes
             nodes.each(function (d) {
