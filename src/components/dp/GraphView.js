@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { parseDp, parseOptimalOne } from "./parseDp";
+import { parseDp, parseOptimal, parseOptimalOne } from "./parseDp";
 import * as d3 from "d3";
 import * as d3dag from "https://cdn.skypack.dev/d3-dag@1.0.0-1";
 import { Checkbox } from "@material-tailwind/react";
@@ -10,13 +10,17 @@ const GraphView = ({ width, height, data }) => {
   const dagSvg = useRef(null);
   const margin = { x: 0, y: 20 };
 
+  const [level, setLevel] = useState(0);
+
   const [showOptimalOne, setShowOptimalOne] = useState(false);
   const handleCheckboxChange = () => {
     setShowOptimalOne((prev) => !prev);
   };
 
+  const optimal = parseOptimal(data);
+  console.log("opt", optimal);
+
   function drawGraph({ graphSvg, data }) {
-    console.log(data);
     d3.select(graphSvg.current).selectAll("*").remove(); //clear
 
     // data graph 형태로 변경
@@ -32,12 +36,12 @@ const GraphView = ({ width, height, data }) => {
       .sugiyama()
       .nodeSize((node) => {
         if (node.data.id.includes(" - ")) {
-          return [node.data.id.length * 6 + 20, 200];
+          return [150, 150];
         } else {
           return [50, 50];
         }
       })
-      .gap([30, 30]);
+      .gap([20, 20]);
     // .tweaks([shape]);
 
     const { width: dagWidth, height: dagHeight } = layout(graph);
@@ -58,7 +62,7 @@ const GraphView = ({ width, height, data }) => {
 
     // create links
     const line = d3.line().curve(d3.curveMonotoneY);
-    svg
+    const links = svg
       .append("g")
       .selectAll("path")
       .data(graph.links())
@@ -141,6 +145,7 @@ const GraphView = ({ width, height, data }) => {
       if (parts.length > 1) {
         node
           .append("rect")
+          .attr("id", (d) => d.data.id.replace(/\s/g, ""))
           .attr("width", d.data.id.length * 6 + 20)
           .attr("height", 50)
           .attr("x", -d.data.id.length * 3 - 10)
@@ -182,6 +187,86 @@ const GraphView = ({ width, height, data }) => {
       .on("mouseout", function () {
         tooltip.style("visibility", "hidden");
       });
+
+    /* ANIMATION */
+    nodes.style("opacity", "0");
+    links.style("opacity", "0");
+
+    function animate(level) {
+      if (level > dagDepth) return;
+
+      var cheapestId = [];
+      nodes
+        .filter(function (d) {
+          return d.data.level === level + 1;
+        })
+        .each(function (d) {
+          cheapestId.push(
+            `${d.data.nodeData.cheapest_total_paths.relid} - ${d.data.nodeData.cheapest_total_paths.node}`.replace(
+              /\s/g,
+              ""
+            )
+          );
+        });
+
+      // First transition: Make nodes with d.data.level <= level + 1 appear
+      nodes
+        .filter(function (d) {
+          return d.data.level <= level + 1 && d.data.level > level - 1;
+        })
+        .transition()
+        .duration(10)
+        .style("opacity", 1);
+
+      links
+        .filter(function (d) {
+          return (
+            d.target.data.level === level + 1 || d.target.data.level === level
+          );
+        })
+        .transition()
+        .duration(10)
+        .style("opacity", 1)
+        .end()
+        .then(() => {
+          // Second transition: Make nodes with d.data.level === level and id !== cheapestId disappear
+          nodes
+            .filter(function (d) {
+              return (
+                d.data.level === level &&
+                !cheapestId.includes(`${d.data.id.replace(/\s/g, "")}`)
+              );
+            })
+            .transition()
+            .duration(10)
+            .style("opacity", 0);
+
+          links
+            .filter(function (d) {
+              return (
+                (d.source.data.level === 1 && d.target.data.level !== 2) ||
+                (d.target.data.level === level &&
+                  !cheapestId.includes(
+                    `${d.target.data.id.replace(/\s/g, "")}`
+                  )) ||
+                (d.target.data.level === level + 1 &&
+                  !cheapestId.includes(
+                    `${d.source.data.id.replace(/\s/g, "")}`
+                  ))
+              );
+            })
+            .transition()
+            .duration(10)
+            .style("opacity", 0)
+            .end()
+            .then(() => {
+              animate(level + 2);
+            });
+        });
+    }
+
+    // Start the animation with level 0
+    animate(0);
   }
 
   useEffect(() => {
@@ -198,7 +283,7 @@ const GraphView = ({ width, height, data }) => {
         graphSvg: dagSvg,
         data: dpData,
       });
-  }, [data, width, height, showOptimalOne]);
+  }, [data, width, height, showOptimalOne, level]);
 
   return (
     <div>
