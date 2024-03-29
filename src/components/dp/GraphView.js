@@ -1,24 +1,95 @@
 import React, { useEffect, useState, useRef } from "react";
-import { parseDp, parseOptimal, parseOptimalOne } from "./parseDp";
+import { parseDp, parseOptimalOne } from "./parseDp";
+import { sliderHorizontal } from "d3-simple-slider";
 import * as d3 from "d3";
 import * as d3dag from "https://cdn.skypack.dev/d3-dag@1.0.0-1";
-import { Checkbox } from "@material-tailwind/react";
+import { Checkbox, slider } from "@material-tailwind/react";
 
 import "../../assets/stylesheets/Dp.css";
 
 const GraphView = ({ width, height, data }) => {
   const dagSvg = useRef(null);
-  const margin = { x: 0, y: 20 };
+  const sliderRef = useRef(null);
+  const sliderWidth = 300;
+  const sliderHeight = 50;
+  const sliderMargin = 10;
+  const sliderSize = 80;
 
-  const [level, setLevel] = useState(0);
+  const target = data.optimizer.dp[data.optimizer.dp.length - 1];
+  const totalCost = target.cheapest_total_paths.total_cost;
+  const margin = { x: 0, y: 20 };
 
   const [showOptimalOne, setShowOptimalOne] = useState(false);
   const handleCheckboxChange = () => {
     setShowOptimalOne((prev) => !prev);
   };
 
-  const optimal = parseOptimal(data);
-  console.log("opt", optimal);
+  function drawSlider({ sliderSvg }) {
+    d3.select(sliderSvg.current).selectAll("*").remove(); //clear
+
+    var margin = { top: 50, right: 50, bottom: 0, left: 50 },
+      width = 960 - margin.left - margin.right,
+      height = 500 - margin.top - margin.bottom;
+    var moving = false;
+    var currentValue = 0;
+    var interval;
+    const tickValue = d3.range(0, 11);
+
+    const svg = d3.select(sliderSvg.current);
+
+    svg
+      .append("svg")
+      .attr("width", sliderWidth)
+      .attr("height", sliderHeight)
+      .append("g")
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    // play/pause button
+    var playButton = d3.select("#play-button");
+
+    // create slider
+    var slider = sliderHorizontal()
+      .min(0)
+      .max(10)
+      .step(1)
+      .width(sliderWidth)
+      .tickValues(tickValue)
+      .default(0)
+      .on("onchange", (val) => {
+        currentValue = val;
+        console.log("Slider value: ", val);
+      });
+
+    var sliderRange = svg
+      .append("g")
+      .attr(
+        "transform",
+        `translate${sliderSize + sliderMargin * 2}, ${sliderMargin / 2})`
+      );
+
+    sliderRange.call(slider);
+
+    playButton.on("click", function () {
+      var button = d3.select(this);
+      if (moving) {
+        clearInterval(interval);
+        moving = false;
+        button.text("Play");
+      } else {
+        moving = true;
+        button.text("Pause");
+        interval = setInterval(function () {
+          currentValue = currentValue < 10 ? currentValue + 1 : 0;
+          slider.value(currentValue);
+          if (currentValue === 10) {
+            clearInterval(interval);
+            moving = false;
+            playButton.text("Play");
+          }
+        }, 1000);
+      }
+    });
+  }
 
   function drawGraph({ graphSvg, data }) {
     d3.select(graphSvg.current).selectAll("*").remove(); //clear
@@ -29,7 +100,6 @@ const GraphView = ({ width, height, data }) => {
     /* coumput layout */
     const nodeRadius = 25;
     const nodeSize = [nodeRadius * 2, nodeRadius * 2];
-    // const shape = d3dag.tweakShape(nodeSize, d3dag.shapeEllipse);
     const dagDepth = data[data.length - 1].level;
 
     const layout = d3dag
@@ -283,10 +353,28 @@ const GraphView = ({ width, height, data }) => {
         graphSvg: dagSvg,
         data: dpData,
       });
-  }, [data, width, height, showOptimalOne, level]);
+  }, [data, width, height, showOptimalOne]);
+
+  useEffect(() => {
+    drawSlider({
+      sliderSvg: sliderRef,
+    });
+  }, [sliderRef]);
 
   return (
     <div>
+      <p className="dp-text">Total Cost: {totalCost}</p>
+      <div className="flex justify-center flex-container">
+        <button className="dp-text" id="play-button">
+          Play
+        </button>
+        <svg
+          className="slider"
+          ref={sliderRef}
+          width={sliderWidth}
+          height={sliderHeight}
+        />
+      </div>
       <svg ref={dagSvg} width={width} height={height + 2 * margin.y}></svg>
       <div className="checkbox-container">
         <Checkbox
