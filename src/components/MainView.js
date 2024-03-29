@@ -9,8 +9,6 @@ import { Button } from "@material-tailwind/react";
 import { HistoryContext } from "./providers/HistoryProvider";
 import axios from "axios";
 
-import responseData from "../data/geqo.json";
-
 
 export default function MainView() {
 
@@ -23,12 +21,8 @@ export default function MainView() {
   };
 
   const submitQuery = (sql) => {
-    const res = responseData;
-    setQueryRes(res);
-    return;
-    // TODO:
     axios
-      .post("http://localhost:8000/query/", {
+      .post("http://147.46.125.229:8000/query/", {
         query: sql,
       })
       .then((response) =>{
