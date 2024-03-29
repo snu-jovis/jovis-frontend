@@ -12,8 +12,6 @@ const GraphView = ({ width, height, data }) => {
     const sliderRef = useRef(null);
     const sliderWidth = 300;
     const sliderHeight = 50;
-    const sliderMargin = 10;
-    const sliderSize = 80;
 
     const target = data.optimizer.dp[data.optimizer.dp.length - 1];
     const totalCost = target.cheapest_total_paths.total_cost;
@@ -24,46 +22,38 @@ const GraphView = ({ width, height, data }) => {
         setShowOptimalOne(prev => !prev);
     };
 
-    function drawSlider({ sliderSvg }) {
+    function drawSlider({ sliderSvg, data }) {
         d3.select(sliderSvg.current).selectAll('*').remove(); //clear
 
-        var margin = { top: 50, right: 50, bottom: 0, left: 50 },
-            width = 960 - margin.left - margin.right,
-            height = 500 - margin.top - margin.bottom;
         var moving = false;
         var currentValue = 0;
         var interval;
-        const tickValue = d3.range(0, 11);
 
+        const levelDepth = data[data.length - 1].level;
+        const tickVale = d3.range(0, (levelDepth + 1) / 2);
+        const maxSliderValue = (levelDepth + 1) / 2;
         const svg = d3.select(sliderSvg.current);
-
-        svg.append('svg')
-            .attr('width', sliderWidth)
-            .attr('height', sliderHeight)
-            .append('g')
-            .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
-
-        // play/pause button
-        var playButton = d3.select('#play-button');
 
         // create slider
         var slider = sliderHorizontal()
-            .min(0)
-            .max(10)
+            .min(1)
+            .max(maxSliderValue)
             .step(1)
             .width(sliderWidth)
-            .tickValues(tickValue)
+            .tickValues(tickVale)
             .default(0)
             .on('onchange', val => {
                 currentValue = val;
                 console.log('Slider value: ', val);
+                updateTotalCost(val);
             });
 
-        var sliderRange = svg
-            .append('g')
-            .attr('transform', `translate${sliderSize + sliderMargin * 2}, ${sliderMargin / 2})`);
+        var sliderRange = svg.append('g');
 
         sliderRange.call(slider);
+
+        // play/pause button
+        var playButton = d3.select('#play-button');
 
         playButton.on('click', function () {
             var button = d3.select(this);
@@ -75,9 +65,9 @@ const GraphView = ({ width, height, data }) => {
                 moving = true;
                 button.text('Pause');
                 interval = setInterval(function () {
-                    currentValue = currentValue < 10 ? currentValue + 1 : 0;
+                    currentValue = currentValue < maxSliderValue ? currentValue + 1 : 0;
                     slider.value(currentValue);
-                    if (currentValue === 10) {
+                    if (currentValue === maxSliderValue) {
                         clearInterval(interval);
                         moving = false;
                         playButton.text('Play');
@@ -85,6 +75,18 @@ const GraphView = ({ width, height, data }) => {
                 }, 1000);
             }
         });
+
+        function updateTotalCost(sliderValue) {
+            const level = (sliderValue - 1) * 2;
+            const filteredData = data.filter(d => d.level === level);
+            filteredData.forEach((d, i) => {
+                svg.append('text')
+                    .attr('class', 'total-cost-text')
+                    .attr('x', 10)
+                    .attr('y', 20 + i * 20)
+                    .text(`Level ${d.level} total cost: ${d.total_cost}`);
+            });
+        }
     }
 
     function drawGraph({ graphSvg, data }) {
@@ -96,7 +98,6 @@ const GraphView = ({ width, height, data }) => {
 
         /* coumput layout */
         const nodeRadius = 25;
-        const nodeSize = [nodeRadius * 2, nodeRadius * 2];
         const dagDepth = data[data.length - 1].level;
 
         const layout = d3dag
@@ -250,8 +251,10 @@ const GraphView = ({ width, height, data }) => {
     }, [data, width, height, showOptimalOne]);
 
     useEffect(() => {
+        const dpData = parseDp(data);
         drawSlider({
             sliderSvg: sliderRef,
+            data: dpData,
         });
     }, [sliderRef]);
 
