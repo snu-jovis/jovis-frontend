@@ -12,7 +12,7 @@ const QueryPlanTree = ({ width, height, plan }) => {
   // data를 d3의 계층 구조로 바꾸어주기
   const root = d3.hierarchy(plan);
 
-  const dx = width / 5;
+  const dx = width / 4;
   const dy = 30;
 
   const treeLayout = d3.tree().nodeSize([dx, dy]);

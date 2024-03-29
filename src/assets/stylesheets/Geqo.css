@@ -24,6 +24,11 @@
   font-size: 12px;
 }
 
+.node-type {
+  font-family: "NanumSquareR";
+  font-size: 14px;
+}
+
 .relation-name {
   font-family: "NanumSquareR";
   font-size: 10px;
