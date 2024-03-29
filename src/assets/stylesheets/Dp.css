@@ -23,3 +23,9 @@
     overflow-y: scroll;
     border: 1px solid #ccc;
 }
+
+.checkbox-container {
+    display: flex;
+    justify-content: flex-end;
+    margin-right: 20px;
+}
