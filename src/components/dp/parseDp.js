@@ -9,11 +9,25 @@ export function parseDp(data) {
   // id, parentIds 만들기
   const addNode = (node, level, relid, parentRelid = null) => {
     if (!nodeMap.has(relid)) {
-      nodeMap.set(relid, { id: relid, parentIds: [], level, ...node });
+      nodeMap.set(relid, {
+        id: relid,
+        parentIds: [],
+        children: [],
+        level,
+        nodeData: node,
+      });
     }
-    if (parentRelid && !nodeMap.get(relid).parentIds.includes(parentRelid)) {
-      nodeMap.get(relid).parentIds.push(parentRelid);
+    if (parentRelid) {
+      if (!nodeMap.get(relid).parentIds.includes(parentRelid)) {
+        nodeMap.get(relid).parentIds.push(parentRelid);
+      }
+      if (!nodeMap.get(parentRelid).children.includes(relid)) {
+        nodeMap.get(parentRelid).children.push(relid);
+      }
     }
+    // if (parentRelid && !nodeMap.get(relid).parentIds.includes(parentRelid)) {
+    //   nodeMap.get(relid).parentIds.push(parentRelid);
+    // }
   };
 
   // Material / Memoize 처리
@@ -106,6 +120,53 @@ export function parseOptimalOne(data) {
       }
     }
   });
+
+  return Array.from(nodeMap.values());
+}
+
+export function parseOptimal(data) {
+  const nodeMap = new Map();
+
+  const addNode = (id, parentId) => {
+    let node;
+    if (nodeMap.has(id)) {
+      node = nodeMap.get(id);
+    } else {
+      node = { id: id, parentIds: [] };
+      nodeMap.set(id, node);
+    }
+    if (parentId && !node.parentIds.includes(parentId)) {
+      if (id !== parentId) {
+        node.parentIds.push(parentId);
+      }
+    }
+  };
+
+  const entry = data.optimizer.dp[data.optimizer.dp.length - 1];
+  if (entry.cheapest_total_paths) {
+    const node = entry.cheapest_total_paths;
+    const nodeId = `${entry.relid} - ${node.node}`;
+    const parentId = entry.relid;
+
+    const processJoin = (side) => {
+      if (side) {
+        addNode(nodeId, side.relid);
+      }
+
+      if (side.join) {
+        processJoin(side.join.outer);
+        processJoin(side.join.inner);
+      }
+    };
+
+    addNode(nodeId, null);
+    addNode(parentId, nodeId);
+
+    if (node.join) {
+      processJoin(node.join.outer, "outer");
+      processJoin(node.join.inner, "inner");
+    }
+  }
 
   return Array.from(nodeMap.values());
 }
