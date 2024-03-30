@@ -4,13 +4,11 @@ import Editor from "@monaco-editor/react";
 import { Button, Select, Option, Spinner } from "@material-tailwind/react";
 
 import GeqoMain from "./geqo/GeqoMain";
+import DpMain from "./dp/DpMain";
 
 import { HistoryContext } from "./providers/HistoryProvider";
 import { SqlToEditorContext } from "./providers/SqlToEditorProvider";
 import axios from "axios";
-
-import responseData from "../data/geqo.json";
-import GraphView from "./dp/GraphView";
 
 export default function MainView() {
   const editorRef = useRef(null);
@@ -34,12 +32,10 @@ export default function MainView() {
         db: db,
       })
       .then((response) => {
-        console.log(response);
         setQueryRes(response.data);
         setLoading(false);
       })
       .catch((error) => {
-        console.log(error);
         setLoading(false);
       });
   };
@@ -123,10 +119,18 @@ export default function MainView() {
           )}
         </div>
       </div>
-      <div>
-        {/* DP or GEQO here */}
-        <GeqoMain data={queryRes} />
-      </div>
+      <DpMain data={queryRes} />
+      {/* {queryRes.optimizer ? (
+        <div>
+          {queryRes.optimizer.dp.length > 0 && <DpMain data={queryRes} />}
+          {Object.keys(queryRes.optimizer.geqo).length > 0 && (
+            <GeqoMain data={queryRes} />
+          )}
+          {queryRes.optimizer.dp.length === 0 &&
+            Object.keys(queryRes.optimizer.geqo).length === 0 &&
+            queryRes.optimizer.base.length > 0 && <DpMain data={queryRes} />}
+        </div>
+      ) : null} */}
     </div>
   );
 }
