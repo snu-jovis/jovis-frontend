@@ -25,9 +25,6 @@ export function parseDp(data) {
                 nodeMap.get(parentRelid).children.push(relid);
             }
         }
-        // if (parentRelid && !nodeMap.get(relid).parentIds.includes(parentRelid)) {
-        //   nodeMap.get(relid).parentIds.push(parentRelid);
-        // }
     };
 
     // Material / Memoize 처리
@@ -85,12 +82,12 @@ export function parseOptimal(data) {
     const nodeMap = new Map();
     const { optimizer } = data;
 
-    const addNode = (id, parentId) => {
+    const addNode = (id, level, parentId) => {
         let node;
         if (nodeMap.has(id)) {
             node = nodeMap.get(id);
         } else {
-            node = { id: id, parentIds: [] };
+            node = { id: id, level, parentIds: [] };
             nodeMap.set(id, node);
         }
         if (parentId && !node.parentIds.includes(parentId)) {
@@ -99,16 +96,17 @@ export function parseOptimal(data) {
             }
         }
     };
-
-    const parseNode = (node, parentId) => {
+    const parseNode = (node, level, parentId) => {
         let nodeId = `${node.relid} - ${node.node}`;
-        addNode(nodeId, parentId);
-        addNode(node.relid, nodeId);
+
+        addNode(nodeId, level - 1, parentId);
+        addNode(node.relid, level, nodeId);
 
         if (node.join) {
-            parseNode(node.join.outer, nodeId);
-            parseNode(node.join.inner, nodeId);
+            parseNode(node.join.outer, level - 2, nodeId);
+            parseNode(node.join.inner, level - 2, nodeId);
         }
+        console.log('');
     };
 
     const entry = optimizer.dp[optimizer.dp.length - 1];
@@ -116,12 +114,13 @@ export function parseOptimal(data) {
         const node = entry.cheapest_total_paths;
         let nodeId = `${entry.relid} - ${node.node}`;
         let parentId = entry.relid;
+        let level = entry.relid.split(' ').length * 2 - 2;
 
-        addNode(nodeId, null);
-        addNode(parentId, nodeId);
+        addNode(nodeId, level, null);
+        addNode(parentId, level - 1, nodeId);
 
-        parseNode(node.join.outer, nodeId);
-        parseNode(node.join.inner, nodeId);
+        parseNode(node.join.outer, level - 2, nodeId);
+        parseNode(node.join.inner, level - 2, nodeId);
     }
 
     return Array.from(nodeMap.values());
