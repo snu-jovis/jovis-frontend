@@ -126,10 +126,10 @@ const GraphView = ({ width, height, data }) => {
         const svg = d3
             .select(graphSvg.current)
             .append('svg')
-            .attr('width', dagWidth)
-            .attr('height', dagHeight)
+            .attr('width', svgWidth)
+            .attr('height', svgHeight)
             .append('g') // 그룹으로 묶어서
-            .attr('transform', `scale(${scale}, ${scale})`)
+            .attr('transform', `translate(${svgWidth / 2}, ${svgHeight / 8}) scale(${scale}, ${scale})`)
             .call(
                 d3.zoom().on('zoom', event => {
                     svg.attr('transform', event.transform);
@@ -168,7 +168,6 @@ const GraphView = ({ width, height, data }) => {
 
         const colorMap = new Map();
         const nodesArray = Array.from(graph.nodes());
-        const linksArray = Array.from(graph.links());
 
         const nodeTypes = [
             ...new Set(
@@ -288,7 +287,6 @@ const GraphView = ({ width, height, data }) => {
 
         const colorMap = new Map();
         const nodesArray = Array.from(graph.nodes());
-        const linksArray = Array.from(graph.links());
 
         const nodeTypes = [
             ...new Set(
@@ -485,13 +483,13 @@ const GraphView = ({ width, height, data }) => {
         }
     }, [data, moving, svgWidth, svgHeight, showOptimalOne]);
 
-    useEffect(() => {
-        const dpData = parseDp(data);
+    // useEffect(() => {
+    //     const dpData = parseDp(data);
 
-        drawSlider({
-            data: dpData,
-        });
-    }, [sliderRef]);
+    //     drawSlider({
+    //         data: dpData,
+    //     });
+    // }, [sliderRef]);
 
     return (
         <>
