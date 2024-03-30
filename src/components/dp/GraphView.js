@@ -21,11 +21,10 @@ const GraphView = ({ width, height, data }) => {
     const [currLevel, setCurrLevel] = useState(1);
 
     const margin = { x: 0, y: 20 };
+    const cheapstTotalCost = data.optimizer.dp[data.optimizer.dp.length - 1].cheapest_total_paths.total_cost;
 
     const [showOptimalOne, setShowOptimalOne] = useState(false);
-    const [totalCost, setTotalCost] = useState(0);
-
-    const cheapstTotalCost = data.optimizer.dp[data.optimizer.dp.length - 1].cheapest_total_paths.total_cost;
+    const [totalCost, setTotalCost] = useState(cheapstTotalCost);
 
     const handleCheckboxChange = () => {
         setShowOptimalOne(prev => !prev);
