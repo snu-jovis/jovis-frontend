@@ -98,28 +98,34 @@ export function parseOptimal(data) {
     };
     const parseNode = (node, level, parentId) => {
         let nodeId = `${node.relid} - ${node.node}`;
-
-        addNode(nodeId, level - 1, parentId);
         addNode(node.relid, level, nodeId);
 
         if (node.join) {
-            parseNode(node.join.outer, level - 2, nodeId);
-            parseNode(node.join.inner, level - 2, nodeId);
+            if (node.join.outer) {
+                addNode(nodeId, level - 1, node.join.outer.relid);
+                parseNode(node.join.outer, level - 2, node.join.outer.relid);
+            }
+            if (node.join.inner) {
+                addNode(nodeId, level - 1, node.join.inner.relid);
+                parseNode(node.join.inner, level - 2, node.join.inner.relid);
+            }
+        } else {
+            addNode(nodeId, 0, null);
         }
     };
 
     const entry = optimizer.dp[optimizer.dp.length - 1];
     if (entry.cheapest_total_paths) {
         const node = entry.cheapest_total_paths;
-        let nodeId = `${entry.relid} - ${node.node}`;
-        let parentId = entry.relid;
+        const nodeId = `${entry.relid} - ${node.node}`;
         let level = entry.relid.split(' ').length * 2 - 3;
 
-        addNode(nodeId, level, null);
-        addNode(parentId, level - 1, nodeId);
+        addNode(entry.relid, level, nodeId);
+        addNode(nodeId, level - 1, node.join.outer.relid);
+        addNode(nodeId, level - 1, node.join.inner.relid);
 
-        parseNode(node.join.outer, level - 2, nodeId);
-        parseNode(node.join.inner, level - 2, nodeId);
+        parseNode(node.join.outer, level - 2, node.join.outer.relid);
+        parseNode(node.join.inner, level - 2, node.join.inner.relid);
     }
 
     return Array.from(nodeMap.values());
