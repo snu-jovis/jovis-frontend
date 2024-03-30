@@ -25,6 +25,8 @@ const GraphView = ({ width, height, data }) => {
     const [showOptimalOne, setShowOptimalOne] = useState(false);
     const [totalCost, setTotalCost] = useState(0);
 
+    const cheapstTotalCost = data.optimizer.dp[data.optimizer.dp.length - 1].cheapest_total_paths.total_cost;
+
     const handleCheckboxChange = () => {
         setShowOptimalOne(prev => !prev);
     };
@@ -105,7 +107,6 @@ const GraphView = ({ width, height, data }) => {
 
     function drawOptimalGraph({ graphSvg, data }) {
         d3.select(graphSvg.current).selectAll('*').remove();
-
         // data graph 형태로 변경
         const graph = d3dag.graphStratify()(data);
         const nodeSize = 50;
@@ -467,12 +468,13 @@ const GraphView = ({ width, height, data }) => {
         const dpData = parseDp(data);
         const optimalData = parseOptimal(data);
 
-        if (showOptimalOne)
+        if (showOptimalOne) {
+            setTotalCost(cheapstTotalCost);
             drawOptimalGraph({
                 graphSvg: dagSvg,
                 data: optimalData,
             });
-        else {
+        } else {
             drawGraph({
                 graphSvg: dagSvg,
                 data: dpData,
@@ -482,14 +484,6 @@ const GraphView = ({ width, height, data }) => {
             });
         }
     }, [data, moving, svgWidth, svgHeight, showOptimalOne]);
-
-    // useEffect(() => {
-    //     const dpData = parseDp(data);
-
-    //     drawSlider({
-    //         data: dpData,
-    //     });
-    // }, [sliderRef]);
 
     return (
         <>
@@ -501,15 +495,19 @@ const GraphView = ({ width, height, data }) => {
                     </div>
                 </div>
                 <div className='flex justify-center items-center gap-2'>
-                    <button className='dp-play-text' id='play-button'>
-                        Play
-                    </button>
-                    <svg
-                        className='slider'
-                        ref={sliderRef}
-                        width={sliderWidth + sliderMargin * 2}
-                        height={sliderHeight}
-                    />
+                    {showOptimalOne ? null : (
+                        <button className='dp-play-text' id='play-button'>
+                            Play
+                        </button>
+                    )}
+                    {showOptimalOne ? null : (
+                        <svg
+                            className='slider'
+                            ref={sliderRef}
+                            width={sliderWidth + sliderMargin * 2}
+                            height={sliderHeight}
+                        />
+                    )}
                 </div>
             </div>
             <div>
