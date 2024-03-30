@@ -106,7 +106,6 @@ export function parseOptimal(data) {
             parseNode(node.join.outer, level - 2, nodeId);
             parseNode(node.join.inner, level - 2, nodeId);
         }
-        console.log('');
     };
 
     const entry = optimizer.dp[optimizer.dp.length - 1];
@@ -114,7 +113,7 @@ export function parseOptimal(data) {
         const node = entry.cheapest_total_paths;
         let nodeId = `${entry.relid} - ${node.node}`;
         let parentId = entry.relid;
-        let level = entry.relid.split(' ').length * 2 - 2;
+        let level = entry.relid.split(' ').length * 2 - 3;
 
         addNode(nodeId, level, null);
         addNode(parentId, level - 1, nodeId);

@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react';
 import GraphView from './GraphView';
+import CostCard from './CostCard';
 import data from '../../data/dp.json';
+import { Card } from '@material-tailwind/react';
 
 import '../../assets/stylesheets/Dp.css';
 
@@ -24,8 +26,12 @@ const DpMain = props => {
     }, []);
 
     return (
-        <div ref={viewRef} className='w-full place-content-center'>
-            <GraphView width={viewSize[0] ? viewSize[0] - 20 : 500} height={500} data={data} />
+        <div>
+            <div ref={viewRef} className='w-fuvll place-content-center'>
+                <Card>
+                    <GraphView width={viewSize[0] ? viewSize[0] - 20 : 500} height={500} data={data} />
+                </Card>
+            </div>
         </div>
     );
 };

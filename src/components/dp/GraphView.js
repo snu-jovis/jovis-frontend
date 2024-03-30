@@ -1,9 +1,9 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { parseDp, parseOptimalOne } from './parseDp';
+import { parseDp, parseOptimal } from './parseDp';
 import { sliderHorizontal } from 'd3-simple-slider';
 import * as d3 from 'd3';
 import * as d3dag from 'https://cdn.skypack.dev/d3-dag@1.0.0-1';
-import { Checkbox, slider } from '@material-tailwind/react';
+import { Checkbox, Card } from '@material-tailwind/react';
 
 import '../../assets/stylesheets/Dp.css';
 
@@ -217,16 +217,13 @@ const GraphView = ({ width, height, data }) => {
                 tooltip.style('visibility', 'hidden');
             })
             .on('click', function (event, d) {
-                // Check if the total_cost exists and is not null or undefined
                 if (
                     d.data.nodeData &&
                     d.data.nodeData.total_cost !== undefined &&
                     d.data.nodeData.total_cost !== null
                 ) {
                     setTotalCost(`${d.data.nodeData.total_cost}`);
-                }
-                // Else, if total_cost does not exist, check for cheapest_total_paths.total_cost
-                else if (
+                } else if (
                     d.data.nodeData &&
                     d.data.nodeData.cheapest_total_paths &&
                     d.data.nodeData.cheapest_total_paths.total_cost !== undefined &&
@@ -234,7 +231,6 @@ const GraphView = ({ width, height, data }) => {
                 ) {
                     setTotalCost(`${d.data.nodeData.cheapest_total_paths.total_cost}`);
                 } else {
-                    // If neither total_cost nor cheapest_total_paths.total_cost exist, log a message or handle as needed
                     console.log('Total cost and cheapest total paths cost are unavailable for this node.');
                 }
             });
@@ -313,7 +309,7 @@ const GraphView = ({ width, height, data }) => {
 
     useEffect(() => {
         const dpData = parseDp(data);
-        const optimalData = parseOptimalOne(data);
+        const optimalData = parseOptimal(data);
 
         if (showOptimalOne)
             drawGraph({
@@ -325,8 +321,6 @@ const GraphView = ({ width, height, data }) => {
                 graphSvg: dagSvg,
                 data: dpData,
             });
-
-        console.log(dpData);
     }, [data, width, height, showOptimalOne]);
 
     useEffect(() => {
