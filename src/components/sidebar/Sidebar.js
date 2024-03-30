@@ -5,7 +5,7 @@ import { BeakerIcon, NewspaperIcon, QuestionMarkCircleIcon, ServerStackIcon } fr
 import ListAccordion from "./ListAccordion";
 import { HistoryContext } from "../providers/HistoryProvider";
 import { SqlToEditorContext } from "../providers/SqlToEditorProvider";
-import queries from "../../assets/data/queries.json"
+import queries from "../../assets/data/queries.new.json"
 
 function Sidebar(props) {
 
@@ -28,9 +28,9 @@ function Sidebar(props) {
         call(type, history[val].query);
       }
     } else if (type === 'tpch') {
-      call(type, queries.tpch[val]);
+      call(type, queries.tpch[(val + 1).toString()]);
     } else if (type === 'tpcds') {
-      call(type, queries.tpcds[val]);
+      call(type, queries.tpcds[(val + 1).toString()]);
     }
   }
 
