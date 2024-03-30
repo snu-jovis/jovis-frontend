@@ -15,6 +15,7 @@ function ListAcoordion(props) {
     const icon = props.icon;
     const title = props.title;
     const defaultOpen = props.defaultOpen;
+    const onClick = props.onClick;
     
     // only one of the below two should be passed
     const data = props.data ? props.data : [];
@@ -32,6 +33,7 @@ function ListAcoordion(props) {
             {data.map((sql, idx) => (
                 <ListItem
                     key={idx}
+                    onClick={() => onClick(idx)}
                     className="h-6 px-2 hover:!bg-gray-100 hover:!text-gray-900 rounded-md"
                     ripple={false}>
                     <p className="query-menu-text">

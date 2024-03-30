@@ -4,15 +4,18 @@ import React from "react";
 
 import { HistoryProvider } from "./components/providers/HistoryProvider";
 import { GeqoProvider } from "./components/providers/GeqoProvider";
+import { SqlToEditorProvider } from './components/providers/SqlToEditorProvider';
 
 function App() {
   return (
     <div className="App">
-      <HistoryProvider>
-        <GeqoProvider>
-          <Layout />
-        </GeqoProvider>
-      </HistoryProvider>
+      <SqlToEditorProvider>
+        <HistoryProvider>
+          <GeqoProvider>
+            <Layout />
+          </GeqoProvider>
+        </HistoryProvider>
+      </SqlToEditorProvider>
     </div>
   );
 }
