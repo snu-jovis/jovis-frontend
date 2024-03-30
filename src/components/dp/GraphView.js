@@ -1,27 +1,25 @@
 import React, { useEffect, useState, useRef } from "react";
-import { parseDp, parseOptimalOne } from "./parseDp";
+import { parseDp, parseOptimal } from "./parseDp";
 import * as d3 from "d3";
 import * as d3dag from "https://cdn.skypack.dev/d3-dag@1.0.0-1";
-import { Checkbox } from "@material-tailwind/react";
+import { Checkbox, Card } from "@material-tailwind/react";
 
 import "../../assets/stylesheets/Dp.css";
 
 const GraphView = ({ width, height, data }) => {
   const dagSvg = useRef(null);
   const svgWidth = width;
-  const svgHeight = height - 50;
-  const margin = { x: 0, y: 20 };
+  const svgHeight = height;
+  const margin = { x: 0, y: 30 };
 
   const [animation, setAnimation] = useState(false);
   const [showOptimalOne, setShowOptimalOne] = useState(false);
   const [costText, setCostText] = useState("Total Cost for Cheapest Path");
-  const [totalCost, setTotalCost] = useState(
-    data.optimizer.dp[data.optimizer.dp.length - 1].cheapest_total_paths
-      .total_cost
-  );
+  const [totalCost, setTotalCost] = useState(0);
 
   const handleCheckboxChange = () => {
     setShowOptimalOne((prev) => !prev);
+    if (showOptimalOne) setAnimation(false);
   };
 
   const handleClickPlay = () => {
@@ -68,18 +66,24 @@ const GraphView = ({ width, height, data }) => {
     const { width: dagWidth, height: dagHeight } = layout(graph);
 
     const scale = svgHeight / (dagHeight + margin.y * 2);
+
     const svg = d3
       .select(graphSvg.current)
       .append("svg")
-      .attr("width", dagWidth)
+      .attr("width", width < dagWidth ? dagWidth : width)
       .attr("height", dagHeight)
       .append("g")
-      .attr(
-        "transform",
-        `scale(${scale}, ${scale}) translate(${
-          (svgWidth - dagWidth * scale) / 1.2
-        }, ${margin.y})`
-      )
+      .attr("transform", function () {
+        if (showOptimalOne) {
+          return `scale(${scale}, ${scale}) translate(${
+            dagWidth + (svgWidth - dagWidth * scale) / 1.8
+          }, ${dagHeight + margin.y}) rotate(180)`;
+        } else {
+          return `scale(${scale}, ${scale}) translate(${
+            dagWidth + (svgWidth - dagWidth * scale) / 1.2
+          }, ${dagHeight + margin.y}) rotate(180)`;
+        }
+      })
       .call(
         d3.zoom().on("zoom", (event) => {
           svg.attr("transform", event.transform);
@@ -109,7 +113,7 @@ const GraphView = ({ width, height, data }) => {
       })
       .attr("fill", "none")
       .attr("stroke-width", 2)
-      .attr("stroke", "lightgrey");
+      .attr("stroke", "lightgray");
 
     // create nodes
     const nodes = svg
@@ -164,6 +168,7 @@ const GraphView = ({ width, height, data }) => {
       .attr("text-anchor", "middle")
       .attr("alignment-baseline", "middle")
       .attr("class", "dp-node-text")
+      .attr("transform", `rotate(180)`)
       .each(function (d) {
         const lines = mapName(d.data.id.split(" - ").pop()).split("\n");
         if (lines.length === 1) d3.select(this).text(lines[0]);
@@ -173,7 +178,7 @@ const GraphView = ({ width, height, data }) => {
               .append("tspan")
               .text(lines[i])
               .attr("x", 0)
-              .attr("dy", i ? "1.2em" : "-0em");
+              .attr("dy", i ? "1em" : "0em");
           }
         }
       });
@@ -287,16 +292,147 @@ const GraphView = ({ width, height, data }) => {
     }
   }
 
-  useEffect(() => {
-    const dpData = parseDp(data);
-    const optimalData = parseOptimalOne(data);
+  function drawOptimalGraph({ graphSvg, data }) {
+    d3.select(graphSvg.current).selectAll("*").remove();
+    // data graph 형태로 변경
+    const graph = d3dag.graphStratify()(data);
+    const nodeSize = 50;
+    const dagDepth = data[0].level + 1;
 
-    if (showOptimalOne)
+    const layout = d3dag
+      .sugiyama()
+      .nodeSize([nodeSize, nodeSize])
+      .gap([nodeSize / 3, nodeSize / 3]);
+
+    const { width: dagWidth, height: dagHeight } = layout(graph);
+
+    const scale =
+      svgWidth / dagWidth < svgHeight / (dagHeight + 2 * margin.y)
+        ? svgWidth / dagWidth
+        : svgHeight / (dagHeight + 2 * margin.y);
+
+    const svg = d3
+      .select(graphSvg.current)
+      .append("svg")
+      .attr("width", svgWidth)
+      .attr("height", svgHeight)
+      .append("g") // 그룹으로 묶어서
+      .attr(
+        "transform",
+        `translate(${svgWidth / 2}, ${svgHeight / 8}) scale(${scale}, ${scale})`
+      )
+      .call(
+        d3.zoom().on("zoom", (event) => {
+          svg.attr("transform", event.transform);
+        })
+      )
+      .append("g");
+
+    // create links
+    const links = svg
+      .append("g")
+      .selectAll("path")
+      .data(graph.links())
+      .enter()
+      .append("path")
+      .attr("d", (d) => {
+        return d3.line()([
+          [d.source.x, d.source.data.level * (dagHeight / dagDepth)],
+          [d.target.x, d.target.data.level * (dagHeight / dagDepth)],
+        ]);
+      })
+      .attr("transform", `translate(0, ${margin.y})`)
+      .attr("fill", "none")
+      .attr("stroke-width", 3)
+      .attr("stroke", "lightgray");
+
+    // create nodes
+    const nodes = svg
+      .append("g")
+      .selectAll("g")
+      .data(graph.nodes())
+      .enter()
+      .append("g")
+      .attr("transform", (d) => {
+        return `translate(${d.x}, ${
+          d.data.level * (dagHeight / dagDepth) + margin.y
+        })`;
+      });
+
+    const colorMap = new Map();
+    const nodesArray = Array.from(graph.nodes());
+
+    const nodeTypes = [
+      ...new Set(
+        nodesArray.map((node) => {
+          return node.data.id.split(" - ")[1];
+        })
+      ),
+    ];
+
+    nodeTypes.forEach((type, i) => {
+      colorMap.set(type, d3.schemePastel1[i]);
+    });
+
+    nodes.each(function (d) {
+      const node = d3.select(this);
+      const parts = d.data.id.split(" - ");
+
+      if (parts.length > 1) {
+        node
+          .append("rect")
+          .attr("id", (d) => d.data.id.replace(/\s/g, ""))
+          .attr("width", 50)
+          .attr("height", 50)
+          .attr("x", -nodeSize / 2)
+          .attr("y", -nodeSize / 2)
+          .attr("fill", colorMap.get(parts[1]));
+      } else {
+        node
+          .append("circle")
+          .attr("r", nodeSize / 2)
+          .attr("fill", colorMap.get(nodeTypes[0]));
+      }
+    });
+
+    // node type
+    nodes
+      .append("text")
+      .attr("text-anchor", "middle")
+      .attr("alignment-baseline", "middle")
+      .attr("class", "dp-node-text")
+      .each(function (d) {
+        const lines = mapName(d.data.id.split(" - ").pop()).split("\n");
+        if (lines.length === 1) d3.select(this).text(lines[0]);
+        else {
+          for (let i = 0; i < lines.length; i++) {
+            d3.select(this)
+              .append("tspan")
+              .text(lines[i])
+              .attr("x", 0)
+              .attr("dy", i ? "1.2em" : "-0.2em");
+          }
+        }
+      });
+  }
+
+  useEffect(() => {
+    if (data.optimizer && data.optimizer.dp)
+      setTotalCost(
+        data.optimizer.dp[data.optimizer.dp.length - 1].cheapest_total_paths
+          .total_cost
+      );
+
+    if (showOptimalOne) {
+      const optimalData = parseOptimal(data);
+
       drawGraph({
         graphSvg: dagSvg,
         data: optimalData,
       });
-    else {
+    } else {
+      const dpData = parseDp(data);
+
       drawGraph({
         graphSvg: dagSvg,
         data: dpData,
@@ -306,29 +442,31 @@ const GraphView = ({ width, height, data }) => {
 
   return (
     <>
-      <div className="flex justify-between items-center gap-24 ml-4 mb-4">
-        <button
-          className="dp-play-text"
-          id="play-button"
-          onClick={handleClickPlay}
-        >
-          {animation ? "Stop" : "Play"}
-        </button>
-        <div className="stats shadow">
-          <div className="flex m-2 gap-2">
-            <div className="dp-total-cost">{costText}</div>
-            <div className="dp-cost-value">{totalCost}</div>
-          </div>
-        </div>
-        <div className="checkbox-container">
-          <Checkbox
-            color="blue"
-            className="h-4 w-4 rounded-full border-gray-900/20 bg-gray-900/10 transition-all hover:scale-105 hover:before:opacity-0"
-            checked={showOptimalOne}
-            label={<p className="text">Show Optimized One</p>}
-            onChange={handleCheckboxChange}
-          />
-        </div>
+      <div className="flex justify-between items-center gap-24 mx-8 mb-4">
+        <Checkbox
+          color="blue"
+          className="h-4 w-4 rounded-full border-gray-900/20 bg-gray-900/10 transition-all hover:scale-105 hover:before:opacity-0"
+          checked={showOptimalOne}
+          label={<p className="text">Show Optimized One</p>}
+          onChange={handleCheckboxChange}
+        />
+        {!showOptimalOne && (
+          <>
+            <div className="stats shadow">
+              <div className="flex m-2 gap-2">
+                <div className="dp-total-cost">{costText}</div>
+                <div className="dp-cost-value">{totalCost}</div>
+              </div>
+            </div>
+            <button
+              className="dp-play-text"
+              id="play-button"
+              onClick={handleClickPlay}
+            >
+              {animation ? "Stop" : "Play"}
+            </button>
+          </>
+        )}
       </div>
       <div>
         <svg ref={dagSvg} width={svgWidth} height={svgHeight} />
