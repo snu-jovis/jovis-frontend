@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
 import GraphView from './GraphView';
-import CostCard from './CostCard';
 import data from '../../data/dp.json';
 import { Card } from '@material-tailwind/react';
 

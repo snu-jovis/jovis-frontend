@@ -103,7 +103,126 @@ const GraphView = ({ width, height, data }) => {
         });
     }
 
-    function drawGraph({ graphSvg, data, cost }) {
+    function drawOptimalGraph({ graphSvg, data }) {
+        d3.select(graphSvg.current).selectAll('*').remove();
+
+        // data graph 형태로 변경
+        const graph = d3dag.graphStratify()(data);
+        const nodeSize = 50;
+        const dagDepth = data[0].level + 1;
+
+        const layout = d3dag
+            .sugiyama()
+            .nodeSize([nodeSize, nodeSize])
+            .gap([nodeSize / 3, nodeSize / 3]);
+
+        const { width: dagWidth, height: dagHeight } = layout(graph);
+
+        const scale =
+            svgWidth / dagWidth < svgHeight / (dagHeight + 2 * margin.y)
+                ? svgWidth / dagWidth
+                : svgHeight / (dagHeight + 2 * margin.y);
+
+        const svg = d3
+            .select(graphSvg.current)
+            .append('svg')
+            .attr('width', dagWidth)
+            .attr('height', dagHeight)
+            .append('g') // 그룹으로 묶어서
+            .attr('transform', `scale(${scale}, ${scale})`)
+            .call(
+                d3.zoom().on('zoom', event => {
+                    svg.attr('transform', event.transform);
+                })
+            )
+            .append('g');
+
+        // create links
+        const links = svg
+            .append('g')
+            .selectAll('path')
+            .data(graph.links())
+            .enter()
+            .append('path')
+            .attr('d', d => {
+                return d3.line()([
+                    [d.source.x, d.source.data.level * (dagHeight / dagDepth)],
+                    [d.target.x, d.target.data.level * (dagHeight / dagDepth)],
+                ]);
+            })
+            .attr('transform', `translate(0, ${margin.y})`)
+            .attr('fill', 'none')
+            .attr('stroke-width', 3)
+            .attr('stroke', 'lightgrey');
+
+        // create nodes
+        const nodes = svg
+            .append('g')
+            .selectAll('g')
+            .data(graph.nodes())
+            .enter()
+            .append('g')
+            .attr('transform', d => {
+                return `translate(${d.x}, ${d.data.level * (dagHeight / dagDepth) + margin.y})`;
+            });
+
+        const colorMap = new Map();
+        const nodesArray = Array.from(graph.nodes());
+        const linksArray = Array.from(graph.links());
+
+        const nodeTypes = [
+            ...new Set(
+                nodesArray.map(node => {
+                    return node.data.id.split(' - ')[1];
+                })
+            ),
+        ];
+
+        nodeTypes.forEach((type, i) => {
+            colorMap.set(type, d3.schemePastel1[i]);
+        });
+
+        nodes.each(function (d) {
+            const node = d3.select(this);
+            const parts = d.data.id.split(' - ');
+
+            if (parts.length > 1) {
+                node.append('rect')
+                    .attr('id', d => d.data.id.replace(/\s/g, ''))
+                    .attr('width', 50)
+                    .attr('height', 50)
+                    .attr('x', -nodeSize / 2)
+                    .attr('y', -nodeSize / 2)
+                    .attr('fill', colorMap.get(parts[1]));
+            } else {
+                node.append('circle')
+                    .attr('r', nodeSize / 2)
+                    .attr('fill', colorMap.get(nodeTypes[0]));
+            }
+        });
+
+        // node type
+        nodes
+            .append('text')
+            .attr('text-anchor', 'middle')
+            .attr('alignment-baseline', 'middle')
+            .attr('class', 'dp-node-text')
+            .each(function (d) {
+                const lines = mapName(d.data.id.split(' - ').pop()).split('\n');
+                if (lines.length === 1) d3.select(this).text(lines[0]);
+                else {
+                    for (let i = 0; i < lines.length; i++) {
+                        d3.select(this)
+                            .append('tspan')
+                            .text(lines[i])
+                            .attr('x', 0)
+                            .attr('dy', i ? '1.2em' : '-0.2em');
+                    }
+                }
+            });
+    }
+
+    function drawGraph({ graphSvg, data }) {
         d3.select(graphSvg.current).selectAll('*').remove(); //clear
 
         // data graph 형태로 변경
@@ -169,6 +288,7 @@ const GraphView = ({ width, height, data }) => {
 
         const colorMap = new Map();
         const nodesArray = Array.from(graph.nodes());
+        const linksArray = Array.from(graph.links());
 
         const nodeTypes = [
             ...new Set(
@@ -350,7 +470,7 @@ const GraphView = ({ width, height, data }) => {
         const optimalData = parseOptimal(data);
 
         if (showOptimalOne)
-            drawGraph({
+            drawOptimalGraph({
                 graphSvg: dagSvg,
                 data: optimalData,
             });
