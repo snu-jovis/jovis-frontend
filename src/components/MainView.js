@@ -1,9 +1,8 @@
 import { useRef, useContext, useEffect, useState } from 'react';
 
-import Editor, { DiffEditor, useMonaco, loader } from '@monaco-editor/react';
-import { Button } from "@material-tailwind/react";
+import Editor from '@monaco-editor/react';
+import { Button, Select, Option } from "@material-tailwind/react";
 
-import Dp from "./dp/Dp";
 import GeqoMain from "./geqo/GeqoMain";
 
 import { HistoryContext } from "./providers/HistoryProvider";
@@ -17,16 +16,18 @@ export default function MainView() {
   const { addHistory } = useContext(HistoryContext);
   const { setCallback } = useContext(SqlToEditorContext);
 
+  const [ database, setDatabase ] = useState('postgres'); // candidates: postgres, tpch1gb, and tpcds1gb
   const [ queryRes, setQueryRes ] = useState({});
 
   const handleEditorDidMount = (editor, monaco) => {
     editorRef.current = editor;
   };
 
-  const submitQuery = (sql) => {
+  const submitQuery = (db, sql) => {
     axios
       .post("http://147.46.125.229:8000/query/", {
         query: sql,
+        db: db,
       })
       .then((response) =>{
         console.log(response);
@@ -39,16 +40,34 @@ export default function MainView() {
 
   const onClickSubmit = () => {
     const sql = editorRef.current.getValue();
-    addHistory(sql);
-    submitQuery(sql);
+    submitQuery(database, sql);
+
+    // history
+    // the exact database name (e..g, tpch1gb and tpcds1gb) should be known by only the main view
+    // another component only knows the database type (e.g., tpch and tpcds)
+    if (database === "tpch1gb") {
+      addHistory("tpch", sql);
+    } else if (database === "tpcds1gb") {
+      addHistory("tpcds", sql);
+    } else {
+      addHistory(database, sql);
+    }
   };
 
   const onClickClear = () => {
     editorRef.current.setValue("");
+    setDatabase("postgres");
   };
 
-  const onSidebarSignal = (sql) => {
+  const onSidebarSignal = (type, sql) => {
     editorRef.current.setValue(sql);
+    if (type === "tpch") {
+      setDatabase("tpch1gb");
+    } else if (type === "tpcds") {
+      setDatabase("tpcds1gb");
+    } else {
+      setDatabase("postgres");
+    }
   };
 
   useEffect(() => {
@@ -80,6 +99,13 @@ export default function MainView() {
           <Button className="px-2 py-2" ripple={false} onClick={onClickSubmit}>
             Submit
           </Button>
+          <div className='w-52'>
+            <Select label="Select Database" value={database} onChange={setDatabase}>
+              <Option value="postgres">Default Database</Option>
+              <Option value="tpch1gb">TPC-H</Option>
+              <Option value="tpcds1gb">TPC-DS</Option>
+            </Select>
+            </div>
         </div>
       </div>
       <div>

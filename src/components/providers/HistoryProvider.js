@@ -12,8 +12,9 @@ export function HistoryProvider({ children }) {
     /* LocalStorage Data Format
         history = {
             "history": [
-                {"title: "SELECT * FROM Reserves", "query": "SELECT * FROM Reserves"},
-                {"title: "SELECT * FROM Sailors ...", "query": "SELECT * FROM Sailors ORDER BY sid DESC LIMIT 10"},
+                {"title: "SELECT * FROM Reserves", "query": "SELECT * FROM Reserves", "db": "postgres"},
+                {"title: "SELECT * FROM Sailors ...", "query": "SELECT * FROM Sailors ORDER BY sid DESC LIMIT 10", "db": "tpch"},
+                {"title: "SELECT * FROM Sailors ...", "query": "SELECT * FROM Sailors ORDER BY sid DESC LIMIT 1"},
             ]
         }
     */
@@ -34,8 +35,8 @@ export function HistoryProvider({ children }) {
         localStorage.setItem("history", JSON.stringify({ data: history }));
     }, [history]);
 
-    const onAddHistory = (sql) => {
-        const newData = { title: sql.substring(0, Math.min(sql.length, TITLE_SUBSTRING_LENGTH)), query: sql };
+    const onAddHistory = (db, sql) => {
+        const newData = { title: sql.substring(0, Math.min(sql.length, TITLE_SUBSTRING_LENGTH)), query: sql, db: db };
         let newHistory = [newData, ...history];
 
         // only last five queries

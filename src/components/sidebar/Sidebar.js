@@ -20,11 +20,17 @@ function Sidebar(props) {
 
   const onClickHandler = (type, val) => {
     if (type === 'history') {
-      call(history[val].query);
+      if (history[val].db === 'tpch') {
+        call('tpch', history[val].query);
+      } else if (history[val].db === 'tpcds') {
+        call('tpcds', history[val].query);
+      } else {
+        call(type, history[val].query);
+      }
     } else if (type === 'tpch') {
-      call(queries.tpch[val]);
+      call(type, queries.tpch[val]);
     } else if (type === 'tpcds') {
-      call(queries.tpcds[val]);
+      call(type, queries.tpcds[val]);
     }
   }
 

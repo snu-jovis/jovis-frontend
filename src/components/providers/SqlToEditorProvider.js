@@ -8,9 +8,9 @@ export const SqlToEditorContext = createContext({
 export function SqlToEditorProvider({ children }) {
     const [ func, setFunc ] = useState(null);
 
-    const callHandler = (value) => {
+    const callHandler = (type, value) => {
         if (!func) return null;
-        return func(value);
+        return func(type, value);
     }
 
     const setCallbackHandler = (callback) => {
