@@ -1,7 +1,7 @@
 import { useRef, useContext, useEffect, useState } from 'react';
 
 import Editor from '@monaco-editor/react';
-import { Button, Select, Option } from "@material-tailwind/react";
+import { Button, Select, Option, Spinner } from "@material-tailwind/react";
 
 import GeqoMain from "./geqo/GeqoMain";
 
@@ -19,11 +19,14 @@ export default function MainView() {
   const [ database, setDatabase ] = useState('postgres'); // candidates: postgres, tpch1gb, and tpcds1gb
   const [ queryRes, setQueryRes ] = useState({});
 
+  const [ isLoading, setLoading ] = useState(false);
+
   const handleEditorDidMount = (editor, monaco) => {
     editorRef.current = editor;
   };
 
   const submitQuery = (db, sql) => {
+    setLoading(true);
     axios
       .post("http://147.46.125.229:8000/query/", {
         query: sql,
@@ -32,9 +35,11 @@ export default function MainView() {
       .then((response) =>{
         console.log(response);
         setQueryRes(response.data);
+        setLoading(false);
       })
       .catch((error) => {
         console.log(error);
+        setLoading(false);
       });
   }
 
@@ -87,7 +92,7 @@ export default function MainView() {
             minimap: { enabled: false },
           }}
         />
-        <div className="flex flex-row-reverse gap-2 mx-4 my-2">
+        <div className="flex flex-row-reverse items-strech gap-2 mx-4 my-2">
           <Button
             className="px-2 py-2"
             variant="outlined"
@@ -105,7 +110,12 @@ export default function MainView() {
               <Option value="tpch1gb">TPC-H</Option>
               <Option value="tpcds1gb">TPC-DS</Option>
             </Select>
+          </div>
+          { isLoading && (
+            <div className='flex items-center'> 
+              <Spinner className="w-8 h-8" />
             </div>
+          ) }
         </div>
       </div>
       <div>
