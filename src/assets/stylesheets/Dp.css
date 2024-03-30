@@ -24,14 +24,14 @@
   border: 1px solid #ccc;
 }
 
-.dp-text {
+.dp-play-text {
   font-family: "NanumSquareEB";
-  font-size: 16px;
+  font-size: 14px;
 }
 
 .dp-node-text {
   font-family: "NanumSquareB";
-  font-size: 18px;
+  font-size: 14px;
 }
 
 .dp-tooltip {
@@ -45,10 +45,20 @@
   opacity: 0.6;
 }
 
+.dp-total-cost {
+  font-family: "NanumSquareR";
+  font-size: small;
+}
+
+.dp-cost-value {
+  font-family: "NanumSquareEB";
+  font-size: large;
+}
+
 .checkbox-container {
   display: flex;
   justify-content: flex-end;
-  margin-right: 20px;
+  margin-right: 50px;
 }
 
 .graph-tooltip {
