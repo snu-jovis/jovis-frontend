@@ -9,9 +9,16 @@ import '../../assets/stylesheets/Dp.css';
 
 const GraphView = ({ width, height, data }) => {
     const dagSvg = useRef(null);
+    const svgWidth = width;
+    const svgHeight = height - 80;
+
     const sliderRef = useRef(null);
     const sliderWidth = 300;
     const sliderHeight = 50;
+    const sliderMargin = 10;
+
+    const [moving, setMoving] = useState(false);
+    const [currLevel, setCurrLevel] = useState(1);
 
     const margin = { x: 0, y: 20 };
 
@@ -22,55 +29,76 @@ const GraphView = ({ width, height, data }) => {
         setShowOptimalOne(prev => !prev);
     };
 
-    function drawSlider({ sliderSvg, data }) {
-        d3.select(sliderSvg.current).selectAll('*').remove(); //clear
+    function mapName(name) {
+        switch (name) {
+            case 'SeqScan':
+                return 'Seq\nScan';
+            case 'HashJoin':
+                return 'Hash\nJoin';
+            case 'MergeJoin':
+                return 'Merge\nJoin';
+            case 'NestLoop':
+                return 'Nested\nLoop';
+            case 'IdxScan':
+                return 'Index\nScan';
+            default:
+                return name;
+        }
+    }
 
-        var moving = false;
-        var currentValue = 0;
+    function drawSlider({ data }) {
+        const sliderSvg = d3.select(sliderRef.current);
+        sliderSvg.selectAll('*').remove(); //clear
+
         var interval;
 
-        const levelDepth = data[data.length - 1].level;
-        const tickValue = d3.range(0, (levelDepth + 1) / 2);
-        const maxSliderValue = (levelDepth + 1) / 2;
-        const svg = d3.select(sliderSvg.current);
+        const maxLevel = Math.ceil((data[data.length - 1].level + 1) / 2);
+        const tickValue = d3.range(1, maxLevel + 1);
 
-        // create slider
+        var playButton = d3.select('#play-button');
+
+        sliderSvg
+            .append('svg')
+            .attr('width', sliderWidth)
+            .attr('height', sliderHeight)
+            .append('g')
+            .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+
         var slider = sliderHorizontal()
             .min(1)
-            .max(maxSliderValue)
+            .max(maxLevel)
             .step(1)
-            .width(sliderWidth)
+            .width(sliderWidth - 2 * sliderMargin)
             .tickValues(tickValue)
-            .default(0)
+            .default(1)
             .on('onchange', val => {
-                currentValue = val;
+                setCurrLevel(val);
             });
 
-        var sliderRange = svg.append('g');
-
+        var sliderRange = sliderSvg.append('g').attr('transform', `translate(${sliderMargin}, ${sliderMargin / 2})`);
         sliderRange.call(slider);
-
-        // play/pause button
-        var playButton = d3.select('#play-button');
 
         playButton.on('click', function () {
             var button = d3.select(this);
+
             if (moving) {
                 clearInterval(interval);
-                moving = false;
+                setMoving(false);
                 button.text('Play');
             } else {
-                moving = true;
+                setMoving(true);
                 button.text('Pause');
                 interval = setInterval(function () {
-                    currentValue = currentValue < maxSliderValue ? currentValue + 1 : 0;
-                    slider.value(currentValue);
-                    if (currentValue === maxSliderValue) {
+                    currLevel < maxLevel ? setCurrLevel(currLevel + 1) : setCurrLevel(1);
+
+                    slider.value(currLevel);
+
+                    if (currLevel === maxLevel) {
                         clearInterval(interval);
-                        moving = false;
+                        setMoving(false);
                         playButton.text('Play');
                     }
-                }, 1000);
+                }, 500);
             }
         });
     }
@@ -81,22 +109,20 @@ const GraphView = ({ width, height, data }) => {
         // data graph 형태로 변경
         const graph = d3dag.graphStratify()(data);
 
-        /* coumput layout */
-        const nodeRadius = 25;
+        /* coumpute layout */
+        const nodeSize = 50;
         const dagDepth = data[data.length - 1].level;
 
         const layout = d3dag
             .sugiyama()
-            .nodeSize(node => {
-                if (node.data.id.includes(' - ')) {
-                    return [150, 150];
-                } else {
-                    return [50, 50];
-                }
-            })
-            .gap([20, 20]);
-
+            .nodeSize([nodeSize, nodeSize])
+            .gap([nodeSize / 3, nodeSize / 3]);
         const { width: dagWidth, height: dagHeight } = layout(graph);
+
+        const scale =
+            svgWidth / dagWidth < svgHeight / (dagHeight + 2 * margin.y)
+                ? svgWidth / dagWidth
+                : svgHeight / (dagHeight + 2 * margin.y);
 
         const svg = d3
             .select(graphSvg.current)
@@ -104,7 +130,7 @@ const GraphView = ({ width, height, data }) => {
             .attr('width', dagWidth)
             .attr('height', dagHeight)
             .append('g') // 그룹으로 묶어서
-            .attr('transform', `scale(${width / dagWidth}, ${width / dagWidth})`)
+            .attr('transform', `scale(${scale}, ${scale})`)
             .call(
                 d3.zoom().on('zoom', event => {
                     svg.attr('transform', event.transform);
@@ -113,7 +139,6 @@ const GraphView = ({ width, height, data }) => {
             .append('g');
 
         // create links
-        const line = d3.line().curve(d3.curveMonotoneY);
         const links = svg
             .append('g')
             .selectAll('path')
@@ -121,9 +146,9 @@ const GraphView = ({ width, height, data }) => {
             .enter()
             .append('path')
             .attr('d', d =>
-                line([
-                    [d.source.x, d.source.data.level * (dagHeight / dagDepth) + nodeRadius / 2],
-                    [d.target.x, d.target.data.level * (dagHeight / dagDepth) - nodeRadius / 2],
+                d3.line()([
+                    [d.source.x, d.source.data.level * (dagHeight / dagDepth)],
+                    [d.target.x, d.target.data.level * (dagHeight / dagDepth)],
                 ])
             )
             .attr('transform', `translate(0, ${margin.y})`)
@@ -164,23 +189,37 @@ const GraphView = ({ width, height, data }) => {
             if (parts.length > 1) {
                 node.append('rect')
                     .attr('id', d => d.data.id.replace(/\s/g, ''))
-                    .attr('width', d.data.id.length * 6 + 20)
+                    .attr('width', 50)
                     .attr('height', 50)
-                    .attr('x', -d.data.id.length * 3 - 10)
-                    .attr('y', -15)
+                    .attr('x', -nodeSize / 2)
+                    .attr('y', -nodeSize / 2)
                     .attr('fill', colorMap.get(parts[1]));
             } else {
-                node.append('circle').attr('r', nodeRadius).attr('fill', colorMap.get(nodeTypes[0]));
+                node.append('circle')
+                    .attr('r', nodeSize / 2)
+                    .attr('fill', colorMap.get(nodeTypes[0]));
             }
         });
 
         // node type
         nodes
             .append('text')
-            .text(d => d.data.id.split(' - ').pop())
             .attr('text-anchor', 'middle')
             .attr('alignment-baseline', 'middle')
-            .attr('class', 'dp-node-text');
+            .attr('class', 'dp-node-text')
+            .each(function (d) {
+                const lines = mapName(d.data.id.split(' - ').pop()).split('\n');
+                if (lines.length === 1) d3.select(this).text(lines[0]);
+                else {
+                    for (let i = 0; i < lines.length; i++) {
+                        d3.select(this)
+                            .append('tspan')
+                            .text(lines[i])
+                            .attr('x', 0)
+                            .attr('dy', i ? '1.2em' : '-0.2em');
+                    }
+                }
+            });
 
         const tooltip = d3.select('body').append('div').attr('class', 'dp-tooltip').style('visibility', 'hidden');
 
@@ -235,10 +274,6 @@ const GraphView = ({ width, height, data }) => {
                 }
             });
 
-        /* ANIMATION */
-        nodes.style('opacity', '0');
-        links.style('opacity', '0');
-
         function animate(level) {
             if (level > dagDepth) return;
 
@@ -262,7 +297,7 @@ const GraphView = ({ width, height, data }) => {
                     return d.data.level <= level + 1 && d.data.level > level - 1;
                 })
                 .transition()
-                .duration(1000)
+                .duration(500)
                 .style('opacity', 1);
 
             links
@@ -270,7 +305,7 @@ const GraphView = ({ width, height, data }) => {
                     return d.target.data.level === level + 1 || d.target.data.level === level;
                 })
                 .transition()
-                .duration(1000)
+                .duration(500)
                 .style('opacity', 1)
                 .end()
                 .then(() => {
@@ -280,7 +315,7 @@ const GraphView = ({ width, height, data }) => {
                             return d.data.level === level && !cheapestId.includes(`${d.data.id.replace(/\s/g, '')}`);
                         })
                         .transition()
-                        .duration(1000)
+                        .duration(500)
                         .style('opacity', 0);
 
                     links
@@ -294,7 +329,7 @@ const GraphView = ({ width, height, data }) => {
                             );
                         })
                         .transition()
-                        .duration(1000)
+                        .duration(500)
                         .style('opacity', 0)
                         .end()
                         .then(() => {
@@ -303,8 +338,11 @@ const GraphView = ({ width, height, data }) => {
                 });
         }
 
-        // Start the animation with level 0
-        animate(0);
+        if (moving) {
+            nodes.style('opacity', '0');
+            links.style('opacity', '0');
+            animate(0);
+        }
     }
 
     useEffect(() => {
@@ -316,41 +354,59 @@ const GraphView = ({ width, height, data }) => {
                 graphSvg: dagSvg,
                 data: optimalData,
             });
-        else
+        else {
             drawGraph({
                 graphSvg: dagSvg,
                 data: dpData,
             });
-    }, [data, width, height, showOptimalOne]);
+            drawSlider({
+                data: dpData,
+            });
+        }
+    }, [data, moving, svgWidth, svgHeight, showOptimalOne]);
 
     useEffect(() => {
         const dpData = parseDp(data);
+
         drawSlider({
-            sliderSvg: sliderRef,
             data: dpData,
         });
     }, [sliderRef]);
 
     return (
-        <div>
-            <p className='dp-text'>Total Cost: {totalCost}</p>
-            <div className='flex justify-center flex-container'>
-                <button className='dp-text' id='play-button'>
-                    Play
-                </button>
-                <svg className='slider' ref={sliderRef} width={sliderWidth} height={sliderHeight} />
+        <>
+            <div className='flex justify-center items-center gap-6 pb-4'>
+                <div className='stats shadow'>
+                    <div className='flex m-2 gap-2'>
+                        <div className='dp-total-cost'>Total Cost</div>
+                        <div className='dp-cost-value'>{totalCost}</div>
+                    </div>
+                </div>
+                <div className='flex justify-center items-center gap-2'>
+                    <button className='dp-play-text' id='play-button'>
+                        Play
+                    </button>
+                    <svg
+                        className='slider'
+                        ref={sliderRef}
+                        width={sliderWidth + sliderMargin * 2}
+                        height={sliderHeight}
+                    />
+                </div>
             </div>
-            <svg ref={dagSvg} width={width} height={height + 2 * margin.y}></svg>
-            <div className='checkbox-container'>
-                <Checkbox
-                    color='blue'
-                    className='h-4 w-4 rounded-full border-gray-900/20 bg-gray-900/10 transition-all hover:scale-105 hover:before:opacity-0'
-                    checked={showOptimalOne}
-                    label={<p className='text'>Show Optimized One</p>}
-                    onClick={handleCheckboxChange}
-                />
+            <div>
+                <svg ref={dagSvg} width={svgWidth} height={svgHeight + 4 * margin.y} />
+                <div className='checkbox-container'>
+                    <Checkbox
+                        color='blue'
+                        className='h-4 w-4 rounded-full border-gray-900/20 bg-gray-900/10 transition-all hover:scale-105 hover:before:opacity-0'
+                        checked={showOptimalOne}
+                        label={<p className='text'>Show Optimized One</p>}
+                        onChange={handleCheckboxChange}
+                    />
+                </div>
             </div>
-        </div>
+        </>
     );
 };
 
