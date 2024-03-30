@@ -20,11 +20,11 @@ const GraphView = ({ width, height, data }) => {
   const [moving, setMoving] = useState(false);
   const [currLevel, setCurrLevel] = useState(1);
 
-  const target = data.optimizer.dp[data.optimizer.dp.length - 1];
-  const totalCost = target.cheapest_total_paths.total_cost;
   const margin = { x: 0, y: 20 };
 
   const [showOptimalOne, setShowOptimalOne] = useState(false);
+  const [totalCost, setTotalCost] = useState(0);
+
   const handleCheckboxChange = () => {
     setShowOptimalOne((prev) => !prev);
   };
@@ -105,7 +105,7 @@ const GraphView = ({ width, height, data }) => {
     });
   }
 
-  function drawGraph({ graphSvg, data }) {
+  function drawGraph({ graphSvg, data, cost }) {
     d3.select(graphSvg.current).selectAll("*").remove(); //clear
 
     // data graph 형태로 변경
@@ -236,7 +236,31 @@ const GraphView = ({ width, height, data }) => {
     nodes
       .on("mouseover", function (event, d) {
         tooltip
-          .html(`${d.data.id} level: ${d.data.level}`)
+          .html(() => {
+            let htmlString = `${d.data.id} level: ${d.data.level}`;
+
+            htmlString += d.data.nodeData.startup_cost
+              ? `<br> startup_cost: ${d.data.nodeData.startup_cost}`
+              : "";
+            htmlString += d.data.nodeData.total_cost
+              ? `<br> total_cost: ${d.data.nodeData.total_cost}`
+              : "";
+            htmlString += d.data.nodeData.node
+              ? `<br> node: ${d.data.nodeData.node}`
+              : "";
+            htmlString += d.data.nodeData.rows
+              ? `<br> rows: ${d.data.nodeData.rows}`
+              : "";
+
+            if (d.data.nodeData.cheapest_startup_paths) {
+              htmlString += `<br> cheapest_startup_cost: ${d.data.nodeData.cheapest_startup_paths.node} ${d.data.nodeData.cheapest_startup_paths.relid}`;
+            }
+
+            if (d.data.nodeData.cheapest_total_paths) {
+              htmlString += `<br> cheapest_total_path: ${d.data.nodeData.cheapest_total_paths.node} ${d.data.nodeData.cheapest_total_paths.relid}`;
+            }
+            return htmlString;
+          })
           .style("visibility", "visible");
       })
       .on("mousemove", function (event) {
@@ -246,6 +270,30 @@ const GraphView = ({ width, height, data }) => {
       })
       .on("mouseout", function () {
         tooltip.style("visibility", "hidden");
+      })
+      .on("click", function (event, d) {
+        // Check if the total_cost exists and is not null or undefined
+        if (
+          d.data.nodeData &&
+          d.data.nodeData.total_cost !== undefined &&
+          d.data.nodeData.total_cost !== null
+        ) {
+          setTotalCost(`${d.data.nodeData.total_cost}`);
+        }
+        // Else, if total_cost does not exist, check for cheapest_total_paths.total_cost
+        else if (
+          d.data.nodeData &&
+          d.data.nodeData.cheapest_total_paths &&
+          d.data.nodeData.cheapest_total_paths.total_cost !== undefined &&
+          d.data.nodeData.cheapest_total_paths.total_cost !== null
+        ) {
+          setTotalCost(`${d.data.nodeData.cheapest_total_paths.total_cost}`);
+        } else {
+          // If neither total_cost nor cheapest_total_paths.total_cost exist, log a message or handle as needed
+          console.log(
+            "Total cost and cheapest total paths cost are unavailable for this node."
+          );
+        }
       });
 
     function animate(level) {

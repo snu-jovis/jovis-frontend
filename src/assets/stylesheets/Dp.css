@@ -101,5 +101,5 @@
 .flex-container {
   display: flex;
   justify-content: center;
-  gap: 16px; /* Space between flex items */
+  gap: 50px;
 }
