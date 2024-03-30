@@ -1,0 +1,105 @@
+.html {
+  height: 100%;
+}
+
+.body {
+  margin: 0;
+  height: 100%;
+  overflow-y: clip;
+}
+
+.svg {
+  position: relative;
+  justify-content: center;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.svg-container {
+  width: 800px;
+  height: 500px;
+  overflow-x: scroll;
+  overflow-y: scroll;
+  border: 1px solid #ccc;
+}
+
+.dp-play-text {
+  font-family: "NanumSquareEB";
+  font-size: 14px;
+}
+
+.dp-node-text {
+  font-family: "NanumSquareB";
+  font-size: 14px;
+}
+
+.dp-tooltip {
+  position: absolute;
+  visibility: hidden;
+  padding: 3px;
+  font-family: "NanumSquareB";
+  font-size: 11px;
+  color: white;
+  background-color: black;
+  opacity: 0.6;
+}
+
+.dp-total-cost {
+  font-family: "NanumSquareR";
+  font-size: small;
+}
+
+.dp-cost-value {
+  font-family: "NanumSquareEB";
+  font-size: large;
+}
+
+.checkbox-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-right: 50px;
+}
+
+.graph-tooltip {
+  position: absolute;
+  visibility: hidden;
+  font-family: "NanumSquareB";
+  font-size: small;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 4px;
+  color: #fff;
+  padding: 5px;
+}
+
+#play-button {
+  background: #f08080;
+  padding-right: 26px;
+  border-radius: 3px;
+  border: none;
+  color: white;
+  margin: 0;
+  padding: 0 12px;
+  width: 70px;
+  cursor: pointer;
+  height: 30px;
+}
+
+#play-button:hover {
+  background-color: #696969;
+}
+
+.slider text {
+  font-size: 12px;
+  font-family: "NanumSquareB";
+}
+
+.slider {
+  cursor: pointer;
+}
+
+.flex-container {
+  display: flex;
+  justify-content: center;
+  gap: 50px;
+}

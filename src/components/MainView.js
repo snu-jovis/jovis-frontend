@@ -1,25 +1,26 @@
-import { useRef, useContext, useEffect, useState } from 'react';
+import { useRef, useContext, useEffect, useState } from "react";
 
-import Editor from '@monaco-editor/react';
+import Editor from "@monaco-editor/react";
 import { Button, Select, Option, Spinner } from "@material-tailwind/react";
 
 import GeqoMain from "./geqo/GeqoMain";
 
 import { HistoryContext } from "./providers/HistoryProvider";
 import { SqlToEditorContext } from "./providers/SqlToEditorProvider";
-import axios from 'axios';
+import axios from "axios";
 
+import responseData from "../data/geqo.json";
+import GraphView from "./dp/GraphView";
 
 export default function MainView() {
-
   const editorRef = useRef(null);
   const { addHistory } = useContext(HistoryContext);
   const { setCallback } = useContext(SqlToEditorContext);
 
-  const [ database, setDatabase ] = useState('postgres'); // candidates: postgres, tpch1gb, and tpcds1gb
-  const [ queryRes, setQueryRes ] = useState({});
+  const [database, setDatabase] = useState("postgres"); // candidates: postgres, tpch1gb, and tpcds1gb
+  const [queryRes, setQueryRes] = useState({});
 
-  const [ isLoading, setLoading ] = useState(false);
+  const [isLoading, setLoading] = useState(false);
 
   const handleEditorDidMount = (editor, monaco) => {
     editorRef.current = editor;
@@ -32,7 +33,7 @@ export default function MainView() {
         query: sql,
         db: db,
       })
-      .then((response) =>{
+      .then((response) => {
         console.log(response);
         setQueryRes(response.data);
         setLoading(false);
@@ -41,7 +42,7 @@ export default function MainView() {
         console.log(error);
         setLoading(false);
       });
-  }
+  };
 
   const onClickSubmit = () => {
     const sql = editorRef.current.getValue();
@@ -76,7 +77,7 @@ export default function MainView() {
   };
 
   useEffect(() => {
-      setCallback(onSidebarSignal);
+    setCallback(onSidebarSignal);
   }, []);
 
   return (
@@ -104,23 +105,27 @@ export default function MainView() {
           <Button className="px-2 py-2" ripple={false} onClick={onClickSubmit}>
             Submit
           </Button>
-          <div className='w-52'>
-            <Select label="Select Database" value={database} onChange={setDatabase}>
+          <div className="w-52">
+            <Select
+              label="Select Database"
+              value={database}
+              onChange={setDatabase}
+            >
               <Option value="postgres">Default Database</Option>
               <Option value="tpch1gb">TPC-H</Option>
               <Option value="tpcds1gb">TPC-DS</Option>
             </Select>
           </div>
-          { isLoading && (
-            <div className='flex items-center'> 
+          {isLoading && (
+            <div className="flex items-center">
               <Spinner className="w-8 h-8" />
             </div>
-          ) }
+          )}
         </div>
       </div>
       <div>
         {/* DP or GEQO here */}
-        <GeqoMain data={queryRes}/>
+        <GeqoMain data={queryRes} />
       </div>
     </div>
   );

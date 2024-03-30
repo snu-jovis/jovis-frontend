@@ -4,7 +4,7 @@ import React from "react";
 
 import { HistoryProvider } from "./components/providers/HistoryProvider";
 import { GeqoProvider } from "./components/providers/GeqoProvider";
-import { SqlToEditorProvider } from './components/providers/SqlToEditorProvider';
+import { SqlToEditorProvider } from "./components/providers/SqlToEditorProvider";
 
 function App() {
   return (
