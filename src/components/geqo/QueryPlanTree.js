@@ -3,6 +3,10 @@ import * as d3 from "d3";
 import { nodeColor } from "./tree";
 
 const QueryPlanTree = ({ width, height, plan }) => {
+  plan = JSON.stringify(plan);
+  plan = plan.replace(/"Plans":/g, '"children":');
+  plan = JSON.parse(plan);
+
   const treeSvg = useRef(null);
   const minimapSvg = useRef(null);
 
@@ -12,7 +16,8 @@ const QueryPlanTree = ({ width, height, plan }) => {
   // data를 d3의 계층 구조로 바꾸어주기
   const root = d3.hierarchy(plan);
 
-  const dx = width / 4;
+  // const dx = width / 4;
+  const dx = 80;
   const dy = 30;
 
   const treeLayout = d3.tree().nodeSize([dx, dy]);
@@ -311,8 +316,13 @@ const QueryPlanTree = ({ width, height, plan }) => {
 
   return (
     <div>
-      <svg ref={treeSvg} width={width} height={height + 2 * marginY} />
-      {/* <svg ref={minimapSvg} /> */}
+      <div className="flex justify-between px-4 pt-2">
+        <p className="vis-title pt-2">EXPLAIN Result</p>
+      </div>
+      <div className="relative">
+        <svg ref={treeSvg} width={width} height={height + 2 * marginY} />
+        {/* <svg ref={minimapSvg} className="absolute bottom-0 right-0" /> */}
+      </div>
     </div>
   );
 };

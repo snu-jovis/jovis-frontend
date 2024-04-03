@@ -1,132 +1,106 @@
 /*
  * parseDp.js: 데이터 전처리
  */
+const subqueryNodes = ["SubqueryScan", "Append"];
 
-export function parseDp(data) {
-  const { optimizer } = data;
-  const nodeMap = new Map();
+function countSubs(sub) {
+  let count = 0;
+  while (sub) {
+    sub = sub.sub;
+    count++;
+  }
+  return count;
+}
 
-  // id, parentIds 만들기
-  const addNode = (node, level, relid, parentRelid = null) => {
-    if (!nodeMap.has(relid)) {
-      nodeMap.set(relid, {
-        id: relid,
-        parentIds: [],
-        children: [],
-        level,
-        nodeData: node,
-      });
+function getRelId(path) {
+  return `${path.relid} - ${path.node}`;
+}
+
+function addNode(nodeMap, node, level, relid, parentRelid = null) {
+  if (!nodeMap.has(relid)) {
+    nodeMap.set(relid, {
+      id: relid,
+      parentIds: [],
+      children: [],
+      level,
+      nodeData: node,
+    });
+  }
+
+  if (parentRelid) {
+    if (!nodeMap.get(relid).parentIds.includes(parentRelid)) {
+      nodeMap.get(relid).parentIds.push(parentRelid);
     }
-    if (parentRelid) {
-      if (!nodeMap.get(relid).parentIds.includes(parentRelid)) {
-        nodeMap.get(relid).parentIds.push(parentRelid);
-      }
-      if (!nodeMap.get(parentRelid).children.includes(relid)) {
-        nodeMap.get(parentRelid).children.push(relid);
-      }
+    if (!nodeMap.get(parentRelid).children.includes(relid)) {
+      nodeMap.get(parentRelid).children.push(relid);
     }
-  };
+  }
+}
 
-  // Material / Memoize 처리
-  const addSpecialNode = (node, pathNode, relid, parentRelid) => {
-    const level = relid.split(" ").length;
-    const specialRelid = `${relid} - ${pathNode}`;
+function processSub(nodeMap, path, entry, level, numSubs) {
+  let currPath = path;
+  let currEntry = entry;
+  let newLevel = level;
 
-    addNode(node, level * 2 - 0.5, specialRelid);
-    addNode(node, level * 2 - 0.5, specialRelid, relid);
-    addNode(node, level * 2 - 0.5, parentRelid, specialRelid);
-  };
+  for (let i = numSubs; i >= 0; i--) {
+    if (subqueryNodes.includes(currPath.node)) break;
 
-  // process SCAN
-  [...optimizer.base].forEach((entry) => {
-    entry.paths?.forEach((path) => {
-      const pathRelid = `${path.relid} - ${path.node}`;
+    const relId = getRelId(currPath);
 
-      addNode(path, 0, pathRelid);
-      addNode(entry, 1, entry.relid, pathRelid);
+    addNode(nodeMap, currPath, newLevel - 1 / (numSubs + 1), relId);
+    addNode(
+      nodeMap,
+      currEntry,
+      newLevel,
+      currEntry.node ? getRelId(currEntry) : currEntry.relid,
+      relId
+    );
+
+    currEntry = currPath;
+    currPath = currPath.sub;
+    newLevel = newLevel - 1 / (numSubs + 1);
+  }
+}
+
+export function parseDp(base, dp, nodeMap, printSub = false) {
+  /*
+   * base 처리; access paths
+   * 현재 subquery 미지원 ("SubqueryScan", "Append" node 생략)
+   * TODO: subquery 고려하도록 backend에서 log parsing 수정
+   */
+  base.forEach((relation) => {
+    relation.paths?.forEach((path) => {
+      if (printSub) processSub(nodeMap, path, relation, 1, countSubs(path.sub));
+      else {
+        if (path.sub) return;
+
+        addNode(nodeMap, path, 0, getRelId(path));
+        addNode(nodeMap, relation, 1, relation.relid, getRelId(path));
+      }
     });
   });
 
-  // process JOIN
-  [...optimizer.dp].forEach((entry) => {
+  /* dp 처리 */
+  dp.forEach((entry) => {
     const level = entry.relid.split(" ").length;
+
     entry.paths?.forEach((path) => {
-      let pathRelid = `${entry.relid} - ${path.node}`;
-
-      addNode(path, 2 * level - 2, pathRelid);
-      addNode(entry, 2 * level - 1, entry.relid, pathRelid);
-
       if (path.join) {
-        const processJoin = (side) => {
-          if (side) {
-            // if (side.node === "Material" || side.node === "Memoize") {
-            // addSpecialNode(side, side.node, side.relid, pathRelid);
-            // } else {
-            addNode(path, level, pathRelid, side.relid);
-            // }
-          }
-        };
+        const pathRelid = `${entry.relid} - ${path.node}`;
 
-        processJoin(path.join.outer);
-        processJoin(path.join.inner);
+        addNode(nodeMap, path, 2 * level - 2, pathRelid);
+        addNode(nodeMap, entry, 2 * level - 1, entry.relid, pathRelid);
+
+        addNode(nodeMap, path, level, pathRelid, path.join.outer.relid);
+        addNode(nodeMap, path, level, pathRelid, path.join.inner.relid);
       }
+
+      if (printSub && path.sub)
+        processSub(nodeMap, path, entry, 2 * level - 1, countSubs(path.sub));
     });
   });
 
   return Array.from(nodeMap.values()).map((node) => ({
     ...node,
   }));
-}
-
-export function parseOptimal(data) {
-  const nodeMap = new Map();
-  const { optimizer } = data;
-
-  const addNode = (id, level, parentId) => {
-    let node;
-    if (nodeMap.has(id)) {
-      node = nodeMap.get(id);
-    } else {
-      node = { id: id, level, parentIds: [] };
-      nodeMap.set(id, node);
-    }
-    if (parentId && !node.parentIds.includes(parentId)) {
-      if (id !== parentId) {
-        node.parentIds.push(parentId);
-      }
-    }
-  };
-  const parseNode = (node, level, parentId) => {
-    let nodeId = `${node.relid} - ${node.node}`;
-    addNode(node.relid, level, nodeId);
-
-    if (node.join) {
-      if (node.join.outer) {
-        addNode(nodeId, level - 1, node.join.outer.relid);
-        parseNode(node.join.outer, level - 2, node.join.outer.relid);
-      }
-      if (node.join.inner) {
-        addNode(nodeId, level - 1, node.join.inner.relid);
-        parseNode(node.join.inner, level - 2, node.join.inner.relid);
-      }
-    } else {
-      addNode(nodeId, 0, null);
-    }
-  };
-
-  const entry = optimizer.dp[optimizer.dp.length - 1];
-  if (entry.cheapest_total_paths) {
-    const node = entry.cheapest_total_paths;
-    const nodeId = `${entry.relid} - ${node.node}`;
-    let level = entry.relid.split(" ").length * 2 - 3;
-
-    addNode(entry.relid, level, nodeId);
-    addNode(nodeId, level - 1, node.join.outer.relid);
-    addNode(nodeId, level - 1, node.join.inner.relid);
-
-    parseNode(node.join.outer, level - 2, node.join.outer.relid);
-    parseNode(node.join.inner, level - 2, node.join.inner.relid);
-  }
-
-  return Array.from(nodeMap.values());
 }

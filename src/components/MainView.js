@@ -119,8 +119,7 @@ export default function MainView() {
           )}
         </div>
       </div>
-      <DpMain data={queryRes} />
-      {/* {queryRes.optimizer ? (
+      {queryRes.optimizer ? (
         <div>
           {queryRes.optimizer.dp.length > 0 && <DpMain data={queryRes} />}
           {Object.keys(queryRes.optimizer.geqo).length > 0 && (
@@ -130,7 +129,7 @@ export default function MainView() {
             Object.keys(queryRes.optimizer.geqo).length === 0 &&
             queryRes.optimizer.base.length > 0 && <DpMain data={queryRes} />}
         </div>
-      ) : null} */}
+      ) : null}
     </div>
   );
 }

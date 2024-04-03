@@ -1,23 +1,22 @@
-import { useEffect, useState, useRef, useContext } from "react";
+import { useEffect, useState, useRef, useContext, useMemo } from "react";
 import * as d3 from "d3";
 import { sliderHorizontal, sliderVertical } from "d3-simple-slider";
 import { GeqoContext } from "../providers/GeqoProvider";
-import data from "../../data/geqo.json";
 
-const FullView = ({ width, height }) => {
+const FullView = ({ width, height, data: geqoData }) => {
   const { setChosen, setMom, setDad, setChild } = useContext(GeqoContext);
 
   const svgWidth = (5 * width) / 6;
   const svgHeight = (5 * height) / 6;
   const sliderSize = 80;
 
-  const geqoData = data.optimizer.geqo.gen;
   const numGen = geqoData.length;
   const numGene = geqoData[0].pool.length;
 
   const [showRecomb, setShowRecomb] = useState(false);
   const [selectedGen, setSelectedGen] = useState([0, numGen]);
   const [selectedGene, setSelectedGene] = useState([0, numGene]);
+  const [interval, setInterval] = useState({ gen: 1, gene: 1 });
 
   const genRef = useRef(null);
   const horizRef = useRef(null);
@@ -64,121 +63,178 @@ const FullView = ({ width, height }) => {
   };
 
   useEffect(() => {
-    const filteredGen = geqoData.filter(
-      (gen, i) => i >= selectedGen[0] && i <= selectedGen[1]
-    );
+    setShowRecomb(false);
+    setSelectedGen([0, numGen]);
+    setSelectedGene([0, numGene]);
 
-    if (filteredGen.length < 30) setShowRecomb(true);
+    setChosen("");
+    setMom("");
+    setDad("");
+    setChild("");
+  }, [geqoData]);
+
+  useEffect(() => {
+    /*
+     * set intervals for generation and gene
+     * max = 50 x 50
+     */
+    if (selectedGen[1] - selectedGen[0] > 30)
+      setInterval((prevState) => ({
+        ...prevState,
+        gen: Math.round((selectedGen[1] - selectedGen[0]) / 30),
+      }));
+    else
+      setInterval((prevState) => ({
+        ...prevState,
+        gen: 1,
+      }));
+
+    if (selectedGene[1] - selectedGene[0] > 30)
+      setInterval((prevState) => ({
+        ...prevState,
+        gene: Math.round((selectedGene[1] - selectedGene[0]) / 30),
+      }));
+    else
+      setInterval((prevState) => ({
+        ...prevState,
+        gene: 1,
+      }));
+  }, [geqoData, selectedGen, selectedGene]);
+
+  useEffect(() => {
+    let filteredGen = [];
+    for (let i = selectedGen[0]; i <= selectedGen[1]; i += interval.gen) {
+      const matchingElements = geqoData.filter((item) => item.gen_num === i);
+      filteredGen.push(...matchingElements);
+    }
+
+    if (filteredGen.length < 15) setShowRecomb(true);
     else setShowRecomb(false);
 
     const svg = d3.select(genRef.current);
     svg.selectAll("*").remove(); // clear
 
     setRectWidth(
-      (svgWidth - 2 * margin.x) / (selectedGen[1] - selectedGen[0] + 1)
+      // (svgWidth - 2 * margin.x) / (selectedGen[1] - selectedGen[0] + 1)
+      (svgWidth - 2 * margin.x) / filteredGen.length
     );
     setRectHeight(
-      (svgHeight - 2 * margin.y) / (selectedGene[1] - selectedGene[0])
+      // (svgHeight - 2 * margin.y) / (selectedGene[1] - selectedGene[0])
+      (svgHeight - 2 * margin.y) / numGene
     );
 
     filteredGen.forEach((gen, i) => {
-      const filteredGene = gen.pool.filter(
-        (gene, i) => i >= selectedGene[0] && i <= selectedGene[1]
-      );
-
       const tooltip = d3
         .select("body")
         .append("div")
         .attr("class", "gene-tooltip");
 
-      filteredGene.forEach((gene, j) => {
-        const rect = svg
-          .append("rect")
-          .attr("id", `gene-${gen.gen_num}-${gene.population_num}`)
-          .attr("x", i * rectWidth)
-          .attr("y", j * rectHeight)
-          .attr("width", showRecomb ? rectWidth / 2 : rectWidth)
-          .attr("height", rectHeight)
-          .attr("fill", gene.color)
-          .attr("stroke", "lightgray")
-          .attr("stroke-width", 0.1)
-          .attr("transform", `translate(${margin.x},${margin.y})`)
-          .on("mouseover", function (event, d) {
-            d3.select(this).attr("fill", d3.rgb(gene.color).darker());
-            tooltip
-              .html(
-                `Generation: ${gen.gen_num}<br>Population: ${gene.population_num}<br>Fitness: ${gene.fitness}`
-              )
-              .style("visibility", "visible");
-          })
-          .on("mousemove", function (event) {
-            tooltip
-              .style("top", event.pageY - 10 + "px")
-              .style("left", event.pageX + 10 + "px");
-          })
-          .on("mouseout", function () {
-            d3.select(this).attr("fill", gene.color);
-            tooltip.html(``).style("visibility", "hidden");
-          });
-
-        rect.on("click", (event, d) => {
+      const rect = svg
+        .append("g")
+        .selectAll("rect")
+        .data(function () {
+          let filteredGene = [];
+          for (
+            let i = selectedGene[0];
+            i <= selectedGene[1];
+            i += interval.gene
+          ) {
+            const matchingElements = gen.pool.filter(
+              (item) => item.population_num === i
+            );
+            filteredGene.push(...matchingElements);
+          }
+          return filteredGene;
+        })
+        .enter()
+        .append("rect")
+        .attr("id", (gene) => {
+          return `gene-${gen.gen_num}-${gene.population_num}`;
+        })
+        .attr("x", i * rectWidth)
+        .attr("y", (d, j) => {
+          // return j * rectHeight;
+          return ((svgHeight - 2 * margin.y) / filteredGen.length) * j;
+        })
+        .attr("width", (gene) => (showRecomb ? rectWidth / 2 : rectWidth))
+        .attr("height", (svgHeight - 2 * margin.y) / filteredGen.length)
+        .attr("fill", (gene) => gene.color)
+        .attr("stroke", "lightgray")
+        .attr("stroke-width", 0.1)
+        .attr("transform", `translate(${margin.x},${margin.y})`)
+        .on("mouseover", function (event, gene) {
+          d3.select(this).attr("fill", d3.rgb(gene.color).darker());
+          tooltip
+            .html(
+              `Generation: ${gen.gen_num}<br>Population: ${gene.population_num}<br>Fitness: ${gene.fitness}`
+            )
+            .style("visibility", "visible");
+        })
+        .on("mousemove", function (event) {
+          tooltip
+            .style("top", event.pageY - 10 + "px")
+            .style("left", event.pageX + 10 + "px");
+        })
+        .on("mouseout", function (gene) {
+          d3.select(this).attr("fill", gene.color);
           tooltip.html(``).style("visibility", "hidden");
-          handleClick(selectedGen[0] + i, gene);
         });
 
-        if (showRecomb) {
-          if (gene.parents) {
-            // svg.select(`#gene-${gen.gen_num}-${gene.population_num}`);
-            // svg.select(`#gene-${gen.gen_num - 1}-${gene.parents[0]}`);
-            // svg.select(`#gene-${gen.gen_num - 1}-${gene.parents[1]}`);
-
-            svg
-              .append("line")
-              .attr("x1", (i - 1) * rectWidth + rectWidth / 2 + margin.x)
-              .attr(
-                "y1",
-                gene.parents[0] * rectHeight + rectHeight / 2 + margin.y
-              )
-              .attr("x2", (i - 1) * rectWidth + rectWidth / 2 + margin.x)
-              .attr(
-                "y2",
-                gene.parents[0] * rectHeight + rectHeight / 2 + margin.y
-              )
-              .transition()
-              .duration(1000)
-              .attr("x2", (i - 1) * rectWidth + rectWidth + margin.x)
-              .attr("y2", j * rectHeight + rectHeight / 2 + margin.y)
-              .attr(
-                "stroke",
-                geqoData[selectedGen[0] + i - 1].pool[gene.parents[0]].color
-              )
-              .attr("stroke-width", 2.5);
-
-            svg
-              .append("line")
-              .attr("x1", (i - 1) * rectWidth + rectWidth / 2 + margin.x)
-              .attr(
-                "y1",
-                gene.parents[1] * rectHeight + rectHeight / 2 + margin.y
-              )
-              .attr("x2", (i - 1) * rectWidth + rectWidth / 2 + margin.x)
-              .attr(
-                "y2",
-                gene.parents[1] * rectHeight + rectHeight / 2 + margin.y
-              )
-              .transition()
-              .duration(1000)
-              .attr("x2", (i - 1) * rectWidth + rectWidth + margin.x)
-              .attr("y2", j * rectHeight + rectHeight / 2 + margin.y)
-              .attr(
-                "stroke",
-                geqoData[selectedGen[0] + i - 1].pool[gene.parents[1]].color
-              )
-              .attr("stroke-width", 2);
-          }
-        }
+      rect.on("click", (event, gene) => {
+        tooltip.html(``).style("visibility", "hidden");
+        handleClick(selectedGen[0] + i, gene);
       });
     });
+
+    // if (showRecomb) {
+    //   if (gene.parents) {
+    //     // svg.select(`#gene-${gen.gen_num}-${gene.population_num}`);
+    //     // svg.select(`#gene-${gen.gen_num - 1}-${gene.parents[0]}`);
+    //     // svg.select(`#gene-${gen.gen_num - 1}-${gene.parents[1]}`);
+    //     svg
+    //       .append("line")
+    //       .attr("x1", (i - 1) * rectWidth + rectWidth / 2 + margin.x)
+    //       .attr(
+    //         "y1",
+    //         gene.parents[0] * rectHeight + rectHeight / 2 + margin.y
+    //       )
+    //       .attr("x2", (i - 1) * rectWidth + rectWidth / 2 + margin.x)
+    //       .attr(
+    //         "y2",
+    //         gene.parents[0] * rectHeight + rectHeight / 2 + margin.y
+    //       )
+    //       .transition()
+    //       .duration(1000)
+    //       .attr("x2", (i - 1) * rectWidth + rectWidth + margin.x)
+    //       .attr("y2", j * rectHeight + rectHeight / 2 + margin.y)
+    //       .attr(
+    //         "stroke",
+    //         geqoData[selectedGen[0] + i - 1].pool[gene.parents[0]].color
+    //       )
+    //       .attr("stroke-width", 2.5);
+    //     svg
+    //       .append("line")
+    //       .attr("x1", (i - 1) * rectWidth + rectWidth / 2 + margin.x)
+    //       .attr(
+    //         "y1",
+    //         gene.parents[1] * rectHeight + rectHeight / 2 + margin.y
+    //       )
+    //       .attr("x2", (i - 1) * rectWidth + rectWidth / 2 + margin.x)
+    //       .attr(
+    //         "y2",
+    //         gene.parents[1] * rectHeight + rectHeight / 2 + margin.y
+    //       )
+    //       .transition()
+    //       .duration(1000)
+    //       .attr("x2", (i - 1) * rectWidth + rectWidth + margin.x)
+    //       .attr("y2", j * rectHeight + rectHeight / 2 + margin.y)
+    //       .attr(
+    //         "stroke",
+    //         geqoData[selectedGen[0] + i - 1].pool[gene.parents[1]].color
+    //       )
+    //       .attr("stroke-width", 2);
+    //   }
+    // }
   }, [
     width,
     height,
@@ -201,7 +257,10 @@ const FullView = ({ width, height }) => {
       .default(selectedGen)
       .fill("gray")
       .width(svgWidth)
-      .on("onchange", (val) => {
+      // .on("onchange", (val) => {
+      //   setSelectedGen(val);
+      // })
+      .on("end", (val) => {
         setSelectedGen(val);
       });
 
@@ -223,7 +282,10 @@ const FullView = ({ width, height }) => {
       .default(selectedGene)
       .fill("gray")
       .height(svgHeight)
-      .on("onchange", (val) => {
+      // .on("onchange", (val) => {
+      //   setSelectedGene([numGene - val[1], numGene - val[0]]);
+      // })
+      .on("end", (val) => {
         setSelectedGene([numGene - val[1], numGene - val[0]]);
       });
 
@@ -231,7 +293,7 @@ const FullView = ({ width, height }) => {
       .append("g")
       .attr("transform", `translate(${sliderSize - sliderMargin * 2}, 20)`);
     vRange.call(vertSlider);
-  }, [width, height]);
+  }, [width, height, geqoData]);
 
   return (
     <div className="place-content-center">

@@ -1,16 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 import { Checkbox } from "@material-tailwind/react";
-import data from "../../data/geqo.json";
 
-const CostChart = ({ width, height }) => {
-  const geqoData = data.optimizer.geqo.gen; // TODO
-
-  const [logScale, setLogScale] = useState(false);
-  const handleCheckboxChange = () => {
-    setLogScale((prev) => !prev);
-  };
-
+const CostChart = ({ width, height, data: geqoData }) => {
   const metrics = ["best", "worst", "mean", "avg"];
   const [selectedMetric, setSelectedMetric] = useState(null);
   const metricNames = {
@@ -20,14 +12,20 @@ const CostChart = ({ width, height }) => {
     avg: "average",
   };
 
+  const [logScale, setLogScale] = useState(false);
+  const handleCheckboxChange = () => {
+    setLogScale((prev) => !prev);
+    setSelectedMetric(null); // clear selected metric
+  };
+
   const legendRef = useRef(null);
   const legendWidth = 230;
   const legendHeight = 20;
   const legendMargin = { x: 25, y: 6, r: 5 };
 
   const chartSvg = useRef(null);
-  const chartHeight = height ? height - legendHeight : 300; // rect -20 에러 임시 수정
-  const chartMargin = { top: 10, right: 40, bottom: 20, left: 50 };
+  const chartHeight = height ? height - legendHeight : 300;
+  const chartMargin = { top: 30, right: 40, bottom: 20, left: 50 };
 
   const lineColor = d3
     .scaleOrdinal()
@@ -53,7 +51,7 @@ const CostChart = ({ width, height }) => {
       .append("g")
       .attr("id", "yAxis")
       .attr("transform", `translate(${chartMargin.left}, 0)`)
-      .call(d3.axisLeft(yScale).tickFormat(d3.format("d")));
+      .call(d3.axisLeft(yScale).tickFormat(d3.format(".0e")));
   };
 
   const drawLines = (svg, xScale, yScale) => {
@@ -126,14 +124,11 @@ const CostChart = ({ width, height }) => {
     const svg = d3.select(chartSvg.current);
     svg.selectAll("*").remove(); // clear
 
-    const dataMargin =
-      (d3.max(geqoData, (d) => d.worst) - d3.min(geqoData, (d) => d.best)) / 5;
-
     const yScale = d3
       .scaleLinear()
       .domain([
-        d3.min(geqoData, (d) => d.best - dataMargin),
-        d3.max(geqoData, (d) => d.worst + dataMargin),
+        d3.min(geqoData, (d) => d.best),
+        d3.max(geqoData, (d) => d.worst),
       ])
       .range([chartHeight - chartMargin.bottom, chartMargin.top]);
 
@@ -149,30 +144,70 @@ const CostChart = ({ width, height }) => {
     drawLegend(svg);
   }, [geqoData, selectedMetric]);
 
-  /* update when metric is selected */
+  /* update when log scale is toggled */
   useEffect(() => {
     const svg = d3.select(chartSvg.current);
-
-    const dataMargin =
-      (d3.max(geqoData, (d) => (selectedMetric ? d[selectedMetric] : d.worst)) -
-        d3.min(geqoData, (d) =>
-          selectedMetric ? d[selectedMetric] : d.best
-        )) /
-      5;
 
     const yScale = logScale
       ? d3
           .scaleLog()
           .domain([
-            d3.min(geqoData, (d) =>
-              selectedMetric
-                ? d[selectedMetric] - dataMargin
-                : d.best - dataMargin
-            ),
+            d3.max([1, d3.min(geqoData, (d) => d.best)]),
+            d3.max(geqoData, (d) => d.worst),
+          ])
+          .range([chartHeight - chartMargin.bottom, chartMargin.top])
+      : d3
+          .scaleLinear()
+          .domain([
+            d3.max(geqoData, (d) => d.best),
+            d3.max(geqoData, (d) => d.worst),
+          ])
+          .range([chartHeight - chartMargin.bottom, chartMargin.top]);
+
+    logScale
+      ? svg
+          .select("#yAxis")
+          .transition()
+          .duration(500)
+          .call(d3.axisLeft(yScale))
+      : svg
+          .select("#yAxis")
+          .transition()
+          .duration(500)
+          .call(d3.axisLeft(yScale).tickFormat(d3.format(".0e")));
+
+    metrics.forEach((metric) => {
+      svg
+        .select(`#line-${metric}`)
+        .datum(geqoData)
+        .transition()
+        .duration(500)
+        .attr(
+          "d",
+          d3
+            .line()
+            .x((d) => xScale(d.gen_num))
+            .y((d) => yScale(d[metric]))
+        );
+    });
+  }, [logScale]);
+
+  /* update when metric is selected */
+  useEffect(() => {
+    const svg = d3.select(chartSvg.current);
+
+    const yScale = logScale
+      ? d3
+          .scaleLog()
+          .domain([
+            d3.max([
+              1,
+              d3.min(geqoData, (d) =>
+                selectedMetric ? d[selectedMetric] : d.best
+              ),
+            ]),
             d3.max(geqoData, (d) =>
-              selectedMetric
-                ? d[selectedMetric] + dataMargin
-                : d.worst + dataMargin
+              selectedMetric ? d[selectedMetric] : d.worst
             ),
           ])
           .range([chartHeight - chartMargin.bottom, chartMargin.top])
@@ -180,23 +215,25 @@ const CostChart = ({ width, height }) => {
           .scaleLinear()
           .domain([
             d3.min(geqoData, (d) =>
-              selectedMetric
-                ? d[selectedMetric] - dataMargin
-                : d.best - dataMargin
+              selectedMetric ? d[selectedMetric] : d.best
             ),
             d3.max(geqoData, (d) =>
-              selectedMetric
-                ? d[selectedMetric] + dataMargin
-                : d.worst + dataMargin
+              selectedMetric ? d[selectedMetric] : d.worst
             ),
           ])
           .range([chartHeight - chartMargin.bottom, chartMargin.top]);
 
-    svg
-      .select("#yAxis")
-      .transition()
-      .duration(500)
-      .call(d3.axisLeft(yScale).tickFormat(d3.format("d")));
+    logScale
+      ? svg
+          .select("#yAxis")
+          .transition()
+          .duration(500)
+          .call(d3.axisLeft(yScale))
+      : svg
+          .select("#yAxis")
+          .transition()
+          .duration(500)
+          .call(d3.axisLeft(yScale).tickFormat(d3.format(".0e")));
 
     metrics.forEach((metric) => {
       if (!selectedMetric || selectedMetric === metric) {
@@ -215,31 +252,24 @@ const CostChart = ({ width, height }) => {
           );
       } else svg.select(`#line-${metric}`).style("opacity", 0);
     });
-  }, [selectedMetric, logScale]);
+  }, [selectedMetric]);
 
+  /* hover effect */
   useEffect(() => {
     const svg = d3.select(chartSvg.current);
-
-    const dataMargin =
-      (d3.max(geqoData, (d) => (selectedMetric ? d[selectedMetric] : d.worst)) -
-        d3.min(geqoData, (d) =>
-          selectedMetric ? d[selectedMetric] : d.best
-        )) /
-      5;
 
     const yScale = logScale
       ? d3
           .scaleLog()
           .domain([
-            d3.min(geqoData, (d) =>
-              selectedMetric
-                ? d[selectedMetric] - dataMargin
-                : d.best - dataMargin
-            ),
+            d3.max([
+              1,
+              d3.min(geqoData, (d) =>
+                selectedMetric ? d[selectedMetric] : d.best
+              ),
+            ]),
             d3.max(geqoData, (d) =>
-              selectedMetric
-                ? d[selectedMetric] + dataMargin
-                : d.worst + dataMargin
+              selectedMetric ? d[selectedMetric] : d.worst
             ),
           ])
           .range([chartHeight - chartMargin.bottom, chartMargin.top])
@@ -247,14 +277,10 @@ const CostChart = ({ width, height }) => {
           .scaleLinear()
           .domain([
             d3.min(geqoData, (d) =>
-              selectedMetric
-                ? d[selectedMetric] - dataMargin
-                : d.best - dataMargin
+              selectedMetric ? d[selectedMetric] : d.best
             ),
             d3.max(geqoData, (d) =>
-              selectedMetric
-                ? d[selectedMetric] + dataMargin
-                : d.worst + dataMargin
+              selectedMetric ? d[selectedMetric] : d.worst
             ),
           ])
           .range([chartHeight - chartMargin.bottom, chartMargin.top]);
@@ -305,13 +331,13 @@ const CostChart = ({ width, height }) => {
 
         focusLine
           .attr("x1", xScale(focused.gen_num))
-          .attr("y1", chartMargin.top + 15)
+          .attr("y1", chartMargin.top - 15)
           .attr("x2", xScale(focused.gen_num))
           .attr("y2", chartHeight - chartMargin.bottom);
 
         focusText
           .attr("x", xScale(focused.gen_num))
-          .attr("y", chartMargin.top + 10)
+          .attr("y", chartMargin.top - 20)
           .attr("class", "focus-gen")
           .text(`Generation ${focused.gen_num}`);
 
@@ -324,15 +350,20 @@ const CostChart = ({ width, height }) => {
 
             svg
               .select(`#focus-text-${metric}`)
-              .attr("x", xScale(focused.gen_num))
               .attr(
-                "y",
-                metric === "best" || metric === "mean"
-                  ? yScale(focused[metric]) + 15
-                  : yScale(focused[metric]) - 10
+                "x",
+                metric === "best" || metric === "avg"
+                  ? xScale(focused.gen_num) + 25
+                  : xScale(focused.gen_num) - 25
               )
+              .attr("y", yScale(focused[metric]) - 5)
+              .attr("fill", lineColor(metric))
               .attr("class", "focus-cost")
-              .text(Math.round(focused[metric]));
+              .text(
+                logScale
+                  ? d3.format(".4s")(focused[metric])
+                  : d3.format(".2e")(focused[metric])
+              );
           }
         });
       })
@@ -349,7 +380,7 @@ const CostChart = ({ width, height }) => {
   return (
     <div>
       <div className="flex justify-between px-4 pt-2">
-        <p className="vis-title pt-2">Cost Chart</p>
+        <p className="vis-title py-2">Cost Chart</p>
         <Checkbox
           className="h-4 w-4 rounded-full border-gray-900/20 bg-gray-900/10 transition-all hover:scale-105 hover:before:opacity-0"
           checked={logScale}

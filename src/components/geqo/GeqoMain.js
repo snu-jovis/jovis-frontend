@@ -1,14 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import CostChart from "./CostChart";
 import FullView from "./FullView";
-import ParseQueryPlan from "./ParseQueryPlan";
 import EdgeRecomb from "./EdgeRecomb";
 import JoinOrderTree from "./JoinOrderTree";
 import { Card } from "@material-tailwind/react";
 
 import "../../assets/stylesheets/Geqo.css";
+import QueryPlanTree from "./QueryPlanTree";
 
-const GeqoMain = (props) => {
+const GeqoMain = ({ data }) => {
   const chartRef = useRef(null);
   const [chartSize, setChartSize] = useState(0);
 
@@ -20,9 +20,9 @@ const GeqoMain = (props) => {
 
   useEffect(() => {
     const updateSizes = () => {
-      setChartSize(chartRef.current.offsetWidth);
-      setFullSize(fullRef.current.offsetWidth);
-      setIndivSize(indivRef.current.offsetWidth);
+      if (chartRef.current) setChartSize(chartRef.current.offsetWidth);
+      if (fullRef.current) setFullSize(fullRef.current.offsetWidth);
+      if (indivRef.current) setIndivSize(indivRef.current.offsetWidth);
     };
 
     // initial size
@@ -33,27 +33,43 @@ const GeqoMain = (props) => {
 
     // cleanup
     return () => window.removeEventListener("resize", updateSizes);
-  }, []);
+  }, [data]);
 
   return (
     <div className="flex gap-x-2">
       <div ref={chartRef} className="w-1/4 grid grid-cols-1 gap-2 ml-2 mr-6">
         <Card>
-          <CostChart width={chartSize} height={chartSize} />
+          <CostChart
+            width={chartSize}
+            height={chartSize}
+            data={data.optimizer.geqo.gen}
+          />
         </Card>
         <Card>
-          <JoinOrderTree width={chartSize} height={chartSize} />
+          <JoinOrderTree
+            width={chartSize}
+            height={chartSize}
+            data={data.optimizer.geqo.reloptinfo}
+          />
         </Card>
       </div>
       <div ref={fullRef} className="w-1/2 flex justify-center">
-        <FullView width={fullSize} height={fullSize} />
+        <FullView
+          width={fullSize}
+          height={fullSize}
+          data={data.optimizer.geqo.gen}
+        />
       </div>
       <div ref={indivRef} className="w-1/4 grid grid-cols-1 gap-2 ml-6 mr-4">
         <Card>
-          <ParseQueryPlan width={indivSize} height={indivSize} />
+          <QueryPlanTree
+            width={indivSize}
+            height={indivSize}
+            plan={data.result[0][0][0].Plan}
+          />
         </Card>
         <Card>
-          <EdgeRecomb width={indivSize} height={indivSize} />
+          <EdgeRecomb width={indivSize} height={indivSize} data={data} />
         </Card>
       </div>
     </div>

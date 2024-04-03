@@ -1,7 +1,6 @@
 import React, { useContext, useEffect, useRef } from "react";
 import * as d3 from "d3";
 import { GeqoContext } from "../providers/GeqoProvider";
-import data from "../../data/geqo.json";
 
 function preprocessData(relMap, data) {
   const numbers = data.split(" ").map(Number);
@@ -116,7 +115,7 @@ function handleParentHover(momRef, dadRef, selectedPath) {
   });
 }
 
-const EdgeRecomb = ({ width, height }) => {
+const EdgeRecomb = ({ width, height, data }) => {
   const relMap = data.optimizer.geqo.map;
 
   const { mom, dad, child } = useContext(GeqoContext);

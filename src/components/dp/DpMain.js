@@ -1,16 +1,21 @@
 import React, { useEffect, useState, useRef } from "react";
+import { Card } from "@material-tailwind/react";
+import QueryPlanTree from "../geqo/QueryPlanTree";
 import GraphView from "./GraphView";
-import data from "../../data/dp.json";
 
 import "../../assets/stylesheets/Dp.css";
 
-const DpMain = (props) => {
+const DpMain = ({ data }) => {
   const viewRef = useRef(null);
   const [viewSize, setViewSize] = useState([0, 0]);
 
   useEffect(() => {
     const updateSize = () => {
-      setViewSize([viewRef.current.offsetWidth, viewRef.current.offsetHeight]);
+      if (viewRef.current)
+        setViewSize([
+          viewRef.current.offsetWidth,
+          viewRef.current.offsetHeight,
+        ]);
     };
 
     // initial size
@@ -24,12 +29,24 @@ const DpMain = (props) => {
   }, []);
 
   return (
-    <div ref={viewRef} className="w-full place-content-center">
+    <div ref={viewRef} className="w-full flex">
       <GraphView
-        width={viewSize[0] ? viewSize[0] : 500}
+        width={viewSize[0] ? (3 * viewSize[0]) / 4 : 500}
         height={viewSize[1] ? viewSize[1] : 500}
-        data={data}
+        base={data.optimizer.base}
+        dp={data.optimizer.dp}
+        cost={data.result[0][0][0].Plan["Total Cost"]}
       />
+      <div className="w-1/4">
+        <Card className="h-1/2 mb-4">
+          <QueryPlanTree
+            width={viewSize[0] ? viewSize[0] / 4 : 500}
+            height={viewSize[1] ? viewSize[1] / 2 - 16 : 500}
+            plan={data.result[0][0][0].Plan}
+          />
+        </Card>
+        {/* <Card className="h-1/2">Cost Chart</Card> */}
+      </div>
     </div>
   );
 };

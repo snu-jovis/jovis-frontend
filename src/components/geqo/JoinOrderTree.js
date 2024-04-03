@@ -1,9 +1,8 @@
 import { useEffect, useRef, useContext, useState } from "react";
 import * as d3 from "d3";
 import { GeqoContext } from "../providers/GeqoProvider";
-import data from "../../data/geqo.json";
 
-const JoinOrderTree = ({ width, height }) => {
+const JoinOrderTree = ({ width, height, data: relOptInfo }) => {
   const { chosen } = useContext(GeqoContext);
   const costHeight = 30;
   const svgHeight = height - costHeight;
@@ -30,6 +29,8 @@ const JoinOrderTree = ({ width, height }) => {
       if (node.join.inner) {
         newNode.children.push(convertPath(node.join.inner, newNode));
       }
+    } else if (node.sub) {
+      newNode.children.push(convertPath(node.sub, newNode));
     }
 
     return newNode;
@@ -49,8 +50,6 @@ const JoinOrderTree = ({ width, height }) => {
 
     return nodes;
   }
-
-  const relOptInfo = data.optimizer.geqo.reloptinfo;
 
   const treeRef = useRef(null);
   const barRef = useRef(null);
@@ -75,7 +74,9 @@ const JoinOrderTree = ({ width, height }) => {
   useEffect(() => {
     if (!relOptInfo[chosen]) return;
 
-    setFitness(relOptInfo[chosen].cheapest_total_paths.total_cost);
+    setFitness(
+      d3.format(".0f")(relOptInfo[chosen].cheapest_total_paths.total_cost)
+    );
 
     /* Tree */
     const treeData = convertPath(relOptInfo[chosen].cheapest_total_paths);
@@ -267,10 +268,14 @@ const JoinOrderTree = ({ width, height }) => {
 
       const percent = (d[1] - d[0]).toLocaleString("en-US", {
         style: "percent",
-        minimumFractionDigits: 2,
+        minimumFractionDigits: 1,
       });
 
-      setSelectedCost(`Run Cost: ${flatTree[i].data.total_cost} (${percent})`);
+      setSelectedCost(
+        `Run Cost: ${d3.format(".0f")(
+          flatTree[i].data.total_cost
+        )} (${percent})`
+      );
 
       svg
         .selectAll("circle")
@@ -302,7 +307,7 @@ const JoinOrderTree = ({ width, height }) => {
           <hr className="w-48 h-1 mx-auto bg-gray-100 border-0 rounded md:mb-2 dark:bg-gray-700" />
           <div
             style={{ width: `${width}}px`, height: `${costHeight}px` }}
-            className="flex justify-center cost-text gap-6"
+            className="flex justify-center cost-text gap-4"
           >
             <p>Fitness: {fitness}</p>
             <p>{selectedCost}</p>
