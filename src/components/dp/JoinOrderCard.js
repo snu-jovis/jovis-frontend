@@ -19,8 +19,6 @@ const JoinOrderCard = props => {
                 <div className='dp-cost-value flex-col items-center m-2 gap-2'>
                     <div>Node:</div>
                     <div>{props.node}</div>
-                </div>
-                <div className='dp-cost-value flex-col items-center m-2 gap-2'>
                     <div>Join Order:</div>
                     <Latex>{`$${joinOrderArray}$`}</Latex>
                 </div>

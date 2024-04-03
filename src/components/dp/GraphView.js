@@ -1,12 +1,13 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { parseDp, parseOptimal } from './parseDp';
-import * as d3 from 'd3';
-import * as d3dag from 'https://cdn.skypack.dev/d3-dag@1.0.0-1';
-import { Checkbox, Card } from '@material-tailwind/react';
-import JoinOrderCard from './JoinOrderCard';
-import Latex from 'react-latex';
+import React, { useEffect, useState, useRef } from "react";
+import { parseDp, parseOptimal } from "./parseDp";
+import * as d3 from "d3";
+import * as d3dag from "https://cdn.skypack.dev/d3-dag@1.0.0-1";
+import { Checkbox, Card } from "@material-tailwind/react";
+import JoinOrderCard from "./JoinOrderCard";
+import CostCard from "./CostCard";
+import Latex from "react-latex";
 
-import '../../assets/stylesheets/Dp.css';
+import "../../assets/stylesheets/Dp.css";
 
 const GraphView = ({ width, height, data }) => {
     const dagSvg = useRef(null);
@@ -16,10 +17,12 @@ const GraphView = ({ width, height, data }) => {
 
     const [animation, setAnimation] = useState(false);
     const [showOptimalOne, setShowOptimalOne] = useState(false);
-    const [costText, setCostText] = useState('Total Cost for Cheapest Path');
+    const [costText, setCostText] = useState("Total Cost for Cheapest Path");
     const [totalCost, setTotalCost] = useState(0);
     const [showJoinCard, setShowJoinCard] = useState(false);
     const [joinOrder, setJoinOrder] = useState([]);
+    const [showCostCard, setShowCostCard] = useState(false);
+    const [startupCost, setStartupCost] = useState(0);
     const [node, setNode] = useState();
 
     const handleCheckboxChange = () => {
@@ -33,27 +36,27 @@ const GraphView = ({ width, height, data }) => {
 
     function mapName(name) {
         switch (name) {
-            case 'SeqScan':
-                return 'Seq\nScan';
-            case 'HashJoin':
-                return 'Hash\nJoin';
-            case 'MergeJoin':
-                return 'Merge\nJoin';
-            case 'NestLoop':
-                return 'Nested\nLoop';
-            case 'IdxScan':
-                return 'Index\nScan';
+            case "SeqScan":
+                return "Seq\nScan";
+            case "HashJoin":
+                return "Hash\nJoin";
+            case "MergeJoin":
+                return "Merge\nJoin";
+            case "NestLoop":
+                return "Nested\nLoop";
+            case "IdxScan":
+                return "Index\nScan";
             default:
                 return name;
         }
     }
 
     function generateNodeId(d) {
-        return `${d.relid} - ${d.node}`.replace(/\s/g, '');
+        return `${d.relid} - ${d.node}`.replace(/\s/g, "");
     }
 
     function drawGraph({ graphSvg, data }) {
-        d3.select(graphSvg.current).selectAll('*').remove(); //clear
+        d3.select(graphSvg.current).selectAll("*").remove(); //clear
 
         // data graph 형태로 변경
         const graph = d3dag.graphStratify()(data);
@@ -74,11 +77,11 @@ const GraphView = ({ width, height, data }) => {
 
         const svg = d3
             .select(graphSvg.current)
-            .append('svg')
-            .attr('width', width < dagWidth ? dagWidth : width)
-            .attr('height', dagHeight)
-            .append('g')
-            .attr('transform', function () {
+            .append("svg")
+            .attr("width", width < dagWidth ? dagWidth : width)
+            .attr("height", dagHeight)
+            .append("g")
+            .attr("transform", function () {
                 if (showOptimalOne) {
                     return `scale(${scale}, ${scale}) translate(${dagWidth + (svgWidth - dagWidth * scale) / 1.8}, ${
                         dagHeight + margin.y
@@ -90,21 +93,21 @@ const GraphView = ({ width, height, data }) => {
                 }
             })
             .call(
-                d3.zoom().on('zoom', event => {
-                    svg.attr('transform', event.transform);
+                d3.zoom().on("zoom", event => {
+                    svg.attr("transform", event.transform);
                 })
             )
-            .append('g');
+            .append("g");
 
         // create links
         const line = d3.line().curve(d3.curveMonotoneY);
         const links = svg
-            .append('g')
-            .selectAll('path')
+            .append("g")
+            .selectAll("path")
             .data(graph.links())
             .enter()
-            .append('path')
-            .attr('d', function (d) {
+            .append("path")
+            .attr("d", function (d) {
                 var newPoints = d.points;
 
                 newPoints[0][0] = d.source.x;
@@ -114,18 +117,18 @@ const GraphView = ({ width, height, data }) => {
 
                 return line(newPoints);
             })
-            .attr('fill', 'none')
-            .attr('stroke-width', 2)
-            .attr('stroke', 'lightgray');
+            .attr("fill", "none")
+            .attr("stroke-width", 2)
+            .attr("stroke", "lightgray");
 
         // create nodes
         const nodes = svg
-            .append('g')
-            .selectAll('g')
+            .append("g")
+            .selectAll("g")
             .data(graph.nodes())
             .enter()
-            .append('g')
-            .attr('transform', d => {
+            .append("g")
+            .attr("transform", d => {
                 return `translate(${d.x}, ${d.data.level * (dagHeight / dagDepth)})`;
             });
 
@@ -135,7 +138,7 @@ const GraphView = ({ width, height, data }) => {
         const nodeTypes = [
             ...new Set(
                 nodesArray.map(node => {
-                    return node.data.id.split(' - ')[1];
+                    return node.data.id.split(" - ")[1];
                 })
             ),
         ];
@@ -146,55 +149,61 @@ const GraphView = ({ width, height, data }) => {
 
         nodes.each(function (d) {
             const node = d3.select(this);
-            const parts = d.data.id.split(' - ');
+            const parts = d.data.id.split(" - ");
 
             if (parts.length > 1) {
-                node.append('rect')
-                    .attr('id', d => d.data.id.replace(/\s/g, ''))
-                    .attr('width', nodeSize)
-                    .attr('height', nodeSize)
-                    .attr('x', -nodeSize / 2)
-                    .attr('y', -nodeSize / 2)
-                    .attr('fill', colorMap.get(parts[1]));
+                node.append("rect")
+                    .attr("id", d => d.data.id.replace(/\s/g, ""))
+                    .attr("width", nodeSize)
+                    .attr("height", nodeSize)
+                    .attr("x", -nodeSize / 2)
+                    .attr("y", -nodeSize / 2)
+                    .attr("fill", colorMap.get(parts[1]));
             } else {
-                node.append('circle')
-                    .attr('r', nodeSize / 2)
-                    .attr('fill', colorMap.get(nodeTypes[0]));
+                node.append("circle")
+                    .attr("r", nodeSize / 2)
+                    .attr("fill", colorMap.get(nodeTypes[0]));
             }
         });
 
         // node type
         nodes
-            .append('text')
-            .attr('text-anchor', 'middle')
-            .attr('alignment-baseline', 'middle')
-            .attr('class', 'dp-node-text')
-            .attr('transform', `rotate(180)`)
+            .append("text")
+            .attr("text-anchor", "middle")
+            .attr("alignment-baseline", "middle")
+            .attr("class", "dp-node-text")
+            .attr("transform", `rotate(180)`)
             .each(function (d) {
-                const lines = mapName(d.data.id.split(' - ').pop()).split('\n');
+                const lines = mapName(d.data.id.split(" - ").pop()).split("\n");
                 if (lines.length === 1) d3.select(this).text(lines[0]);
                 else {
                     for (let i = 0; i < lines.length; i++) {
                         d3.select(this)
-                            .append('tspan')
+                            .append("tspan")
                             .text(lines[i])
-                            .attr('x', 0)
-                            .attr('dy', i ? '1em' : '0em');
+                            .attr("x", 0)
+                            .attr("dy", i ? "1em" : "0em");
                     }
                 }
             });
 
-        nodes.on('click', function (event, d) {
+        nodes.on("click", function (event, d) {
             if (d.data.nodeData && d.data.nodeData.total_cost) {
-                setCostText('Total Cost for Selected Operator');
+                setCostText("Total Cost for Selected Operator");
+                setStartupCost(d.data.nodeData.startup_cost);
                 setTotalCost(`${d.data.nodeData.total_cost}`);
                 setShowJoinCard(true);
+                setShowCostCard(true);
+                
+
                 if (d.data.parentIds.length > 0) {
                     setJoinOrder(`${d.data.parentIds}`);
                     setNode(`${d.data.id}`);
                 }
+
+
             } else if (d.data.nodeData && d.data.nodeData.cheapest_total_paths) {
-                setCostText('Total Cost for Cheapest Path');
+                setCostText("Total Cost for Cheapest Path");
                 setTotalCost(`${d.data.nodeData.cheapest_total_paths.total_cost}`);
             }
         });
@@ -214,8 +223,8 @@ const GraphView = ({ width, height, data }) => {
                 .each(function (d) {
                     cheapestId.push(generateNodeId(d.data.nodeData.cheapest_total_paths));
                     if (d.data.nodeData.cheapest_total_paths.join) {
-                        cheapestInnerId.push(d.data.nodeData.cheapest_total_paths.join.inner.relid.replace(/\s/g, ''));
-                        cheapestOuterId.push(d.data.nodeData.cheapest_total_paths.join.outer.relid.replace(/\s/g, ''));
+                        cheapestInnerId.push(d.data.nodeData.cheapest_total_paths.join.inner.relid.replace(/\s/g, ""));
+                        cheapestOuterId.push(d.data.nodeData.cheapest_total_paths.join.outer.relid.replace(/\s/g, ""));
                     }
                 });
 
@@ -226,7 +235,7 @@ const GraphView = ({ width, height, data }) => {
                 })
                 .transition()
                 .duration(1000)
-                .style('opacity', 1);
+                .style("opacity", 1);
 
             // 2. makes links appear
             links
@@ -235,32 +244,32 @@ const GraphView = ({ width, height, data }) => {
                 })
                 .transition()
                 .duration(1000)
-                .style('opacity', 1)
+                .style("opacity", 1)
                 .end()
                 .then(() => {
                     // 3. leave only cheapest path
                     nodes
                         .filter(function (d) {
-                            return d.data.level === level && !cheapestId.includes(`${d.data.id.replace(/\s/g, '')}`);
+                            return d.data.level === level && !cheapestId.includes(`${d.data.id.replace(/\s/g, "")}`);
                         })
                         .transition()
                         .duration(1000)
-                        .style('opacity', 0.3);
+                        .style("opacity", 0.3);
 
                     links
                         .filter(function (d) {
                             return (
                                 (d.target.data.level === level &&
-                                    (!cheapestId.includes(`${d.target.data.id.replace(/\s/g, '')}`) ||
-                                        (!cheapestInnerId.includes(`${d.source.data.id.replace(/\s/g, '')}`) &&
-                                            !cheapestOuterId.includes(`${d.source.data.id.replace(/\s/g, '')}`)))) ||
+                                    (!cheapestId.includes(`${d.target.data.id.replace(/\s/g, "")}`) ||
+                                        (!cheapestInnerId.includes(`${d.source.data.id.replace(/\s/g, "")}`) &&
+                                            !cheapestOuterId.includes(`${d.source.data.id.replace(/\s/g, "")}`)))) ||
                                 (d.target.data.level === level + 1 &&
-                                    !cheapestId.includes(`${d.source.data.id.replace(/\s/g, '')}`))
+                                    !cheapestId.includes(`${d.source.data.id.replace(/\s/g, "")}`))
                             );
                         })
                         .transition()
                         .duration(1000)
-                        .style('opacity', 0.3)
+                        .style("opacity", 0.3)
                         .end()
                         .then(() => {
                             animate(level + 2);
@@ -269,14 +278,14 @@ const GraphView = ({ width, height, data }) => {
         }
 
         if (animation) {
-            nodes.style('opacity', '0');
-            links.style('opacity', '0');
+            nodes.style("opacity", "0");
+            links.style("opacity", "0");
             animate(0);
         }
     }
 
     function drawOptimalGraph({ graphSvg, data }) {
-        d3.select(graphSvg.current).selectAll('*').remove();
+        d3.select(graphSvg.current).selectAll("*").remove();
         // data graph 형태로 변경
         const graph = d3dag.graphStratify()(data);
         const nodeSize = 50;
@@ -296,44 +305,44 @@ const GraphView = ({ width, height, data }) => {
 
         const svg = d3
             .select(graphSvg.current)
-            .append('svg')
-            .attr('width', svgWidth)
-            .attr('height', svgHeight)
-            .append('g') // 그룹으로 묶어서
-            .attr('transform', `translate(${svgWidth / 2}, ${svgHeight / 8}) scale(${scale}, ${scale})`)
+            .append("svg")
+            .attr("width", svgWidth)
+            .attr("height", svgHeight)
+            .append("g") // 그룹으로 묶어서
+            .attr("transform", `translate(${svgWidth / 2}, ${svgHeight / 8}) scale(${scale}, ${scale})`)
             .call(
-                d3.zoom().on('zoom', event => {
-                    svg.attr('transform', event.transform);
+                d3.zoom().on("zoom", event => {
+                    svg.attr("transform", event.transform);
                 })
             )
-            .append('g');
+            .append("g");
 
         // create links
         const links = svg
-            .append('g')
-            .selectAll('path')
+            .append("g")
+            .selectAll("path")
             .data(graph.links())
             .enter()
-            .append('path')
-            .attr('d', d => {
+            .append("path")
+            .attr("d", d => {
                 return d3.line()([
                     [d.source.x, d.source.data.level * (dagHeight / dagDepth)],
                     [d.target.x, d.target.data.level * (dagHeight / dagDepth)],
                 ]);
             })
-            .attr('transform', `translate(0, ${margin.y})`)
-            .attr('fill', 'none')
-            .attr('stroke-width', 3)
-            .attr('stroke', 'lightgray');
+            .attr("transform", `translate(0, ${margin.y})`)
+            .attr("fill", "none")
+            .attr("stroke-width", 3)
+            .attr("stroke", "lightgray");
 
         // create nodes
         const nodes = svg
-            .append('g')
-            .selectAll('g')
+            .append("g")
+            .selectAll("g")
             .data(graph.nodes())
             .enter()
-            .append('g')
-            .attr('transform', d => {
+            .append("g")
+            .attr("transform", d => {
                 return `translate(${d.x}, ${d.data.level * (dagHeight / dagDepth) + margin.y})`;
             });
 
@@ -343,7 +352,7 @@ const GraphView = ({ width, height, data }) => {
         const nodeTypes = [
             ...new Set(
                 nodesArray.map(node => {
-                    return node.data.id.split(' - ')[1];
+                    return node.data.id.split(" - ")[1];
                 })
             ),
         ];
@@ -354,39 +363,39 @@ const GraphView = ({ width, height, data }) => {
 
         nodes.each(function (d) {
             const node = d3.select(this);
-            const parts = d.data.id.split(' - ');
+            const parts = d.data.id.split(" - ");
 
             if (parts.length > 1) {
-                node.append('rect')
-                    .attr('id', d => d.data.id.replace(/\s/g, ''))
-                    .attr('width', 50)
-                    .attr('height', 50)
-                    .attr('x', -nodeSize / 2)
-                    .attr('y', -nodeSize / 2)
-                    .attr('fill', colorMap.get(parts[1]));
+                node.append("rect")
+                    .attr("id", d => d.data.id.replace(/\s/g, ""))
+                    .attr("width", 50)
+                    .attr("height", 50)
+                    .attr("x", -nodeSize / 2)
+                    .attr("y", -nodeSize / 2)
+                    .attr("fill", colorMap.get(parts[1]));
             } else {
-                node.append('circle')
-                    .attr('r', nodeSize / 2)
-                    .attr('fill', colorMap.get(nodeTypes[0]));
+                node.append("circle")
+                    .attr("r", nodeSize / 2)
+                    .attr("fill", colorMap.get(nodeTypes[0]));
             }
         });
 
         // node type
         nodes
-            .append('text')
-            .attr('text-anchor', 'middle')
-            .attr('alignment-baseline', 'middle')
-            .attr('class', 'dp-node-text')
+            .append("text")
+            .attr("text-anchor", "middle")
+            .attr("alignment-baseline", "middle")
+            .attr("class", "dp-node-text")
             .each(function (d) {
-                const lines = mapName(d.data.id.split(' - ').pop()).split('\n');
+                const lines = mapName(d.data.id.split(" - ").pop()).split("\n");
                 if (lines.length === 1) d3.select(this).text(lines[0]);
                 else {
                     for (let i = 0; i < lines.length; i++) {
                         d3.select(this)
-                            .append('tspan')
+                            .append("tspan")
                             .text(lines[i])
-                            .attr('x', 0)
-                            .attr('dy', i ? '1.2em' : '-0.2em');
+                            .attr("x", 0)
+                            .attr("dy", i ? "1.2em" : "-0.2em");
                     }
                 }
             });
@@ -410,6 +419,7 @@ const GraphView = ({ width, height, data }) => {
                 graphSvg: dagSvg,
                 data: dpData,
             });
+
         }
     }, [data, animation, svgWidth, svgHeight, showOptimalOne]);
 
@@ -432,14 +442,15 @@ const GraphView = ({ width, height, data }) => {
                             </div>
                         </div>
                         <button className='dp-play-text' id='play-button' onClick={handleClickPlay}>
-                            {animation ? 'Stop' : 'Play'}
+                            {animation ? "Stop" : "Play"}
                         </button>
                     </>
                 )}
             </div>
-            <div className='flex justify-between px-40'>
+            <div className='flex m-2 gap-2'>
                 <svg ref={dagSvg} width={svgWidth} height={svgHeight} />
                 {showJoinCard && <JoinOrderCard joinOrder={joinOrder} totalCost={totalCost} node={node} />}
+                {showCostCard && <CostCard totalCost={totalCost} startupCost={startupCost} node={node}/>}
             </div>
         </>
     );
