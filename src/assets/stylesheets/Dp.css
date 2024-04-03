@@ -55,6 +55,16 @@
   font-size: large;
 }
 
+.dp-join-order {
+  font-family: "NanumSquareB";
+  font-size: 15px;
+  color: black;
+}
+.dp-cost-formula {
+  font-family: "NanumSquareR";
+  font-size: small;
+}
+
 .checkbox-container {
   display: flex;
   justify-content: flex-end;

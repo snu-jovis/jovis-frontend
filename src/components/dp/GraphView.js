@@ -1,4 +1,5 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useContext } from "react";
+import { DpContext } from "../providers/DpProvider";
 import { parseDp } from "./parseDp";
 import * as d3 from "d3";
 import * as d3dag from "https://cdn.skypack.dev/d3-dag@1.0.0-1";
@@ -12,9 +13,19 @@ const GraphView = ({ width, height, base, dp, cost }) => {
   const margin = { x: 0, y: 50 };
 
   const [animation, setAnimation] = useState(false);
-  const [costText, setCostText] = useState("Total Cost for Cheapest Path");
-  const [totalCost, setTotalCost] = useState(cost);
 
+  const [costText, setCostText] = useState("Total Cost for Cheapest Path");
+  const [statCost, setStatCost] = useState(cost);
+
+  const {
+    setShowJoinCard,
+    setNode,
+    setJoinOrder,
+    setStartupCost,
+    setTotalCost,
+  } = useContext(DpContext);
+
+  var selected = null;
   var cheapestId = [];
 
   const handleClickPlay = () => {
@@ -168,9 +179,31 @@ const GraphView = ({ width, height, base, dp, cost }) => {
       });
 
     nodes.on("click", function (event, d) {
+      console.log(d.data);
+
+      if (d.data.id === selected) {
+        selected = null;
+        setShowJoinCard(false);
+
+        setCostText("Total Cost for Cheapest Path");
+        setTotalCost(cost);
+
+        return;
+      }
+
+      selected = d.data.id;
+
       if (d.data.nodeData && d.data.nodeData.total_cost) {
+        setShowJoinCard(true);
+
         setCostText("Total Cost for Selected Operator");
+        setStartupCost(`${d.data.nodeData.startup_cost}`);
         setTotalCost(`${d.data.nodeData.total_cost}`);
+
+        if (d.data.parentIds.length > 0) {
+          setJoinOrder(`${d.data.parentIds}`);
+          setNode(`${d.data.id}`);
+        }
       } else if (d.data.nodeData && d.data.nodeData.cheapest_total_paths) {
         setCostText("Total Cost for Cheapest Path");
         setTotalCost(`${d.data.nodeData.cheapest_total_paths.total_cost}`);
@@ -310,7 +343,7 @@ const GraphView = ({ width, height, base, dp, cost }) => {
   }
 
   useEffect(() => {
-    setTotalCost(cost);
+    setStatCost(cost);
 
     const nodeMap = new Map();
     drawGraph({
@@ -325,7 +358,7 @@ const GraphView = ({ width, height, base, dp, cost }) => {
         <div className="stats shadow">
           <div className="flex m-2 gap-2">
             <div className="dp-total-cost">{costText}</div>
-            <div className="dp-cost-value">{totalCost}</div>
+            <div className="dp-cost-value">{statCost}</div>
           </div>
         </div>
         <button

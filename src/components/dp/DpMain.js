@@ -1,15 +1,36 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useContext } from "react";
+import { DpContext } from "../providers/DpProvider";
 import { Card } from "@material-tailwind/react";
 import QueryPlanTree from "../geqo/QueryPlanTree";
 import GraphView from "./GraphView";
+import JoinOrderCard from "./JoinOrderCard";
 
 import "../../assets/stylesheets/Dp.css";
 
 const DpMain = ({ data }) => {
+  const {
+    showJoinCard,
+    setShowJoinCard,
+    node,
+    setNode,
+    joinOrder,
+    setJoinOrder,
+    startupCost,
+    setStartupCost,
+    totalCost,
+    setTotalCost,
+  } = useContext(DpContext);
+
   const viewRef = useRef(null);
   const [viewSize, setViewSize] = useState([0, 0]);
 
   useEffect(() => {
+    setShowJoinCard(false);
+    setNode(null);
+    setJoinOrder([]);
+    setStartupCost(0);
+    setTotalCost(0);
+
     const updateSize = () => {
       if (viewRef.current)
         setViewSize([
@@ -45,7 +66,18 @@ const DpMain = ({ data }) => {
             plan={data.result[0][0][0].Plan}
           />
         </Card>
-        {/* <Card className="h-1/2">Cost Chart</Card> */}
+        <Card className="h-1/3">
+          <div className="flex justify-between px-4 pt-2">
+            <p className="vis-title pt-2">Cost Formula</p>
+          </div>
+          <JoinOrderCard
+            showJoinCard={showJoinCard}
+            node={node}
+            joinOrder={joinOrder}
+            startupCost={startupCost}
+            totalCost={totalCost}
+          />
+        </Card>
       </div>
     </div>
   );
