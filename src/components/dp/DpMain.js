@@ -32,7 +32,7 @@ const DpMain = ({ data, plan }) => {
         setJoinOrder([]);
         setStartupCost(0);
         setTotalCost(0);
-        setSelectedMetric("none");
+        setSelectedMetric("Default");
 
         const updateSize = () => {
             if (viewRef.current) setViewSize([viewRef.current.offsetWidth, viewRef.current.offsetHeight]);
@@ -65,7 +65,7 @@ const DpMain = ({ data, plan }) => {
                         plan={plan}
                     />
                 </Card>
-                <Card className='h-1/3'>
+                <Card className='h-1/2'>
                     <div className='flex justify-between px-4 pt-2'>
                         <p className='vis-title pt-2'>Cost Formula</p>
                     </div>

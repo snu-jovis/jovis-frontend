@@ -3,7 +3,8 @@ import { DpContext } from "../providers/DpProvider";
 import { parseDp } from "./parseDp";
 import * as d3 from "d3";
 import * as d3dag from "https://cdn.skypack.dev/d3-dag@1.0.0-1";
-import Select from "react-select";
+import Checkbox from "@mui/material/Checkbox";
+import FormControlLabel from "@mui/material/FormControlLabel";
 
 import "../../assets/stylesheets/Dp.css";
 
@@ -18,19 +19,14 @@ const GraphView = ({ width, height, base, dp, cost }) => {
     const [costText, setCostText] = useState("Total Cost for Cheapest Path");
     const [statCost, setStatCost] = useState(cost);
 
-    const options = [
-        { value: "none", label: "none" },
-        { value: "cost", label: "Cost" },
-    ];
-
     const { setShowJoinCard, setNode, setJoinOrder, setStartupCost, setTotalCost, selectedMetric, setSelectedMetric } =
         useContext(DpContext);
 
     var selected = null;
     var cheapestId = [];
 
-    const handleSelectionChange = selectedOption => {
-        setSelectedMetric(selectedOption.value);
+    const handleCheckboxChange = event => {
+        setSelectedMetric(event.target.value);
     };
 
     const handleClickPlay = () => {
@@ -119,7 +115,7 @@ const GraphView = ({ width, height, base, dp, cost }) => {
             const node = d3.select(this);
             const parts = d.data.id.split(" - ");
 
-            if (selectedMetric === "cost") {
+            if (selectedMetric === "Cost") {
                 nodeSize = costScale(d.data.nodeData.total_cost || d.data.nodeData.cheapest_total_paths.total_cost);
             } else {
                 nodeSize = 50;
@@ -353,16 +349,24 @@ const GraphView = ({ width, height, base, dp, cost }) => {
             <div className='flex items-center gap-4 m-4'>
                 <div className='control-panel'>
                     <div className='control-panel-metric'>
-                        <p>Metric:</p>
-                        <Select
-                            options={options}
-                            defaultValue={options[0]}
-                            onChange={handleSelectionChange}
-                            className='control-panel-options'
-                        />
+                        <p>Show Cost Scale: </p>
+                        {["Default", "Cost"].map(checkboxValue => (
+                            <FormControlLabel
+                                key={checkboxValue}
+                                control={
+                                    <Checkbox
+                                        checked={selectedMetric === checkboxValue}
+                                        onChange={handleCheckboxChange}
+                                        value={checkboxValue}
+                                        size='small'
+                                    />
+                                }
+                                label={<div className={"control-panel-options"}>{checkboxValue}</div>}
+                            />
+                        ))}
                     </div>
                 </div>
-                <div className='stats shadow'>
+                <div className='stats' style={{ backgroundColor: "white" }}>
                     <div className='flex m-2 gap-2'>
                         <div className='dp-total-cost'>{costText}</div>
                         <div className='dp-cost-value'>{statCost}</div>

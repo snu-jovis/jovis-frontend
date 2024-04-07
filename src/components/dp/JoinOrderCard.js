@@ -69,10 +69,6 @@ const JoinOrderCard = props => {
                     <div className='dp-cost-formula'>
                         {props.node.length > 0 && (
                             <>
-                                <span className='font-[NanumSquareB] text-base'>
-                                    The formulae for the run and startup costs are not entirely complete, but roughly
-                                    speaking, they are as follows:
-                                </span>
                                 <div>
                                     <br />
                                     Run cost for {node} = <Latex>{runCostFormula}</Latex>
