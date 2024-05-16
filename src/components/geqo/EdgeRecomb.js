@@ -116,7 +116,7 @@ function handleParentHover(momRef, dadRef, selectedPath) {
 }
 
 const EdgeRecomb = ({ width, height, data }) => {
-  const relMap = data.optimizer.geqo.map;
+  const relMap = data.geqo.map;
 
   const { mom, dad, child } = useContext(GeqoContext);
 

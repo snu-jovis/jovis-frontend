@@ -7,7 +7,7 @@ import JoinOrderCard from "./JoinOrderCard";
 
 import "../../assets/stylesheets/Dp.css";
 
-const DpMain = ({ data }) => {
+const DpMain = ({ data, plan }) => {
   const {
     showJoinCard,
     setShowJoinCard,
@@ -54,16 +54,16 @@ const DpMain = ({ data }) => {
       <GraphView
         width={viewSize[0] ? (3 * viewSize[0]) / 4 : 500}
         height={viewSize[1] ? viewSize[1] : 500}
-        base={data.optimizer.base}
-        dp={data.optimizer.dp}
-        cost={data.result[0][0][0].Plan["Total Cost"]}
+        base={data.base}
+        dp={data.dp}
+        cost={plan["Total Cost"]}
       />
       <div className="w-1/4">
         <Card className="h-1/2 mb-4">
           <QueryPlanTree
             width={viewSize[0] ? viewSize[0] / 4 : 500}
             height={viewSize[1] ? viewSize[1] / 2 - 16 : 500}
-            plan={data.result[0][0][0].Plan}
+            plan={plan}
           />
         </Card>
         <Card className="h-1/3">

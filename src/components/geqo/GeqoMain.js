@@ -3,12 +3,12 @@ import CostChart from "./CostChart";
 import FullView from "./FullView";
 import EdgeRecomb from "./EdgeRecomb";
 import JoinOrderTree from "./JoinOrderTree";
+import QueryPlanTree from "./QueryPlanTree";
 import { Card } from "@material-tailwind/react";
 
 import "../../assets/stylesheets/Geqo.css";
-import QueryPlanTree from "./QueryPlanTree";
 
-const GeqoMain = ({ data }) => {
+const GeqoMain = ({ data, plan }) => {
   const chartRef = useRef(null);
   const [chartSize, setChartSize] = useState(0);
 
@@ -42,14 +42,14 @@ const GeqoMain = ({ data }) => {
           <CostChart
             width={chartSize}
             height={chartSize}
-            data={data.optimizer.geqo.gen}
+            data={data.geqo.gen}
           />
         </Card>
         <Card>
           <JoinOrderTree
             width={chartSize}
             height={chartSize}
-            data={data.optimizer.geqo.reloptinfo}
+            data={data.geqo.reloptinfo}
           />
         </Card>
       </div>
@@ -57,16 +57,13 @@ const GeqoMain = ({ data }) => {
         <FullView
           width={fullSize}
           height={fullSize}
-          data={data.optimizer.geqo.gen}
+          data={data.geqo.gen}
+          map={data.for}
         />
       </div>
       <div ref={indivRef} className="w-1/4 grid grid-cols-1 gap-2 ml-6 mr-4">
         <Card>
-          <QueryPlanTree
-            width={indivSize}
-            height={indivSize}
-            plan={data.result[0][0][0].Plan}
-          />
+          <QueryPlanTree width={indivSize} height={indivSize} plan={plan} />
         </Card>
         <Card>
           <EdgeRecomb width={indivSize} height={indivSize} data={data} />

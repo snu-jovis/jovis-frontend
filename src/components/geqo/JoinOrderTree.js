@@ -4,6 +4,12 @@ import { GeqoContext } from "../providers/GeqoProvider";
 
 const JoinOrderTree = ({ width, height, data: relOptInfo }) => {
   const { chosen } = useContext(GeqoContext);
+  const chosenRelOptInfo = Object.values(relOptInfo).find(
+    (info) => info.relid === chosen
+  );
+
+  console.log(chosenRelOptInfo);
+
   const costHeight = 30;
   const svgHeight = height - costHeight;
   const [fitness, setFitness] = useState(0);
@@ -72,14 +78,17 @@ const JoinOrderTree = ({ width, height, data: relOptInfo }) => {
     .y((d) => d.y);
 
   useEffect(() => {
-    if (!relOptInfo[chosen]) return;
+    // if (!relOptInfo[chosen]) return;
+    if (!chosenRelOptInfo) return;
 
     setFitness(
-      d3.format(".0f")(relOptInfo[chosen].cheapest_total_paths.total_cost)
+      // d3.format(".0f")(relOptInfo[chosen].cheapest_total_paths.total_cost)
+      d3.format(".0f")(chosenRelOptInfo.cheapest_total_paths.total_cost)
     );
 
     /* Tree */
-    const treeData = convertPath(relOptInfo[chosen].cheapest_total_paths);
+    // const treeData = convertPath(relOptInfo[chosen].cheapest_total_paths);
+    const treeData = convertPath(chosenRelOptInfo.cheapest_total_paths);
     const root = d3.hierarchy(treeData);
     treeLayout(root);
 
@@ -298,7 +307,8 @@ const JoinOrderTree = ({ width, height, data: relOptInfo }) => {
       <div className="flex justify-between px-4 pt-2">
         <p className="vis-title pt-2">Join Order Tree</p>
       </div>
-      {relOptInfo[chosen] ? (
+      {/* {relOptInfo[chosen] ? ( */}
+      {chosenRelOptInfo ? (
         <div>
           <div className="flex">
             <svg ref={treeRef} width={treeWidth} height={svgHeight} />

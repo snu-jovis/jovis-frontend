@@ -1,8 +1,6 @@
 /*
  * parseDp.js: 데이터 전처리
  */
-const subqueryNodes = ["SubqueryScan", "Append"];
-
 function countSubs(sub) {
   let count = 0;
   while (sub) {
@@ -43,8 +41,6 @@ function processSub(nodeMap, path, entry, level, numSubs) {
   let newLevel = level;
 
   for (let i = numSubs; i >= 0; i--) {
-    if (subqueryNodes.includes(currPath.node)) break;
-
     const relId = getRelId(currPath);
 
     addNode(nodeMap, currPath, newLevel - 1 / (numSubs + 1), relId);
@@ -63,11 +59,7 @@ function processSub(nodeMap, path, entry, level, numSubs) {
 }
 
 export function parseDp(base, dp, nodeMap, printSub = false) {
-  /*
-   * base 처리; access paths
-   * 현재 subquery 미지원 ("SubqueryScan", "Append" node 생략)
-   * TODO: subquery 고려하도록 backend에서 log parsing 수정
-   */
+  /* base 처리; access paths */
   base.forEach((relation) => {
     relation.paths?.forEach((path) => {
       if (printSub) processSub(nodeMap, path, relation, 1, countSubs(path.sub));

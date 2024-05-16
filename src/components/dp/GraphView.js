@@ -179,8 +179,6 @@ const GraphView = ({ width, height, base, dp, cost }) => {
       });
 
     nodes.on("click", function (event, d) {
-      console.log(d.data);
-
       if (d.data.id === selected) {
         selected = null;
         setShowJoinCard(false);

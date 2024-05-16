@@ -76,6 +76,8 @@ export default function MainView() {
     setCallback(onSidebarSignal);
   }, []);
 
+  // console.log(queryRes);
+
   return (
     <div className="view-container grow">
       <div className="border-2 border-solid flex flex-col mb-2">
@@ -121,13 +123,24 @@ export default function MainView() {
       </div>
       {queryRes.optimizer ? (
         <div>
-          {queryRes.optimizer.dp.length > 0 && <DpMain data={queryRes} />}
-          {Object.keys(queryRes.optimizer.geqo).length > 0 && (
-            <GeqoMain data={queryRes} />
-          )}
-          {queryRes.optimizer.dp.length === 0 &&
-            Object.keys(queryRes.optimizer.geqo).length === 0 &&
-            queryRes.optimizer.base.length > 0 && <DpMain data={queryRes} />}
+          {/* {queryRes.optimizer
+            .filter((opt) => opt.type === "dp")
+            .map((opt, index) => (
+              <DpMain
+                key={index}
+                data={opt}
+                plan={queryRes.result[0][0][0].Plan}
+              />
+            ))} */}
+          {queryRes.optimizer
+            .filter((opt) => opt.type === "geqo")
+            .map((opt, index) => (
+              <GeqoMain
+                key={index}
+                data={opt}
+                plan={queryRes.result[0][0][0].Plan}
+              />
+            ))}
         </div>
       ) : null}
     </div>
