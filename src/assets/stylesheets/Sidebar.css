@@ -1,6 +1,8 @@
 .main-card {
   width: 240px; /* fixed width 사용 */
-  height: calc(100vh - 80px); /* Sidebar에 맞춰 높이 조절; FIXME: 80px는 하드코딩.. 나중에 header height 바뀌면 수정할 것 */
+  height: calc(
+    100vh - 80px
+  ); /* Sidebar에 맞춰 높이 조절; FIXME: 80px는 하드코딩.. 나중에 header height 바뀌면 수정할 것 */
 }
 
 .main-menu-text {

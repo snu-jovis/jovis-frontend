@@ -4,12 +4,12 @@ const TITLE_SUBSTRING_LENGTH = 24;
 const HISTORY_LENGTH = 8;
 
 export const HistoryContext = createContext({
-    history: [],
-    addHistory: () => {}
+  history: [],
+  addHistory: () => {},
 });
 
 export function HistoryProvider({ children }) {
-    /* LocalStorage Data Format
+  /* LocalStorage Data Format
         history = {
             "history": [
                 {"title: "SELECT * FROM Reserves", "query": "SELECT * FROM Reserves", "db": "postgres"},
@@ -19,38 +19,45 @@ export function HistoryProvider({ children }) {
         }
     */
 
-    const [history, setHistory] = useState([]);
+  const [history, setHistory] = useState([]);
 
-    useEffect(() => {
-        const storage = localStorage.getItem("history");
-        if (storage) {
-            const parsed = JSON.parse(storage);
-            if (parsed.data) {
-                setHistory(parsed.data);
-            }
-        }
-    }, []);
-
-    useEffect(() => {
-        localStorage.setItem("history", JSON.stringify({ data: history }));
-    }, [history]);
-
-    const onAddHistory = (db, sql) => {
-        const newData = { title: sql.substring(0, Math.min(sql.length, TITLE_SUBSTRING_LENGTH)), query: sql, db: db };
-        let newHistory = [newData, ...history];
-
-        // only last five queries
-        if (newHistory.length > HISTORY_LENGTH) {
-            newHistory.pop();
-        }
-        setHistory(newHistory);
+  useEffect(() => {
+    const storage = localStorage.getItem("history");
+    if (storage) {
+      const parsed = JSON.parse(storage);
+      if (parsed.data) {
+        setHistory(parsed.data);
+      }
     }
-    
-    return (
-        <HistoryContext.Provider value={{
-            history: history, 
-            addHistory: onAddHistory}}>
-            {children}
-        </HistoryContext.Provider>
-    )
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("history", JSON.stringify({ data: history }));
+  }, [history]);
+
+  const onAddHistory = (db, sql) => {
+    const newData = {
+      title: sql.substring(0, Math.min(sql.length, TITLE_SUBSTRING_LENGTH)),
+      query: sql,
+      db: db,
+    };
+    let newHistory = [newData, ...history];
+
+    // only last five queries
+    if (newHistory.length > HISTORY_LENGTH) {
+      newHistory.pop();
+    }
+    setHistory(newHistory);
+  };
+
+  return (
+    <HistoryContext.Provider
+      value={{
+        history: history,
+        addHistory: onAddHistory,
+      }}
+    >
+      {children}
+    </HistoryContext.Provider>
+  );
 }

@@ -76,8 +76,6 @@ export default function MainView() {
     setCallback(onSidebarSignal);
   }, []);
 
-  // console.log(queryRes);
-
   return (
     <div className="view-container grow">
       <div className="border-2 border-solid flex flex-col mb-2">
@@ -85,7 +83,6 @@ export default function MainView() {
           height="20vh"
           defaultLanguage="sql"
           defaultValue="/* Type your query here */"
-          // theme="vs-dark"
           onMount={handleEditorDidMount}
           options={{
             minimap: { enabled: false },
@@ -123,7 +120,7 @@ export default function MainView() {
       </div>
       {queryRes.optimizer ? (
         <div>
-          {/* {queryRes.optimizer
+          {queryRes.optimizer
             .filter((opt) => opt.type === "dp")
             .map((opt, index) => (
               <DpMain
@@ -131,7 +128,7 @@ export default function MainView() {
                 data={opt}
                 plan={queryRes.result[0][0][0].Plan}
               />
-            ))} */}
+            ))}
           {queryRes.optimizer
             .filter((opt) => opt.type === "geqo")
             .map((opt, index) => (

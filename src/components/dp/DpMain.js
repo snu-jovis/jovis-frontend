@@ -19,6 +19,7 @@ const DpMain = ({ data, plan }) => {
     setStartupCost,
     totalCost,
     setTotalCost,
+    setSelectedMetric,
   } = useContext(DpContext);
 
   const viewRef = useRef(null);
