@@ -3,6 +3,8 @@ import { DpContext } from "../providers/DpProvider";
 import { parseDp } from "./parseDp";
 import * as d3 from "d3";
 import * as d3dag from "https://cdn.skypack.dev/d3-dag@1.0.0-1";
+import Checkbox from "@mui/material/Checkbox";
+import FormControlLabel from "@mui/material/FormControlLabel";
 
 import "../../assets/stylesheets/Dp.css";
 
@@ -23,10 +25,16 @@ const GraphView = ({ width, height, base, dp, cost }) => {
     setJoinOrder,
     setStartupCost,
     setTotalCost,
+    selectedMetric,
+    setSelectedMetric,
   } = useContext(DpContext);
 
   var selected = null;
   var cheapestId = [];
+
+  const handleCheckboxChange = (event) => {
+    setSelectedMetric(event.target.value);
+  };
 
   const handleClickPlay = () => {
     setAnimation((prev) => !prev);
@@ -43,7 +51,7 @@ const GraphView = ({ width, height, base, dp, cost }) => {
     const graph = d3dag.graphStratify()(data);
 
     // coumpute layout
-    const nodeSize = 50;
+    let nodeSize = 50;
     const dagDepth = d3.max(data, (d) => d.level);
     const shape = d3dag.tweakShape([nodeSize, nodeSize], d3dag.shapeEllipse);
 
@@ -77,30 +85,6 @@ const GraphView = ({ width, height, base, dp, cost }) => {
       )
       .append("g");
 
-    // create links
-    const line = d3.line().curve(d3.curveMonotoneY);
-    const links = svg
-      .append("g")
-      .selectAll("path")
-      .data(graph.links())
-      .enter()
-      .append("path")
-      .attr("d", function (d) {
-        var newPoints = d.points;
-
-        newPoints[0][0] = d.source.x;
-        newPoints[0][1] =
-          d.source.data.level * (dagHeight / dagDepth) + nodeSize / 2;
-        newPoints[d.points.length - 1][0] = d.target.x;
-        newPoints[d.points.length - 1][1] =
-          d.target.data.level * (dagHeight / dagDepth) - nodeSize / 2;
-
-        return line(newPoints);
-      })
-      .attr("fill", "none")
-      .attr("stroke-width", 2)
-      .attr("stroke", "lightgray");
-
     // create nodes
     const nodes = svg
       .append("g")
@@ -128,9 +112,36 @@ const GraphView = ({ width, height, base, dp, cost }) => {
       colorMap.set(type, colorSchemes[i % 17]);
     });
 
+    const costs = nodes
+      .data()
+      .map(
+        (d) =>
+          d.data.nodeData.total_cost ||
+          d.data.nodeData.cheapest_total_paths.total_cost
+      );
+    const minCost = d3.min(costs);
+    const maxCost = d3.max(costs);
+
+    // scale for node radius
+    const costScale = d3
+      .scaleLinear()
+      .domain([minCost, maxCost])
+      .range([40, 70]);
+
     nodes.each(function (d) {
       const node = d3.select(this);
       const parts = d.data.id.split(" - ");
+
+      if (selectedMetric === "Cost") {
+        nodeSize = costScale(
+          d.data.nodeData.total_cost ||
+            d.data.nodeData.cheapest_total_paths.total_cost
+        );
+      } else {
+        nodeSize = 50;
+      }
+
+      d.data.nodeSize = nodeSize;
 
       if (parts.length > 1) {
         node
@@ -190,10 +201,9 @@ const GraphView = ({ width, height, base, dp, cost }) => {
       }
 
       selected = d.data.id;
+      setShowJoinCard(true);
 
       if (d.data.nodeData && d.data.nodeData.total_cost) {
-        setShowJoinCard(true);
-
         setCostText("Total Cost for Selected Operator");
         setStartupCost(`${d.data.nodeData.startup_cost}`);
         setTotalCost(`${d.data.nodeData.total_cost}`);
@@ -201,12 +211,42 @@ const GraphView = ({ width, height, base, dp, cost }) => {
         if (d.data.parentIds.length > 0) {
           setJoinOrder(`${d.data.parentIds}`);
           setNode(`${d.data.id}`);
+        } else {
+          setJoinOrder("");
+          setNode("");
         }
       } else if (d.data.nodeData && d.data.nodeData.cheapest_total_paths) {
         setCostText("Total Cost for Cheapest Path");
         setTotalCost(`${d.data.nodeData.cheapest_total_paths.total_cost}`);
+        setStartupCost(`${d.data.nodeData.cheapest_total_paths.startup_cost}`);
       }
     });
+
+    // create links
+    const line = d3.line().curve(d3.curveMonotoneY);
+    const links = svg
+      .append("g")
+      .selectAll("path")
+      .data(graph.links())
+      .enter()
+      .append("path")
+      .attr("d", function (d) {
+        var newPoints = d.points;
+
+        newPoints[0][0] = d.source.x;
+        newPoints[0][1] =
+          d.source.data.level * (dagHeight / dagDepth) +
+          d.source.data.nodeSize / 2;
+        newPoints[d.points.length - 1][0] = d.target.x;
+        newPoints[d.points.length - 1][1] =
+          d.target.data.level * (dagHeight / dagDepth) -
+          d.target.data.nodeSize / 2;
+
+        return line(newPoints);
+      })
+      .attr("fill", "none")
+      .attr("stroke-width", 2)
+      .attr("stroke", "lightgray");
 
     function process() {
       const processNode = (node) => {
@@ -348,12 +388,33 @@ const GraphView = ({ width, height, base, dp, cost }) => {
       graphSvg: dagSvg,
       data: parseDp(base, dp, nodeMap),
     });
-  }, [base, dp, cost, animation, width, height]);
+  }, [base, dp, cost, animation, width, height, selectedMetric]);
 
   return (
     <div>
       <div className="flex items-center gap-4 m-4">
-        <div className="stats shadow">
+        <div className="control-panel">
+          <div className="control-panel-metric">
+            <p>Show Cost Scale: </p>
+            {["Default", "Cost"].map((checkboxValue) => (
+              <FormControlLabel
+                key={checkboxValue}
+                control={
+                  <Checkbox
+                    checked={selectedMetric === checkboxValue}
+                    onChange={handleCheckboxChange}
+                    value={checkboxValue}
+                    size="small"
+                  />
+                }
+                label={
+                  <div className={"control-panel-options"}>{checkboxValue}</div>
+                }
+              />
+            ))}
+          </div>
+        </div>
+        <div className="stats" style={{ backgroundColor: "white" }}>
           <div className="flex m-2 gap-2">
             <div className="dp-total-cost">{costText}</div>
             <div className="dp-cost-value">{statCost}</div>

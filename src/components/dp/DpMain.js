@@ -30,6 +30,7 @@ const DpMain = ({ data, plan }) => {
     setJoinOrder([]);
     setStartupCost(0);
     setTotalCost(0);
+    setSelectedMetric("Default");
 
     const updateSize = () => {
       if (viewRef.current)
