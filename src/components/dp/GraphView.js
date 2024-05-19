@@ -38,9 +38,45 @@ const GraphView = ({ width, height, base, dp, cost }) => {
         setMaxIOCost,
         setMinIOCost,
         setCsquared,
-        setT,
         setTargetPerTuple,
         setCostPerPage,
+        setInnerPathRows,
+        setOuterRows,
+        setInnerRows,
+        setOuterSkipRows,
+        setInnerSkipRows,
+        setInnerRunCost,
+        setBareInnerCost,
+        setMatInnerCost,
+        setRescannedtuples,
+        setRescanratio,
+        setOuterPathRows,
+        setOuterEndSel,
+        setInnerEndSel,
+        setInnerStartSel,
+        setOuterStartSel,
+        setHashBuildCost,
+        setHashJoinCost,
+        setInnerBuildCost,
+        setOuterBuildCost,
+        setHashCpuCost,
+        setSeqPageCost,
+        setNumBuckets,
+        setNumBatches,
+        setInnerPages,
+        setOuterPages,
+        setInitialStartupCost,
+        setInitialRunCost,
+        setNumHashClauses,
+        setVirtualBuckets,
+        setInnerBucketSize,
+        setInnerMvcfreq,
+        setInnerRescanStartCost,
+        setInnerRescanTotalCost,
+        setInnerRescanRunCost,
+        setOuterMatchedRows,
+        setOuterUnmatchedRows,
+        setInnerScanFrac,
     } = useContext(DpContext);
 
     var selected = null;
@@ -233,6 +269,12 @@ const GraphView = ({ width, height, base, dp, cost }) => {
                 setIdxScanDetails(nodeData);
             } else if (operatorType.includes("BitmapHeapScan")) {
                 setBitmapHeapScanDetails(nodeData);
+            } else if (operatorType.includes("NestLoop")) {
+                setNestLoopDetails(nodeData);
+            } else if (operatorType.includes("HashJoin")) {
+                setHashJoinDetails(nodeData);
+            } else if (operatorType.includes("MergeJoin")) {
+                setMergeJoinDetails(nodeData);
             }
         };
 
@@ -248,8 +290,8 @@ const GraphView = ({ width, height, base, dp, cost }) => {
             setCpuPerTuple(`${nodeData.cpu_per_tuple}`);
             setPages(`${nodeData.pages_fetched}`);
             setTuples(`${nodeData.tuples_fetched}`);
-            setIndexStartupCost(`${nodeData.indexstartupcost}`);
-            setIndexTotalCost(`${nodeData.indextotalcost}`);
+            setIndexStartupCost(`${nodeData.index_startup_cost}`);
+            setIndexTotalCost(`${nodeData.index_total_cost}`);
             setSelectivity(`${nodeData.selectivity}`);
             setMaxIOCost(`${nodeData.max_IO_cost}`);
             setMinIOCost(`${nodeData.min_IO_cost}`);
@@ -264,6 +306,59 @@ const GraphView = ({ width, height, base, dp, cost }) => {
             setTargetPerTuple(`${nodeData.target_per_tuple}`);
             setTuples(`${nodeData.tuples}`);
             setCostPerPage(`${nodeData.cost_per_page}`);
+        };
+
+        const setNestLoopDetails = nodeData => {
+            setInnerRescanStartCost(`${nodeData.inner_rescan_start_cost}`);
+            setInnerRescanTotalCost(`${nodeData.inner_rescan_total_cost}`);
+            setInnerRunCost(`${nodeData.inner_run_cost}`);
+            setInnerRescanRunCost(`${nodeData.inner_rescan_run_cost}`);
+            setOuterPathRows(`${nodeData.outer_path_rows}`);
+            setOuterMatchedRows(`${nodeData.outer_matched_rows}`);
+            setOuterUnmatchedRows(`${nodeData.outer_unmatched_rows}`);
+            setInnerScanFrac(`${nodeData.inner_scan_frac}`);
+            setTuples(`${nodeData.ntuples}`);
+        };
+
+        const setHashJoinDetails = nodeData => {
+            setHashBuildCost(`${nodeData.hashbuild_cost}`);
+            setHashJoinCost(`${nodeData.hashjoin_cost}`);
+            setInnerBuildCost(`${nodeData.innerbuild_cost}`);
+            setOuterBuildCost(`${nodeData.outerbuild_cost}`);
+            setHashCpuCost(`${nodeData.hashcpu_cost}`);
+            setSeqPageCost(`${nodeData.seqpage_cost}`);
+            setNumBuckets(`${nodeData.numbuckets}`);
+            setNumBatches(`${nodeData.numbatches}`);
+            setInnerPages(`${nodeData.innerpages}`);
+            setOuterPages(`${nodeData.outerpages}`);
+            setInitialStartupCost(`${nodeData.initial_startup_cost}`);
+            setInitialRunCost(`${nodeData.initial_run_cost}`);
+            setNumHashClauses(`${nodeData.num_hashclauses}`);
+            setOuterPathRows(`${nodeData.outer_path_rows}`);
+            setInnerPathRows(`${nodeData.inner_path_rows}`);
+            setCpuPerTuple(`${nodeData.cpu_per_tuple}`);
+            setTuples(`${nodeData.hashjointuples}`);
+            setVirtualBuckets(`${nodeData.virtualbuckets}`);
+            setInnerBucketSize(`${nodeData.innerbucketsize}`);
+            setInnerMvcfreq(`${nodeData.innermcvfreq}`);
+        };
+
+        const setMergeJoinDetails = nodeData => {
+            setOuterEndSel(`${nodeData.merge_outer_end_sel}`);
+            setInnerStartSel(`${nodeData.merge_inner_start_sel}`);
+            setInnerEndSel(`${nodeData.merge_inner_end_sel}`);
+            setInnerRunCost(`${nodeData.merge_inner_run_cost}`);
+            setInnerPathRows(`${nodeData.inner_path_rows}`);
+            setOuterRows(`${nodeData.outer_rows}`);
+            setInnerRows(`${nodeData.inner_rows}`);
+            setOuterSkipRows(`${nodeData.outer_skip_rows}`);
+            setInnerSkipRows(`${nodeData.inner_skip_rows}`);
+            setInnerRunCost(`${nodeData.inner_run_cost}`);
+            setBareInnerCost(`${nodeData.bare_inner_cost}`);
+            setMatInnerCost(`${nodeData.mat_inner_cost}`);
+            setTuples(`${nodeData.mergejointuples}`);
+            setRescannedtuples(`${nodeData.rescannedtuples}`);
+            setRescanratio(`${nodeData.rescanratio}`);
         };
 
         // create links
@@ -408,8 +503,6 @@ const GraphView = ({ width, height, base, dp, cost }) => {
             graphSvg: dagSvg,
             data: parseDp(base, dp, nodeMap),
         });
-
-        console.log(parseDp(base, dp, nodeMap));
     }, [base, dp, cost, animation, width, height, selectedMetric]);
 
     return (

@@ -6,6 +6,7 @@ import imgHashJoinBuild from "../../assets/img/hashjoin-build.png";
 import imgHashJoinProbe from "../../assets/img/hashjoin-probe.png";
 import imgMergeJoin from "../../assets/img/mergejoin.png";
 import imgNestLoop from "../../assets/img/nestloop.png";
+import "../../assets/stylesheets/Dp.css";
 
 const DescriptionCard = props => {
     const [node, setNode] = useState("");
@@ -45,7 +46,7 @@ const DescriptionCard = props => {
                         node in imageMap &&
                         imageMap[node].map((imgSrc, index) => (
                             <div key={index}>
-                                <img src={imgSrc} alt={node} />
+                                <img src={imgSrc} alt={node} className='image-resize' />
                                 <br />
                                 <br />
                                 {index === imageMap[node].length - 1 && <p>{description}</p>}

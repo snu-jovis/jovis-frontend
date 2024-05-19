@@ -119,6 +119,106 @@ const JoinOrderCard = props => {
                     <Latex>{"$Sequential\\ Random\\ Cost$"}</Latex> = 4.0
                 </>
             ),
+            HashJoin: (
+                <>
+                    <Latex>{"$Hash\\ Build\\ Cost$"}</Latex> = {props.hashBuildCost}
+                    <br />
+                    <Latex>{"$Hash\\ Join\\ Cost$"}</Latex> = {props.hashJoinCost}
+                    <br />
+                    <Latex>{"$Inner\\ Build\\ Cost$"}</Latex> = {props.innerBuildCost}
+                    <br />
+                    <Latex>{"$Outer\\ Build\\ Cost$"}</Latex> = {props.outerBuildCost}
+                    <br />
+                    <Latex>{"$Hash\\ Cpu\\ Cost$"}</Latex> = {props.hashCpuCost}
+                    <br />
+                    <Latex>{"$Seq\\ Page\\ Cost$"}</Latex> = {props.seqPageCost}
+                    <br />
+                    <Latex>{"$N_{buckets}$"}</Latex> = {props.numBuckets}
+                    <br />
+                    <Latex>{"$N_{batches}$"}</Latex> = {props.numBatches}
+                    <br />
+                    <Latex>{"$Inner\\ Pages$"}</Latex> = {props.innerPages}
+                    <br />
+                    <Latex>{"$Outer\\ Pages$"}</Latex> = {props.outerPages}
+                    <br />
+                    <Latex>{"$Initial\\ Startup\\ Cost$"}</Latex> = {props.initialStartupCost}
+                    <br />
+                    <Latex>{"$Initial\\ Run\\ Cost$"}</Latex> = {props.initialRunCost}
+                    <br />
+                    <Latex>{"$Num\\ Hash\\ Clauses$"}</Latex> = {props.numHashClauses}
+                    <br />
+                    <Latex>{"$Outer\\ Path\\ Rows$"}</Latex> = {props.outerPathRows}
+                    <br />
+                    <Latex>{"$Inner\\ Path\\ Rows$"}</Latex> = {props.innerPathRows}
+                    <br />
+                    <Latex>{"$Cpu\\ Per\\ Tuple$"}</Latex> = {props.cpuPerTuple}
+                    <br />
+                    <Latex>{"$N_{tuples}$"}</Latex> = {props.tuples}
+                    <br />
+                    <Latex>{"$Virtual\\ Buckets$"}</Latex> = {props.virtualBuckets}
+                    <br />
+                    <Latex>{"$Inner\\ Bucket\\ Size$"}</Latex> = {props.innerBucketSize}
+                    <br />
+                    <Latex>{"$Inner\\ Mvc\\ Freq$"}</Latex> = {props.innerMvcfreq}
+                    <br />
+                </>
+            ),
+            MergeJoin: (
+                <>
+                    <Latex>{"$Outer\\ Path\\ Rows$"}</Latex> = {props.outerPathRows}
+                    <br />
+                    <Latex>{"$Inner\\ Path\\ Rows$"}</Latex> = {props.innerPathRows}
+                    <br />
+                    <Latex>{"$Outer Rows$"}</Latex> = {props.outerRows}
+                    <br />
+                    <Latex>{"$Inner\\ Rows$"}</Latex> = {props.innerRows}
+                    <br />
+                    <Latex>{"$Outer\\ Skip\\ Rows$"}</Latex> = {props.outerSkipRows}
+                    <br />
+                    <Latex>{"$Inner\\ Skip\\ Rows$"}</Latex> = {props.innerSkipRows}
+                    <br />
+                    <Latex>{"$Outer\\ End\\ Selectivity$"}</Latex> = {props.outerEndSel}
+                    <br />
+                    <Latex>{"$Inner\\ Start\\ Selectivity$"}</Latex> = {props.innerStartSel}
+                    <br />
+                    <Latex>{"$Inner\\ End\\ Selectivity$"}</Latex> = {props.innerEndSel}
+                    <br />
+                    <Latex>{"$Inner\\ Run\\ Cost$"}</Latex> = {props.innerRunCost}
+                    <br />
+                    <Latex>{"$Bare\\ Inner\\ Cost$"}</Latex> = {props.bareInnerCost}
+                    <br />
+                    <Latex>{"$Mat\\ Inner\\ Cost$"}</Latex> = {props.matInnerCost}
+                    <br />
+                    <Latex>{"$N_{tuples}$"}</Latex> = {props.tuples}
+                    <br />
+                    <Latex>{"$Rescanned\\ Tuples$"}</Latex> = {props.rescannedTuples}
+                    <br />
+                    <Latex>{"$Rescan\\ Ratio$"}</Latex> = {props.rescanRatio}
+                    <br />
+                </>
+            ),
+            NestLoop: (
+                <>
+                    <Latex>{"$Inner\\ Rescan\\ Start\\ Cost$"}</Latex> = {props.innerRescanStartCost}
+                    <br />
+                    <Latex>{"$Inner\\ Rescan\\ Total\\ Cost$"}</Latex> = {props.innerRescanTotalCost}
+                    <br />
+                    <Latex>{"$Inner\\ Run\\ Cost$"}</Latex> = {props.innerRunCost}
+                    <br />
+                    <Latex>{"$Inner\\ Rescan\\ Run\\ Cost$"}</Latex> = {props.innerRescanRunCost}
+                    <br />
+                    <Latex>{"$Outer\\ Path\\ Rows$"}</Latex> = {props.outerPathRows}
+                    <br />
+                    <Latex>{"$Outer\\ Matched\\ Rows$"}</Latex> = {props.outerMatchedRows}
+                    <br />
+                    <Latex>{"$Outer\\ Unmatched\\ Rows$"}</Latex> = {props.outerUnmatchedRows}
+                    <br />
+                    <Latex>{"$Inner\\ Scan Frac$"}</Latex> = {props.innerScanFrac}
+                    <br />
+                    <Latex>{"$N_{tuples}$"}</Latex> = {props.tuples}
+                    <br />
+                </>
+            ),
         };
 
         return costDetails[node] || null;
@@ -162,6 +262,17 @@ const JoinOrderCard = props => {
                                         <Latex>{"$N_{outer}$"}</Latex> = # of tuples in the outer relation
                                         <br />
                                         <Latex>{"$N_{inner}$"}</Latex> = # of tuples in the inner relation
+                                        <br />
+                                        <br />
+                                    </>
+                                )}
+                                {(node === "SeqScan" || node === "IdxScan" || node === "BitmapHeapScan") && (
+                                    <>
+                                        <Latex>{"$N_{tuples}$"}</Latex> = # of tuples in the relation
+                                        <br />
+                                        <Latex>{"$N_{pages}$"}</Latex> = # of pages in the relation
+                                        <br />
+                                        <br />
                                     </>
                                 )}
                                 {renderCostDetails()}
