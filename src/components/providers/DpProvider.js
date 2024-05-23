@@ -40,36 +40,31 @@ export function DpProvider({ children }) {
     const [innerRows, setInnerRows] = useState(0);
     const [outerSkipRows, setOuterSkipRows] = useState(0);
     const [innerSkipRows, setInnerSkipRows] = useState(0);
-    const [bareInnerCost, setBareInnerCost] = useState(0);
-    const [matInnerCost, setMatInnerCost] = useState(0);
-    const [rescannedTuples, setRescannedtuples] = useState(0);
-    const [rescanratio, setRescanratio] = useState(0);
+    const [sortInner, setSortInner] = useState(false);
+    const [sortOuter, setSortOuter] = useState(false);
+    const [materializeInner, setMaterializeInner] = useState(false);
+    const [innerScanCost, setInnerScanCost] = useState(0);
+    const [outerScanCost, setOuterScanCost] = useState(0);
+    const [initialRunCost, setInitialRunCost] = useState(0);
 
     /* HashJoin */
-    const [hashBuildCost, setHashBuildCost] = useState(0);
-    const [hashJoinCost, setHashJoinCost] = useState(0);
-    const [innerBuildCost, setInnerBuildCost] = useState(0);
-    const [outerBuildCost, setOuterBuildCost] = useState(0);
+    const [outerPathStartup, setOuterPathStartup] = useState(0);
+    const [outerPathTotal, setOuterPathTotal] = useState(0);
+    const [innerPathStartup, setInnerPathStartup] = useState(0);
+    const [innerPathTotal, setInnerPathTotal] = useState(0);
+    const [numHashClauses, setNumHashClauses] = useState(0);
+    const [cpuTupleCost, setCpuTupleCost] = useState(0);
     const [hashCpuCost, setHashCpuCost] = useState(0);
     const [seqPageCost, setSeqPageCost] = useState(0);
-    const [numBuckets, setNumBuckets] = useState(0);
-    const [numBatches, setNumBatches] = useState(0);
     const [innerPages, setInnerPages] = useState(0);
     const [outerPages, setOuterPages] = useState(0);
-    const [initialStartupCost, setInitialStartupCost] = useState(0);
-    const [initialRunCost, setInitialRunCost] = useState(0);
-    const [numHashClauses, setNumHashClauses] = useState(0);
-    const [virtualBuckets, setVirtualBuckets] = useState(0);
-    const [innerBucketSize, setInnerBucketSize] = useState(0);
-    const [innerMvcfreq, setInnerMvcfreq] = useState(0);
 
     /* NestLoop */
-    const [innerRescanStartCost, setInnerRescanStartCost] = useState(0);
-    const [innerRescanTotalCost, setInnerRescanTotalCost] = useState(0);
+    const [outerStartupCost, setOuterStartupCost] = useState(0);
+    const [outerRunCost, setOuterRunCost] = useState(0);
+    const [innerStartupCost, setInnerStartupCost] = useState(0);
     const [innerRescanRunCost, setInnerRescanRunCost] = useState(0);
-    const [outerMatchedRows, setOuterMatchedRows] = useState(0);
-    const [outerUnmatchedRows, setOuterUnmatchedRows] = useState(0);
-    const [innerScanFrac, setInnerScanFrac] = useState(0);
+    const [innerRescanStartupCost, setInnerRescanStartupCost] = useState(0);
 
     return (
         <DpContext.Provider
@@ -124,14 +119,14 @@ export function DpProvider({ children }) {
                 setInnerSkipRows,
                 innerRunCost,
                 setInnerRunCost,
-                bareInnerCost,
-                setBareInnerCost,
-                matInnerCost,
-                setMatInnerCost,
-                rescannedTuples,
-                setRescannedtuples,
-                rescanratio,
-                setRescanratio,
+                sortInner,
+                setSortInner,
+                sortOuter,
+                setSortOuter,
+                materializeInner,
+                setMaterializeInner,
+                initialRunCost,
+                setInitialRunCost,
                 outerPathRows,
                 setOuterPathRows,
                 outerEndSel,
@@ -142,50 +137,40 @@ export function DpProvider({ children }) {
                 setInnerStartSel,
                 outerStartSel,
                 setOuterStartSel,
-                hashBuildCost,
-                setHashBuildCost,
-                hashJoinCost,
-                setHashJoinCost,
-                innerBuildCost,
-                setInnerBuildCost,
-                outerBuildCost,
-                setOuterBuildCost,
+                innerScanCost,
+                setInnerScanCost,
+                outerScanCost,
+                setOuterScanCost,
+                outerPathStartup,
+                setOuterPathStartup,
+                outerPathTotal,
+                setOuterPathTotal,
+                innerPathStartup,
+                setInnerPathStartup,
+                innerPathTotal,
+                setInnerPathTotal,
+                numHashClauses,
+                setNumHashClauses,
+                cpuTupleCost,
+                setCpuTupleCost,
                 hashCpuCost,
                 setHashCpuCost,
                 seqPageCost,
                 setSeqPageCost,
-                numBuckets,
-                setNumBuckets,
-                numBatches,
-                setNumBatches,
                 innerPages,
                 setInnerPages,
                 outerPages,
                 setOuterPages,
-                initialStartupCost,
-                setInitialStartupCost,
-                initialRunCost,
-                setInitialRunCost,
-                numHashClauses,
-                setNumHashClauses,
-                virtualBuckets,
-                setVirtualBuckets,
-                innerBucketSize,
-                setInnerBucketSize,
-                innerMvcfreq,
-                setInnerMvcfreq,
-                innerRescanStartCost,
-                setInnerRescanStartCost,
-                innerRescanTotalCost,
-                setInnerRescanTotalCost,
+                outerStartupCost,
+                setOuterStartupCost,
+                outerRunCost,
+                setOuterRunCost,
+                innerStartupCost,
+                setInnerStartupCost,
                 innerRescanRunCost,
                 setInnerRescanRunCost,
-                outerMatchedRows,
-                setOuterMatchedRows,
-                outerUnmatchedRows,
-                setOuterUnmatchedRows,
-                innerScanFrac,
-                setInnerScanFrac,
+                innerRescanStartupCost,
+                setInnerRescanStartupCost,
             }}
         >
             {children}

@@ -59,14 +59,16 @@ const DpMain = ({ data, plan }) => {
         setInnerSkipRows,
         innerRunCost,
         setInnerRunCost,
-        bareInnerCost,
-        setBareInnerCost,
-        matInnerCost,
-        setMatInnerCost,
-        rescannedTuples,
-        setRescannedtuples,
-        rescanratio,
-        setRescanratio,
+        sortInner,
+        setSortInner,
+        sortOuter,
+        setSortOuter,
+        materializeInner,
+        setMaterializeInner,
+        innerScanCost,
+        setInnerScanCost,
+        outerScanCost,
+        setOuterScanCost,
         outerPathRows,
         setOuterPathRows,
         outerEndSel,
@@ -77,50 +79,38 @@ const DpMain = ({ data, plan }) => {
         setInnerStartSel,
         outerStartSel,
         setOuterStartSel,
-        hashBuildCost,
-        setHashBuildCost,
-        hashJoinCost,
-        setHashJoinCost,
-        innerBuildCost,
-        setInnerBuildCost,
-        outerBuildCost,
-        setOuterBuildCost,
-        hashCpuCost,
-        setHashCpuCost,
-        seqPageCost,
-        setSeqPageCost,
-        numBuckets,
-        setNumBuckets,
-        numBatches,
-        setNumBatches,
-        innerPages,
-        setInnerPages,
-        outerPages,
-        setOuterPages,
-        initialStartupCost,
-        setInitialStartupCost,
         initialRunCost,
         setInitialRunCost,
         numHashClauses,
         setNumHashClauses,
-        virtualBuckets,
-        setVirtualBuckets,
-        innerBucketSize,
-        setInnerBucketSize,
-        innerMvcfreq,
-        setInnerMvcfreq,
-        innerRescanStartCost,
-        setInnerRescanStartCost,
-        innerRescanTotalCost,
-        setInnerRescanTotalCost,
+        hashCpuCost,
+        setHashCpuCost,
+        seqPageCost,
+        setSeqPageCost,
+        outerPathStartup,
+        setOuterPathStartup,
+        outerPathTotal,
+        setOuterPathTotal,
+        innerPathStartup,
+        setInnerPathStartup,
+        innerPathTotal,
+        setInnerPathTotal,
+        innerPages,
+        setInnerPages,
+        outerPages,
+        setOuterPages,
+        cpuTupleCost,
+        setCpuTupleCost,
         innerRescanRunCost,
         setInnerRescanRunCost,
-        outerMatchedRows,
-        setOuterMatchedRows,
-        outerUnmatchedRows,
-        setOuterUnmatchedRows,
-        innerScanFrac,
-        setInnerScanFrac,
+        innerRescanStartupCost,
+        setInnerRescanStartupCost,
+        outerStartupCost,
+        setOuterStartupCost,
+        outerRunCost,
+        setOuterRunCost,
+        innerStartupCost,
+        setInnerStartupCost,
     } = useContext(DpContext);
 
     const viewRef = useRef(null);
@@ -158,41 +148,36 @@ const DpMain = ({ data, plan }) => {
         setOuterSkipRows(0);
         setInnerSkipRows(0);
         setInnerRunCost(0);
-        setBareInnerCost(0);
-        setMatInnerCost(0);
-        setRescannedtuples(0);
-        setRescanratio(0);
         setOuterPathRows(0);
         setOuterEndSel(0);
         setInnerEndSel(0);
         setInnerStartSel(0);
         setOuterStartSel(0);
+        setInnerScanCost(0);
+        setOuterScanCost(0);
+        setSortInner(false);
+        setSortOuter(false);
+        setMaterializeInner(false);
+        setInitialRunCost(0);
 
         /* HashJoin */
-        setHashBuildCost(0);
-        setHashJoinCost(0);
-        setInnerBuildCost(0);
-        setOuterBuildCost(0);
+        setOuterPathStartup(0);
+        setOuterPathTotal(0);
+        setInnerPathStartup(0);
+        setInnerPathTotal(0);
+        setNumHashClauses(0);
+        setCpuTupleCost(0);
         setHashCpuCost(0);
         setSeqPageCost(0);
-        setNumBuckets(0);
-        setNumBatches(0);
         setInnerPages(0);
         setOuterPages(0);
-        setInitialStartupCost(0);
-        setInitialRunCost(0);
-        setNumHashClauses(0);
-        setVirtualBuckets(0);
-        setInnerBucketSize(0);
-        setInnerMvcfreq(0);
 
         /* NestLoop */
-        setInnerRescanStartCost(0);
-        setInnerRescanTotalCost(0);
         setInnerRescanRunCost(0);
-        setOuterMatchedRows(0);
-        setOuterUnmatchedRows(0);
-        setInnerScanFrac(0);
+        setOuterRunCost(0);
+        setOuterStartupCost(0);
+        setInnerStartupCost(0);
+        setInnerRescanStartupCost(0);
 
         const updateSize = () => {
             if (viewRef.current) setViewSize([viewRef.current.offsetWidth, viewRef.current.offsetHeight]);
@@ -227,75 +212,70 @@ const DpMain = ({ data, plan }) => {
                         plan={plan}
                     />
                 </Card>
-                <Card className='h-1/3 mb-4'>
+                <Card className='h-1/2 mb-4'>
                     <div className='flex justify-between px-4 pt-2'>
                         <p className='vis-title pt-2'>Description</p>
                     </div>
                     <DescriptionCard showJoinCard={showJoinCard} node={node} />
                 </Card>
-                <Card className='h-1/3'>
-                    <div className='flex justify-between px-4 pt-2'>
-                        <p className='vis-title pt-2'>Cost Formula</p>
-                    </div>
-                    <JoinOrderCard
-                        showJoinCard={showJoinCard}
-                        node={node}
-                        joinOrder={joinOrder}
-                        startupCost={startupCost}
-                        totalCost={totalCost}
-                        cpuPerTuple={cpuPerTuple}
-                        cpuRunCost={cpuRunCost}
-                        diskRunCost={diskRunCost}
-                        pages={pages}
-                        tuples={tuples}
-                        csquared={csquared}
-                        maxIOCost={maxIOCost}
-                        minIOCost={minIOCost}
-                        indexStartupCost={indexStartupCost}
-                        indexTotalCost={indexTotalCost}
-                        selectivity={selectivity}
-                        targetPerTuple={targetPerTuple}
-                        costPerPage={costPerPage}
-                        innerPathRows={innerPathRows}
-                        outerRows={outerRows}
-                        innerRows={innerRows}
-                        outerSkipRows={outerSkipRows}
-                        innerSkipRows={innerSkipRows}
-                        innerRunCost={innerRunCost}
-                        bareInnerCost={bareInnerCost}
-                        matInnerCost={matInnerCost}
-                        rescannedTuples={rescannedTuples}
-                        rescanratio={rescanratio}
-                        outerPathRows={outerPathRows}
-                        outerEndSel={outerEndSel}
-                        innerEndSel={innerEndSel}
-                        innerStartSel={innerStartSel}
-                        outerStartSel={outerStartSel}
-                        hashBuildCost={hashBuildCost}
-                        hashJoinCost={hashJoinCost}
-                        innerBuildCost={innerBuildCost}
-                        outerBuildCost={outerBuildCost}
-                        hashCpuCost={hashCpuCost}
-                        seqPageCost={seqPageCost}
-                        numBuckets={numBuckets}
-                        numBatches={numBatches}
-                        innerPages={innerPages}
-                        outerPages={outerPages}
-                        initialStartupCost={initialStartupCost}
-                        initialRunCost={initialRunCost}
-                        numHashClauses={numHashClauses}
-                        virtualBuckets={virtualBuckets}
-                        innerBucketSize={innerBucketSize}
-                        innerMvcfreq={innerMvcfreq}
-                        innerRescanStartCost={innerRescanStartCost}
-                        innerRescanTotalCost={innerRescanTotalCost}
-                        innerRescanRunCost={innerRescanRunCost}
-                        outerMatchedRows={outerMatchedRows}
-                        outerUnmatchedRows={outerUnmatchedRows}
-                        innerScanFrac={innerScanFrac}
-                    />
-                </Card>
             </div>
+            <Card className='w-3/4 h-full'>
+                <div className='flex justify-between px-4 pt-2'>
+                    <p className='vis-title pt-2'>Cost Formula</p>
+                </div>
+                <JoinOrderCard
+                    showJoinCard={showJoinCard}
+                    node={node}
+                    joinOrder={joinOrder}
+                    startupCost={startupCost}
+                    totalCost={totalCost}
+                    cpuPerTuple={cpuPerTuple}
+                    cpuRunCost={cpuRunCost}
+                    diskRunCost={diskRunCost}
+                    pages={pages}
+                    tuples={tuples}
+                    csquared={csquared}
+                    maxIOCost={maxIOCost}
+                    minIOCost={minIOCost}
+                    indexStartupCost={indexStartupCost}
+                    indexTotalCost={indexTotalCost}
+                    selectivity={selectivity}
+                    targetPerTuple={targetPerTuple}
+                    costPerPage={costPerPage}
+                    innerPathRows={innerPathRows}
+                    outerRows={outerRows}
+                    innerRows={innerRows}
+                    outerSkipRows={outerSkipRows}
+                    innerSkipRows={innerSkipRows}
+                    innerRunCost={innerRunCost}
+                    sortInner={sortInner}
+                    sortOuter={sortOuter}
+                    materializeInner={materializeInner}
+                    innerScanCost={innerScanCost}
+                    outerScanCost={outerScanCost}
+                    outerPathRows={outerPathRows}
+                    outerEndSel={outerEndSel}
+                    innerEndSel={innerEndSel}
+                    innerStartSel={innerStartSel}
+                    outerStartSel={outerStartSel}
+                    initialRunCost={initialRunCost}
+                    outerPathStartup={outerPathStartup}
+                    outerPathTotal={outerPathTotal}
+                    innerPathStartup={innerPathStartup}
+                    innerPathTotal={innerPathTotal}
+                    numHashClauses={numHashClauses}
+                    hashCpuCost={hashCpuCost}
+                    seqPageCost={seqPageCost}
+                    cpuTupleCost={cpuTupleCost}
+                    innerPages={innerPages}
+                    outerPages={outerPages}
+                    innerRescanRunCost={innerRescanRunCost}
+                    innerRescanStartupCost={innerRescanStartupCost}
+                    outerRunCost={outerRunCost}
+                    outerStartupCost={outerStartupCost}
+                    innerStartupCost={innerStartupCost}
+                />
+            </Card>
         </div>
     );
 };

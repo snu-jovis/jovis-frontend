@@ -55,31 +55,10 @@
     font-size: large;
 }
 
-.dp-join-order {
-    font-family: "NanumSquareB";
-    font-size: 15px;
-    color: black;
-}
-.dp-cost-formula {
-    font-family: "NanumSquareR";
-    font-size: small;
-}
-
 .checkbox-container {
     display: flex;
     justify-content: flex-end;
     margin-right: 50px;
-}
-
-.graph-tooltip {
-    position: absolute;
-    visibility: hidden;
-    font-family: "NanumSquareB";
-    font-size: small;
-    background: rgba(0, 0, 0, 0.6);
-    border-radius: 4px;
-    color: #fff;
-    padding: 5px;
 }
 
 #play-button {
@@ -118,4 +97,73 @@
     max-height: 200px;
     width: auto;
     margin: 0 auto;
+}
+
+/* Style for the entire container */
+.dp-join-order {
+    font-family: "NanumSquareB";
+    font-size: 15px;
+    color: black;
+    line-height: 1.6; /* Increase line height */
+    padding: 20px; /* Add padding around the container */
+    background-color: #f9f9f9; /* Light background color for the container */
+    border: 1px solid #ddd; /* Border around the container */
+    border-radius: 5px; /* Rounded corners for the container */
+    margin-bottom: 20px; /* Space below the container */
+}
+
+/* Style for the join order section */
+.dp-join-order .my-4 {
+    margin-bottom: 20px; /* Space below the join order */
+    font-weight: bold; /* Bold font for join order */
+}
+
+/* Style for cost details */
+.dp-cost-formula {
+    font-family: "NanumSquareR";
+    font-size: small;
+    margin-top: 20px; /* Space above the cost formula section */
+}
+
+.dp-cost-formula div {
+    margin-bottom: 10px; /* Space between lines in cost formula */
+}
+
+/* Style for detailed cost components list */
+.dp-cost-formula ul {
+    list-style-type: disc; /* Dot points for list items */
+    margin-left: 20px; /* Indent the list */
+    padding-left: 20px;
+}
+
+.dp-cost-formula ul li {
+    margin-bottom: 5px; /* Space between list items */
+}
+
+.dp-cost-formula .warning {
+    color: red; /* Red color for warning */
+    margin-bottom: 10px; /* Space below the warning */
+    font-weight: bold; /* Bold font for warning */
+    font-style: italic; /* Italic font for warning */
+}
+
+.formula-text {
+    font-family: "Consolas", Consola, monospace;
+    background-color: #fff;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    display: inline-block;
+    text-align: left;
+    font-size: 12px;
+}
+
+.center-latex {
+    text-align: center; /* Center-align text */
+}
+.sub-title {
+    font-size: 1.2em; /* Slightly increase font size */
+    font-weight: bold; /* Make the font bold */
+    margin-bottom: 10px; /* Add margin below the text */
 }

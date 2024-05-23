@@ -7,6 +7,7 @@ import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
 
 import "../../assets/stylesheets/Dp.css";
+import { propTypesSelected } from "@material-tailwind/react/types/components/select";
 
 const GraphView = ({ width, height, base, dp, cost }) => {
     const dagSvg = useRef(null);
@@ -46,37 +47,28 @@ const GraphView = ({ width, height, base, dp, cost }) => {
         setOuterSkipRows,
         setInnerSkipRows,
         setInnerRunCost,
-        setBareInnerCost,
-        setMatInnerCost,
-        setRescannedtuples,
-        setRescanratio,
+        setInnerScanCost,
+        setOuterScanCost,
         setOuterPathRows,
         setOuterEndSel,
         setInnerEndSel,
         setInnerStartSel,
-        setOuterStartSel,
-        setHashBuildCost,
-        setHashJoinCost,
-        setInnerBuildCost,
-        setOuterBuildCost,
+        setInitialRunCost,
+        setOuterPathStartup,
+        setOuterPathTotal,
+        setCpuTupleCost,
+        setInnerPathStartup,
+        setInnerPathTotal,
         setHashCpuCost,
         setSeqPageCost,
-        setNumBuckets,
-        setNumBatches,
         setInnerPages,
         setOuterPages,
-        setInitialStartupCost,
-        setInitialRunCost,
         setNumHashClauses,
-        setVirtualBuckets,
-        setInnerBucketSize,
-        setInnerMvcfreq,
-        setInnerRescanStartCost,
-        setInnerRescanTotalCost,
+        setInnerRescanStartupCost,
         setInnerRescanRunCost,
-        setOuterMatchedRows,
-        setOuterUnmatchedRows,
-        setInnerScanFrac,
+        setOuterRunCost,
+        setOuterStartupCost,
+        setInnerStartupCost,
     } = useContext(DpContext);
 
     var selected = null;
@@ -309,56 +301,45 @@ const GraphView = ({ width, height, base, dp, cost }) => {
         };
 
         const setNestLoopDetails = nodeData => {
-            setInnerRescanStartCost(`${nodeData.inner_rescan_start_cost}`);
-            setInnerRescanTotalCost(`${nodeData.inner_rescan_total_cost}`);
-            setInnerRunCost(`${nodeData.inner_run_cost}`);
             setInnerRescanRunCost(`${nodeData.inner_rescan_run_cost}`);
-            setOuterPathRows(`${nodeData.outer_path_rows}`);
-            setOuterMatchedRows(`${nodeData.outer_matched_rows}`);
-            setOuterUnmatchedRows(`${nodeData.outer_unmatched_rows}`);
-            setInnerScanFrac(`${nodeData.inner_scan_frac}`);
-            setTuples(`${nodeData.ntuples}`);
+            setInnerRescanStartupCost(`${nodeData.inner_rescan_start_cost}`);
+            setOuterPathRows(`${nodeData.outer_rows}`);
+            setOuterRunCost(`${nodeData.outer_path_run}`);
+            setOuterStartupCost(`${nodeData.outer_path_startup}`);
+            setInnerStartupCost(`${nodeData.inner_path_startup}`);
+            setInnerRunCost(`${nodeData.inner_run_cost}`);
         };
 
         const setHashJoinDetails = nodeData => {
-            setHashBuildCost(`${nodeData.hashbuild_cost}`);
-            setHashJoinCost(`${nodeData.hashjoin_cost}`);
-            setInnerBuildCost(`${nodeData.innerbuild_cost}`);
-            setOuterBuildCost(`${nodeData.outerbuild_cost}`);
+            setOuterPathStartup(`${nodeData.outer_path_startup}`);
+            setOuterPathTotal(`${nodeData.outer_path_total}`);
+            setInnerPathStartup(`${nodeData.inner_path_startup}`);
+            setInnerPathTotal(`${nodeData.inner_path_total}`);
             setHashCpuCost(`${nodeData.hashcpu_cost}`);
             setSeqPageCost(`${nodeData.seqpage_cost}`);
-            setNumBuckets(`${nodeData.numbuckets}`);
-            setNumBatches(`${nodeData.numbatches}`);
             setInnerPages(`${nodeData.innerpages}`);
             setOuterPages(`${nodeData.outerpages}`);
-            setInitialStartupCost(`${nodeData.initial_startup_cost}`);
-            setInitialRunCost(`${nodeData.initial_run_cost}`);
             setNumHashClauses(`${nodeData.num_hashclauses}`);
             setOuterPathRows(`${nodeData.outer_path_rows}`);
             setInnerPathRows(`${nodeData.inner_path_rows}`);
-            setCpuPerTuple(`${nodeData.cpu_per_tuple}`);
-            setTuples(`${nodeData.hashjointuples}`);
-            setVirtualBuckets(`${nodeData.virtualbuckets}`);
-            setInnerBucketSize(`${nodeData.innerbucketsize}`);
-            setInnerMvcfreq(`${nodeData.innermcvfreq}`);
+            setCpuTupleCost(`${nodeData.cpu_tuple_cost}`);
         };
 
         const setMergeJoinDetails = nodeData => {
-            setOuterEndSel(`${nodeData.merge_outer_end_sel}`);
-            setInnerStartSel(`${nodeData.merge_inner_start_sel}`);
-            setInnerEndSel(`${nodeData.merge_inner_end_sel}`);
-            setInnerRunCost(`${nodeData.merge_inner_run_cost}`);
-            setInnerPathRows(`${nodeData.inner_path_rows}`);
+            setOuterEndSel(`${nodeData.outerendsel}`);
+            setInnerStartSel(`${nodeData.innerstartsel}`);
+            setInnerEndSel(`${nodeData.innerendsel}`);
+            setInnerRunCost(`${nodeData.inner_run_cost}`);
             setOuterRows(`${nodeData.outer_rows}`);
             setInnerRows(`${nodeData.inner_rows}`);
             setOuterSkipRows(`${nodeData.outer_skip_rows}`);
             setInnerSkipRows(`${nodeData.inner_skip_rows}`);
             setInnerRunCost(`${nodeData.inner_run_cost}`);
-            setBareInnerCost(`${nodeData.bare_inner_cost}`);
-            setMatInnerCost(`${nodeData.mat_inner_cost}`);
-            setTuples(`${nodeData.mergejointuples}`);
-            setRescannedtuples(`${nodeData.rescannedtuples}`);
-            setRescanratio(`${nodeData.rescanratio}`);
+            setInnerPathStartup(`${nodeData.inner_startup_cost}`);
+            setOuterPathStartup(`${nodeData.outer_startup_cost}`);
+            setInnerScanCost(`${nodeData.inner_scan_cost}`);
+            setOuterScanCost(`${nodeData.outer_scan_cost}`);
+            setInitialRunCost(`${nodeData.initial_run_cost}`);
         };
 
         // create links
