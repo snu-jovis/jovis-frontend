@@ -1,4 +1,10 @@
 import { useState, useEffect } from "react";
+
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import CardMedia from "@mui/material/CardMedia";
+import Typography from "@mui/material/Typography";
+
 import imgSeqScan from "../../assets/img/seqscan.png";
 import imgIdxScan from "../../assets/img/idxscan.png";
 import imgBitmapHeapScan from "../../assets/img/bitmapheapscan.png";
@@ -22,8 +28,7 @@ const DescriptionCard = props => {
     };
 
     const descriptionMap = {
-        SeqScan:
-            "A sequential scan reads the entire table sequentially.\nIt examines every row in the table, regardless of any indexes that might be present.\nThis method is straightforward but can be inefficient for large tables, as it does not utilize indexes to narrow down the search.\n",
+        SeqScan: `A sequential scan reads the entire table sequentially.\nIt examines every row in the table, regardless of any indexes that might be present.\nThis method is straightforward but can be inefficient for large tables, as it does not utilize indexes to narrow down the search.\n`,
 
         IdxScan:
             "An index scan uses an index to find the rows that satisfy the condition. It scans the index to locate the rows of interest and then retrieves these rows from the table.\nThis method is efficient for large tables with selective conditions, as it avoids reading the entire table.\n",
@@ -56,12 +61,22 @@ const DescriptionCard = props => {
                     {props.node.length > 0 &&
                         node in imageMap &&
                         imageMap[node].map((imgSrc, index) => (
-                            <div key={index}>
-                                <img src={imgSrc} alt={node} className='image-resize' />
-                                <br />
-                                <br />
-                                {index === imageMap[node].length - 1 && <p>{description}</p>}
-                            </div>
+                            <Card className='my-2'>
+                                <CardMedia
+                                    key={index}
+                                    component='img'
+                                    image={imgSrc}
+                                    alt={node}
+                                    className='image-resize dp-cost-formula'
+                                />
+                                {index === imageMap[node].length - 1 && (
+                                    <CardContent>
+                                        <Typography variant='body2' color='textSecondary' component='p'>
+                                            {description}
+                                        </Typography>
+                                    </CardContent>
+                                )}
+                            </Card>
                         ))}
                 </div>
             )}
