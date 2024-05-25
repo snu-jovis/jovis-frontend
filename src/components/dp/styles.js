@@ -24,7 +24,6 @@ const styles = {
     },
     bodyFont: {
         fontFamily: "NanumSquareB",
-        fontSize: "1rem",
         color: "gray",
     },
 };

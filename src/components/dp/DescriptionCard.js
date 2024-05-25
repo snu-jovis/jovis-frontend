@@ -70,12 +70,7 @@ const DescriptionCard = props => {
                                         <Typography style={styles.valueFont} gutterBottom variant='h5' component='div'>
                                             {node}
                                         </Typography>
-                                        <Typography
-                                            styles={styles.bodyFont}
-                                            variant='body2'
-                                            color='textSecondary'
-                                            component='p'
-                                        >
+                                        <Typography style={styles.bodyFont} variant='body2' component='p'>
                                             {description}
                                         </Typography>
                                     </CardContent>
