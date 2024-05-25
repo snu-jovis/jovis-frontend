@@ -4,7 +4,7 @@ import { Tabs, Tab, Box, Table, TableBody, TableCell, TableContainer, TableHead,
 import "katex/dist/katex.min.css";
 import styles from "./styles";
 import { extractNodeType, formatJoinOrder, generateFormulas } from "./utils";
-import { HashJoinDetails, MergeJoinDetails } from "./Details";
+import { HashJoinDetails, MergeJoinDetails, IdxScanDetails } from "./Details";
 import { TabPanel } from "./TabPanel";
 
 const JoinOrderCard = ({ showJoinCard, node, joinOrder, totalCost, startupCost, ...props }) => {
@@ -14,6 +14,7 @@ const JoinOrderCard = ({ showJoinCard, node, joinOrder, totalCost, startupCost, 
     const [runCostValue, setRunCostValue] = useState(0);
     const [startupCostValue, setStartupCostValue] = useState(0);
     const [joinOrderArray, setJoinOrderArray] = useState([]);
+    const [selectivity, setSelectivity] = useState(0);
     const [value, setValue] = useState(0);
 
     const handleChange = (event, newValue) => {
@@ -37,6 +38,7 @@ const JoinOrderCard = ({ showJoinCard, node, joinOrder, totalCost, startupCost, 
             setRunCostValue(formulas[nodeType].runValue);
             setStartupCostFormula(formulas[nodeType].startup);
             setStartupCostValue(formulas[nodeType].startupValue);
+            setSelectivity(formulas[nodeType].selectivity);
         }
     }, [nodeType, props]);
 
@@ -49,6 +51,12 @@ const JoinOrderCard = ({ showJoinCard, node, joinOrder, totalCost, startupCost, 
                         <Tab label='Cost Calculation' />
                     </Tabs>
                     <TabPanel value={value} index={0}>
+                        <div className='dp-join-order my-2'>Cost Summary</div>
+                        {nodeType === "IdxScan" && (
+                            <div className='dp-index-warning'>
+                                This index is not selected because its selectivity is 0.
+                            </div>
+                        )}
                         <TableContainer component={Paper}>
                             <Table>
                                 <TableHead style={styles.tableCell}>
@@ -108,12 +116,12 @@ const JoinOrderCard = ({ showJoinCard, node, joinOrder, totalCost, startupCost, 
                         <div className='dp-join-order my-2'>Cost Calculation</div>
                         {node.length > 0 && (
                             <>
+                                {" "}
                                 {nodeType === "IdxScan" && (
                                     <div className='dp-index-warning'>
                                         This index is not selected because its selectivity is 0.
                                     </div>
                                 )}
-
                                 <TableContainer component={Paper}>
                                     <Table>
                                         <TableHead>
@@ -129,6 +137,7 @@ const JoinOrderCard = ({ showJoinCard, node, joinOrder, totalCost, startupCost, 
                                                 </TableCell>
                                                 <TableCell style={styles.valueFont}>
                                                     <div style={styles.roundedBox}>{runCostFormula}</div>
+                                                    <br />
                                                     <div style={styles.roundedBox}>{runCostValue}</div>
                                                 </TableCell>
                                             </TableRow>
@@ -138,19 +147,40 @@ const JoinOrderCard = ({ showJoinCard, node, joinOrder, totalCost, startupCost, 
                                                 </TableCell>
                                                 <TableCell style={styles.valueFont}>
                                                     <div style={styles.roundedBox}>{startupCostFormula}</div>
-                                                    <div style={styles.roundedBox}>{startupCostValue}</div>
+                                                    <br />
+                                                    {nodeType !== "SeqScan" && (
+                                                        <>
+                                                            <br />
+                                                            <div style={styles.roundedBox}>{startupCostValue}</div>
+                                                        </>
+                                                    )}{" "}
                                                 </TableCell>
                                             </TableRow>
+                                            {nodeType === "IdxScan" && (
+                                                <>
+                                                    <TableRow>
+                                                        <TableCell
+                                                            style={{ ...styles.tableCell, ...styles.firstColumn }}
+                                                        >
+                                                            Selectivity
+                                                        </TableCell>
+                                                        <TableCell style={styles.valueFont}>
+                                                            <div style={styles.roundedBox}>{selectivity}</div>
+                                                        </TableCell>
+                                                    </TableRow>
+                                                </>
+                                            )}
                                         </TableBody>
                                     </Table>
                                 </TableContainer>
                                 <br />
-                                {(nodeType === "HashJoin" || nodeType === "MergeJoin") && (
+                                {(nodeType === "HashJoin" || nodeType === "MergeJoin" || nodeType === "IdxScan") && (
                                     <>
                                         <div className='dp-join-order my-2'>Detailed Cost Components</div>
                                         <TableContainer component={Paper}>
                                             {nodeType === "HashJoin" && <HashJoinDetails />}
                                             {nodeType === "MergeJoin" && <MergeJoinDetails />}
+                                            {nodeType === "IdxScan" && <IdxScanDetails />}
                                         </TableContainer>
                                     </>
                                 )}

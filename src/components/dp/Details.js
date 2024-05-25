@@ -93,3 +93,36 @@ export const MergeJoinDetails = () => (
         </Table>
     </>
 );
+
+export const IdxScanDetails = () => (
+    <>
+        <Table>
+            <TableHead>
+                <TableRow>
+                    <TableCell style={{ ...styles.tableCell, ...styles.firstColumn }}>Cost Component</TableCell>
+                    <TableCell>Formula</TableCell>
+                </TableRow>
+            </TableHead>
+            <TableBody>
+                <TableRow>
+                    <TableCell style={{ ...styles.tableCell, ...styles.firstColumn }}>Index CPU & I/O Cost</TableCell>
+                    <TableCell style={{ ...styles.valueFont, ...styles.roundedBox }}>
+                        Index Total Cost - Index Startup Cost
+                    </TableCell>
+                </TableRow>
+                <TableRow>
+                    <TableCell style={{ ...styles.tableCell, ...styles.firstColumn }}>Table CPU Cost</TableCell>
+                    <TableCell style={{ ...styles.valueFont, ...styles.roundedBox }}>
+                        CPU Tuple Cost * # of Tuples + CPU Target Tuple Cost * # of Target Tuples
+                    </TableCell>
+                </TableRow>
+                <TableRow>
+                    <TableCell style={{ ...styles.tableCell, ...styles.firstColumn }}>Table IO Cost</TableCell>
+                    <TableCell style={{ ...styles.valueFont, ...styles.roundedBox }}>
+                        Max IO Cost + C^2 * (Min IO Cost - Max IO cost)
+                    </TableCell>
+                </TableRow>
+            </TableBody>
+        </Table>
+    </>
+);

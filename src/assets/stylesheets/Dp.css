@@ -34,17 +34,6 @@
     font-size: 14px;
 }
 
-.dp-tooltip {
-    position: absolute;
-    visibility: hidden;
-    padding: 3px;
-    font-family: "NanumSquareB";
-    font-size: 11px;
-    color: white;
-    background-color: black;
-    opacity: 0.6;
-}
-
 .dp-total-cost {
     font-family: "NanumSquareR";
     font-size: small;
@@ -78,15 +67,6 @@
     background-color: #696969;
 }
 
-.slider text {
-    font-size: 12px;
-    font-family: "NanumSquareB";
-}
-
-.slider {
-    cursor: pointer;
-}
-
 .flex-container {
     display: flex;
     justify-content: center;
@@ -94,53 +74,37 @@
 }
 
 .image-resize {
-    max-height: 200px;
-    width: auto;
-    margin: 0 auto;
+    max-width: 300px;
+    height: auto;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .dp-join-order {
     font-family: "NanumSquareB";
     font-size: 15px;
     color: black;
-    line-height: 1.6; /* Increase line height */
-    padding: 20px; /* Add padding around the container */
-    background-color: #f9f9f9; /* Light background color for the container */
-    border: 1px solid #ddd; /* Border around the container */
-    border-radius: 5px; /* Rounded corners for the container */
-    margin-bottom: 20px; /* Space below the container */
+    line-height: 1.6;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 20px;
 }
 
 .dp-join-order .my-4 {
-    margin-bottom: 20px; /* Space below the join order */
-    font-weight: bold; /* Bold font for join order */
+    margin-bottom: 20px;
+    font-weight: bold;
 }
 
 .dp-index-warning {
     font-family: "NanumSquareR";
     font-size: small;
-    margin-top: 20px; /* Space above the cost formula section */
+    margin-top: 20px;
     margin-bottom: 10px;
     color: red;
     margin-bottom: 10px;
     font-weight: bold;
     font-style: italic;
-}
-
-.formula-text {
-    font-family: "NanumSquareB";
-    background-color: #fff;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    margin-bottom: 10px;
-    display: inline-block;
-    text-align: left;
-    font-size: 12px;
-}
-
-.sub-title {
-    font-size: 1.2em; /* Slightly increase font size */
-    font-weight: bold; /* Make the font bold */
-    margin-bottom: 10px; /* Add margin below the text */
 }

@@ -45,7 +45,7 @@ export const generateFormulas = props => {
         MergeJoin: {
             run: `Outer Path Join CPU Cost + Inner Path Join CPU Cost`,
             runValue: `= ${formatNumber(props.initialRunCost)} + ${formatNumber(props.innerRunCost)}`,
-            startup: `Outer Path Sort Cost + Inner Path Sort Cost + Outer Path Initial Scan Cost + Inner Path Initial Scan Cost`,
+            startup: `(Outer Path Sort Cost + Inner Path Sort Cost) + (Outer Path Initial Scan Cost + Inner Path Initial Scan Cost)`,
             startupValue: `= (${formatNumber(props.innerStartupCost)} + ${formatNumber(
                 props.outerStartupCost
             )}) + (${formatNumber(props.innerScanCost)} + ${formatNumber(props.outerScanCost)})`,
@@ -68,12 +68,13 @@ export const generateFormulas = props => {
             startup: "0",
         },
         IdxScan: {
-            run: `(Index CPU Cost + Table CPU Cost) + (Index IO Cost + Table IO Cost)`,
+            run: `Index CPU & IO Cost + Table CPU Cost + Table IO Cost`,
             runValue: `= ${formatNumber(props.indexTotalCost - props.indexStartupCost)} + ${formatNumber(
                 props.cpuRunCost
-            )} + (1.0 * ${formatNumber(props.pages)})`,
+            )} + (${props.maxIOCost} + ${props.csquared} * (${props.maxIOCost} - ${props.minIOCost}))`,
             startup: `Index Startup Cost`,
-            startupValue: `= ${formatNumber(props.indexStartupCost)} Selectivity = ${formatNumber(props.selectivity)}`,
+            startupValue: `= ${formatNumber(props.indexStartupCost)}`,
+            selectivity: `${props.selectivity}`,
         },
         BitmapHeapScan: {
             run: `(CPU cost per tuple * # of tuples) + (Disk cost per page * # of pages)`,

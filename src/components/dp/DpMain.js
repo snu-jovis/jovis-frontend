@@ -212,7 +212,7 @@ const DpMain = ({ data, plan }) => {
                         plan={plan}
                     />
                 </Card>
-                <Card className='h-1/2 mb-4'>
+                <Card className='auto-height mb-4'>
                     <div className='flex justify-between px-4 pt-2'>
                         <p className='vis-title pt-2'>Description</p>
                     </div>

@@ -22,6 +22,11 @@ const styles = {
         marginBottom: "10px",
         textAlign: "center",
     },
+    bodyFont: {
+        fontFamily: "NanumSquareB",
+        fontSize: "1rem",
+        color: "gray",
+    },
 };
 
 export default styles;
