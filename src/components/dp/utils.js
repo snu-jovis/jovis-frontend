@@ -1,3 +1,7 @@
+/*
+ * utils.js: Contains utility functions for the Dynamic Programming component.
+ */
+
 export const extractNodeType = node => node.split(" - ")[1];
 
 export const formatJoinOrder = joinOrder => {
@@ -26,63 +30,47 @@ export const formatJoinOrder = joinOrder => {
     }
 };
 
-export const formatNumber = num => num.toLocaleString();
-
 export const generateFormulas = props => {
     return {
         HashJoin: {
-            run: `Outer Path Run Cost + Hash Table Probe CPU Cost + Disk Page Read/Write Cost (if batching)`,
-            runValue: `= ${formatNumber(props.outerPathTotal - props.outerPathStartup)} + (0.01 * ${formatNumber(
-                props.numHashClauses
-            )} * ${formatNumber(props.outerPathRows)}) + (1.0 * (${formatNumber(props.innerPages)} + 2 * ${formatNumber(
-                props.outerPages
-            )}))`,
-            startup: `Inner Path Total Cost + Outer Path Startup Cost + Hash Table Build CPU Cost + Disk Page Read Cost (if batching)`,
-            startupValue: `= ${formatNumber(props.innerPathTotal + props.outerPathStartup)} + ${
-                (0.0125 * formatNumber(props.numHashClauses) + 1.0) * formatNumber(props.innerPathRows)
-            } + (1.0 * ${formatNumber(props.innerPages)})`,
+            run: `Outer Run Cost + Hash Table Probe CPU Cost + Disk Page Read/Write Cost (if batching)`,
+            runValue: `= ${props.outerPathTotal - props.outerPathStartup} + ${
+                0.0025 * props.numHashClauses * props.outerPathRows
+            }  + (1.0 * (${props.innerPages} + 2 * ${props.outerPages}))`,
+            startup: `Inner Total Cost + Outer Startup Cost + Hash Table Build CPU Cost + Disk Page Read Cost (if batching)`,
+            startupValue: `= ${props.innerPathTotal} + ${props.outerPathStartup} + ${props.hashCpuCost} + (1.0 * ${props.innerPages})`,
         },
         MergeJoin: {
-            run: `Outer Path Join CPU Cost + Inner Path Join CPU Cost`,
-            runValue: `= ${formatNumber(props.initialRunCost)} + ${formatNumber(props.innerRunCost)}`,
-            startup: `(Outer Path Sort Cost + Inner Path Sort Cost) + (Outer Path Initial Scan Cost + Inner Path Initial Scan Cost)`,
-            startupValue: `= (${formatNumber(props.innerStartupCost)} + ${formatNumber(
-                props.outerStartupCost
-            )}) + (${formatNumber(props.innerScanCost)} + ${formatNumber(props.outerScanCost)})`,
+            run: `Outer Join CPU Cost + Inner Join CPU Cost`,
+            runValue: `= ${props.initialRunCost} + ${props.innerRunCost}`,
+            startup: `(Outer Sort Cost + Inner Sort Cost) + (Outer Initial Scan Cost + Inner Initial Scan Cost)`,
+            startupValue: `= (${props.innerStartupCost} + ${props.outerStartupCost}) + (${props.innerScanCost} + ${props.outerScanCost})`,
         },
         NestLoop: {
-            run: `Outer Path Run Cost + Inner Path Run Cost + (N_outerpathrows - 1) * Inner Rescan Start Cost + (N_outerpathrows - 1) * Inner Rescan Run Cost`,
-            runValue: `= ${formatNumber(props.outerRunCost)} + ${formatNumber(props.innerRunCost)} + ${formatNumber(
-                props.outerPathRows
-            )} * ${formatNumber(props.innerRescanStartupCost)} + ${formatNumber(props.outerPathRows)} * ${formatNumber(
-                props.innerRescanRunCost
-            )}`,
-            startup: `Outer Path Startup Cost + Inner Path Startup Cost`,
-            startupValue: `= ${formatNumber(props.outerStartupCost)} + ${formatNumber(props.innerStartupCost)}`,
+            run: `Outer Run Cost + Inner Run Cost + (Outer Rows * Inner Rescan Start Cost) + (Outer Rows * Inner Rescan Run Cost)`,
+            runValue: `= ${props.outerRunCost} + ${props.innerRunCost} + (${props.outerPathRows} * ${props.innerRescanStartupCost}) + (${props.outerPathRows} * ${props.innerRescanRunCost})`,
+            startup: `Outer Startup Cost + Inner Startup Cost`,
+            startupValue: `= ${props.outerStartupCost} + ${props.innerStartupCost}`,
         },
         SeqScan: {
-            run: `(CPU cost per tuple * # of tuples) + (Disk cost per page * # of pages)`,
-            runValue: `= (${formatNumber(props.cpuPerTuple)} * ${formatNumber(props.tuples)}) + (1.0 * ${formatNumber(
-                props.pages
-            )})`,
+            run: `CPU Run Cost + Disk Run Cost`,
+            runValue: `= ${props.cpuRunCost} + ${props.pages}`,
             startup: "0",
         },
         IdxScan: {
             run: `Index CPU & IO Cost + Table CPU Cost + Table IO Cost`,
-            runValue: `= ${formatNumber(props.indexTotalCost - props.indexStartupCost)} + ${formatNumber(
-                props.cpuRunCost
-            )} + (${props.maxIOCost} + ${props.csquared} * (${props.maxIOCost} - ${props.minIOCost}))`,
+            runValue: `= ${props.indexTotalCost - props.indexStartupCost} + ${props.cpuRunCost} + (${
+                props.maxIOCost
+            } + ${props.csquared} * (${props.maxIOCost} - ${props.minIOCost}))`,
             startup: `Index Startup Cost`,
-            startupValue: `= ${formatNumber(props.indexStartupCost)}`,
+            startupValue: `= ${props.indexStartupCost}`,
             selectivity: `${props.selectivity}`,
         },
         BitmapHeapScan: {
-            run: `(CPU cost per tuple * # of tuples) + (Disk cost per page * # of pages)`,
-            runValue: `= (${formatNumber(props.cpuPerTuple)} * ${formatNumber(props.tuples)}) + (${formatNumber(
-                props.costPerPage
-            )} * ${formatNumber(props.pages)})`,
+            run: `CPU Run Cost + Disk Run Cost`,
+            runValue: `= ${props.cpuRunCost} + ${props.pages}`,
             startup: `Index Total Cost`,
-            startupValue: `= ${formatNumber(props.indexTotalCost)}`,
+            startupValue: `= ${props.indexTotalCost}`,
         },
     };
 };

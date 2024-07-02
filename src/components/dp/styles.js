@@ -20,7 +20,7 @@ const styles = {
         padding: "10px",
         display: "inline-block",
         marginBottom: "10px",
-        textAlign: "center",
+        textAlign: "left",
     },
     bodyFont: {
         fontFamily: "NanumSquareB",

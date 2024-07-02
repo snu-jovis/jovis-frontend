@@ -1,4 +1,3 @@
-import { merge } from "d3";
 import { createContext, useState } from "react";
 
 export const DpContext = createContext();
@@ -27,6 +26,7 @@ export function DpProvider({ children }) {
     const [selectivity, setSelectivity] = useState(0);
     const [targetPerTuple, setTargetPerTuple] = useState(0);
     const [costPerPage, setCostPerPage] = useState(0);
+    const [qualCost, setQualCost] = useState(0);
 
     /* MergeJoin */
     const [innerStartSel, setInnerStartSel] = useState(0);
@@ -91,6 +91,8 @@ export function DpProvider({ children }) {
                 setPages,
                 tuples,
                 setTuples,
+                qualCost,
+                setQualCost,
                 csquared,
                 setCsquared,
                 maxIOCost,

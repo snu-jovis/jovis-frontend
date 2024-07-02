@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import Latex from "react-latex-next";
-import { Tabs, Tab, Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from "@mui/material";
+import { Tabs, Tab, Table, TableBody, TableCell, TableContainer, TableRow, Paper } from "@mui/material";
 import "katex/dist/katex.min.css";
 import styles from "./styles";
 import { extractNodeType, formatJoinOrder, generateFormulas } from "./utils";
-import { HashJoinDetails, MergeJoinDetails, IdxScanDetails } from "./Details";
+import { HashJoinDetails, MergeJoinDetails, IdxScanDetails, SeqScanDetails } from "./Details";
 import { TabPanel } from "./TabPanel";
 
 const JoinOrderCard = ({ showJoinCard, node, joinOrder, totalCost, startupCost, ...props }) => {
@@ -19,6 +19,23 @@ const JoinOrderCard = ({ showJoinCard, node, joinOrder, totalCost, startupCost, 
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
+    };
+
+    const renderDetails = () => {
+        switch (nodeType) {
+            case "HashJoin":
+                return <HashJoinDetails />;
+            case "MergeJoin":
+                return <MergeJoinDetails />;
+            case "IdxScan":
+                return <IdxScanDetails />;
+            case "SeqScan":
+                return <SeqScanDetails />;
+            case "BitmapHeapScan":
+                return <SeqScanDetails />;
+            default:
+                return null;
+        }
     };
 
     useEffect(() => {
@@ -59,12 +76,6 @@ const JoinOrderCard = ({ showJoinCard, node, joinOrder, totalCost, startupCost, 
                         )}
                         <TableContainer component={Paper}>
                             <Table>
-                                <TableHead style={styles.tableCell}>
-                                    <TableRow>
-                                        <TableCell style={styles.firstColumn}>Property</TableCell>
-                                        <TableCell>Value</TableCell>
-                                    </TableRow>
-                                </TableHead>
                                 <TableBody>
                                     <TableRow>
                                         <TableCell style={{ ...styles.tableCell, ...styles.firstColumn }}>
@@ -124,12 +135,6 @@ const JoinOrderCard = ({ showJoinCard, node, joinOrder, totalCost, startupCost, 
                                 )}
                                 <TableContainer component={Paper}>
                                     <Table>
-                                        <TableHead>
-                                            <TableRow>
-                                                <TableCell style={styles.firstColumn}>Cost Type</TableCell>
-                                                <TableCell>Formula</TableCell>
-                                            </TableRow>
-                                        </TableHead>
                                         <TableBody>
                                             <TableRow>
                                                 <TableCell style={{ ...styles.tableCell, ...styles.firstColumn }}>
@@ -174,14 +179,14 @@ const JoinOrderCard = ({ showJoinCard, node, joinOrder, totalCost, startupCost, 
                                     </Table>
                                 </TableContainer>
                                 <br />
-                                {(nodeType === "HashJoin" || nodeType === "MergeJoin" || nodeType === "IdxScan") && (
+                                {(nodeType === "HashJoin" ||
+                                    nodeType === "MergeJoin" ||
+                                    nodeType === "IdxScan" ||
+                                    nodeType === "SeqScan" ||
+                                    nodeType === "BitmapHeapScan") && (
                                     <>
                                         <div className='dp-join-order my-2'>Detailed Cost Components</div>
-                                        <TableContainer component={Paper}>
-                                            {nodeType === "HashJoin" && <HashJoinDetails />}
-                                            {nodeType === "MergeJoin" && <MergeJoinDetails />}
-                                            {nodeType === "IdxScan" && <IdxScanDetails />}
-                                        </TableContainer>
+                                        {renderDetails()}
                                     </>
                                 )}
                             </>

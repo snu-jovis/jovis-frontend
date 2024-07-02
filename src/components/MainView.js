@@ -81,7 +81,7 @@ export default function MainView() {
         <div className='view-container grow'>
             <div className='border-2 border-solid flex flex-col mb-2'>
                 <Editor
-                    height='20vh'
+                    height='50vh'
                     defaultLanguage='sql'
                     defaultValue='/* Type your query here */'
                     onMount={handleEditorDidMount}

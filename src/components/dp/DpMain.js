@@ -31,6 +31,8 @@ const DpMain = ({ data, plan }) => {
         setPages,
         tuples,
         setTuples,
+        qualCost,
+        setQualCost,
         csquared,
         setCsquared,
         maxIOCost,
@@ -140,6 +142,7 @@ const DpMain = ({ data, plan }) => {
         setSelectivity(0);
         setTargetPerTuple(0);
         setCostPerPage(0);
+        setQualCost(0);
 
         /* MergeJoin */
         setInnerPathRows(0);
@@ -234,6 +237,7 @@ const DpMain = ({ data, plan }) => {
                     diskRunCost={diskRunCost}
                     pages={pages}
                     tuples={tuples}
+                    qualCost={qualCost}
                     csquared={csquared}
                     maxIOCost={maxIOCost}
                     minIOCost={minIOCost}

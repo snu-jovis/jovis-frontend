@@ -33,6 +33,7 @@ const GraphView = ({ width, height, base, dp, cost }) => {
         setDiskRunCost,
         setPages,
         setTuples,
+        setQualCost,
         setIndexStartupCost,
         setIndexTotalCost,
         setSelectivity,
@@ -276,6 +277,7 @@ const GraphView = ({ width, height, base, dp, cost }) => {
             setDiskRunCost(`${nodeData.disk_run_cost}`);
             setPages(`${nodeData.pages}`);
             setTuples(`${nodeData.tuples}`);
+            setQualCost(`${nodeData.qual_cost}`);
         };
 
         const setIdxScanDetails = nodeData => {
@@ -298,6 +300,7 @@ const GraphView = ({ width, height, base, dp, cost }) => {
             setTargetPerTuple(`${nodeData.target_per_tuple}`);
             setTuples(`${nodeData.tuples}`);
             setCostPerPage(`${nodeData.cost_per_page}`);
+            setQualCost(`${nodeData.qual_cost}`);
         };
 
         const setNestLoopDetails = nodeData => {
@@ -484,6 +487,7 @@ const GraphView = ({ width, height, base, dp, cost }) => {
             graphSvg: dagSvg,
             data: parseDp(base, dp, nodeMap),
         });
+        console.log(parseDp(base, dp, nodeMap));
     }, [base, dp, cost, animation, width, height, selectedMetric]);
 
     return (
