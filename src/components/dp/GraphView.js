@@ -343,6 +343,7 @@ const GraphView = ({ width, height, base, dp, cost }) => {
             setOuterSkipRows(`${nodeData.outer_skip_rows}`);
             setInnerSkipRows(`${nodeData.inner_skip_rows}`);
             setInnerRunCost(`${nodeData.inner_run_cost}`);
+            setOuterRunCost(`${nodeData.outer_run_cost}`);
             setInnerPathStartup(`${nodeData.inner_startup_cost}`);
             setOuterPathStartup(`${nodeData.outer_startup_cost}`);
             setInnerScanCost(`${nodeData.inner_scan_cost}`);

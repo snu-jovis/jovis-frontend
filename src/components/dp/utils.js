@@ -43,8 +43,8 @@ export const generateFormulas = props => {
             startupValue: `= ${props.innerPathTotal} + ${props.outerPathStartup} + ${props.hashCpuCost} + (1.0 * ${props.innerPages})`,
         },
         MergeJoin: {
-            run: `Outer Join CPU Cost + Inner Join CPU Cost`,
-            runValue: `= ${props.initialRunCost} + ${props.innerRunCost}`,
+            run: `Outer Join CPU Cost`,
+            runValue: `= ${props.outerRunCost}`,
             startup: `(Inner Sort Cost + Outer Sort Cost) + (Inner Initial Scan Cost + Outer Initial Scan Cost)`,
             startupValue: `= (${props.innerPathStartup} + ${props.outerPathStartup}) + (${props.innerScanCost} + ${props.outerScanCost})`,
         },
