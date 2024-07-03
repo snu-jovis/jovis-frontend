@@ -33,10 +33,12 @@ export const formatJoinOrder = joinOrder => {
 export const generateFormulas = props => {
     return {
         HashJoin: {
-            run: `Outer Run Cost + Hash Table Probe CPU Cost + Disk Page Read/Write Cost (if batching)`,
+            run: `Outer Run Cost + Hash Table Probe CPU Cost + Disk Page Read/Write Cost (if batching) + Hash Join Qualification CPU Cost + Hash Join CPU Cost`,
             runValue: `= ${props.outerPathTotal - props.outerPathStartup} + ${
                 0.0025 * props.numHashClauses * props.outerPathRows
-            }  + (1.0 * (${props.innerPages} + 2 * ${props.outerPages}))`,
+            }  + (1.0 * (${props.innerPages} + 2 * ${props.outerPages})) + ${props.hashQualEvalCost} + ${
+                props.hashJoinTuples * props.cpuPerTuple
+            }`,
             startup: `Inner Total Cost + Outer Startup Cost + Hash Table Build CPU Cost + Disk Page Read Cost (if batching)`,
             startupValue: `= ${props.innerPathTotal} + ${props.outerPathStartup} + ${props.hashCpuCost} + (1.0 * ${props.innerPages})`,
         },

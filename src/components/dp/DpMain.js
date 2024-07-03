@@ -113,6 +113,10 @@ const DpMain = ({ data, plan }) => {
         setOuterRunCost,
         innerStartupCost,
         setInnerStartupCost,
+        hashJoinTuples,
+        setHashJoinTuples,
+        hashQualEvalCost,
+        setHashQualEvalCost,
     } = useContext(DpContext);
 
     const viewRef = useRef(null);
@@ -174,6 +178,8 @@ const DpMain = ({ data, plan }) => {
         setSeqPageCost(0);
         setInnerPages(0);
         setOuterPages(0);
+        setHashJoinTuples(0);
+        setHashQualEvalCost(0);
 
         /* NestLoop */
         setInnerRescanRunCost(0);
@@ -263,6 +269,8 @@ const DpMain = ({ data, plan }) => {
                     innerStartSel={innerStartSel}
                     outerStartSel={outerStartSel}
                     initialRunCost={initialRunCost}
+                    hashJoinTuples={hashJoinTuples}
+                    hashQualEvalCost={hashQualEvalCost}
                     outerPathStartup={outerPathStartup}
                     outerPathTotal={outerPathTotal}
                     innerPathStartup={innerPathStartup}

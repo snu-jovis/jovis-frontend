@@ -58,6 +58,8 @@ export function DpProvider({ children }) {
     const [seqPageCost, setSeqPageCost] = useState(0);
     const [innerPages, setInnerPages] = useState(0);
     const [outerPages, setOuterPages] = useState(0);
+    const [hashJoinTuples, setHashJoinTuples] = useState(0);
+    const [hashQualEvalCost, setHashQualEvalCost] = useState(0);
 
     /* NestLoop */
     const [outerStartupCost, setOuterStartupCost] = useState(0);
@@ -163,6 +165,10 @@ export function DpProvider({ children }) {
                 setInnerPages,
                 outerPages,
                 setOuterPages,
+                hashJoinTuples,
+                setHashJoinTuples,
+                hashQualEvalCost,
+                setHashQualEvalCost,
                 outerStartupCost,
                 setOuterStartupCost,
                 outerRunCost,

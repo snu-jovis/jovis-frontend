@@ -36,6 +36,21 @@ export const HashJoinDetails = () => (
                         Seq Page Cost * (Inner Pages + 2 * Outer Pages)
                     </TableCell>
                 </TableRow>
+                <TableRow>
+                    <TableCell style={{ ...styles.tableCell, ...styles.firstColumn }}>
+                        Hash Join Qualification Cost
+                    </TableCell>
+                    <TableCell style={{ ...styles.valueFont, ...styles.roundedBox }}>
+                        (Hash Qualification Cost * Hash Join Tuples) * Outer Rows * (Inner Rows * Inner Bucket Size) *
+                        0.5
+                    </TableCell>
+                </TableRow>
+                <TableRow>
+                    <TableCell style={{ ...styles.tableCell, ...styles.firstColumn }}>Hash Join CPU Cost</TableCell>
+                    <TableCell style={{ ...styles.valueFont, ...styles.roundedBox }}>
+                        CPU Per Tuple * Hash Join Tuples
+                    </TableCell>
+                </TableRow>
             </TableBody>
         </Table>
     </TableContainer>

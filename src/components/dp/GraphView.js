@@ -65,6 +65,8 @@ const GraphView = ({ width, height, base, dp, cost }) => {
         setInnerPages,
         setOuterPages,
         setNumHashClauses,
+        setHashQualEvalCost,
+        setHashJoinTuples,
         setInnerRescanStartupCost,
         setInnerRescanRunCost,
         setOuterRunCost,
@@ -326,6 +328,9 @@ const GraphView = ({ width, height, base, dp, cost }) => {
             setOuterPathRows(`${nodeData.outer_path_rows}`);
             setInnerPathRows(`${nodeData.inner_path_rows}`);
             setCpuTupleCost(`${nodeData.cpu_tuple_cost}`);
+            setHashQualEvalCost(`${nodeData.hash_qual_eval_cost}`);
+            setHashJoinTuples(`${nodeData.hashjointuples}`);
+            setCpuPerTuple(`${nodeData.cpu_per_tuple}`);
         };
 
         const setMergeJoinDetails = nodeData => {
