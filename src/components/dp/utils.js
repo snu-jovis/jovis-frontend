@@ -45,8 +45,8 @@ export const generateFormulas = props => {
         MergeJoin: {
             run: `Outer Join CPU Cost + Inner Join CPU Cost`,
             runValue: `= ${props.initialRunCost} + ${props.innerRunCost}`,
-            startup: `(Outer Sort Cost + Inner Sort Cost) + (Outer Initial Scan Cost + Inner Initial Scan Cost)`,
-            startupValue: `= (${props.innerStartupCost} + ${props.outerStartupCost}) + (${props.innerScanCost} + ${props.outerScanCost})`,
+            startup: `(Inner Sort Cost + Outer Sort Cost) + (Inner Initial Scan Cost + Outer Initial Scan Cost)`,
+            startupValue: `= (${props.innerPathStartup} + ${props.outerPathStartup}) + (${props.innerScanCost} + ${props.outerScanCost})`,
         },
         NestLoop: {
             run: `Outer Run Cost + Inner Run Cost + (Outer Rows * Inner Rescan Start Cost) + (Outer Rows * Inner Rescan Run Cost)`,
