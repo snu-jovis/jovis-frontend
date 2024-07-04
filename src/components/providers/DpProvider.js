@@ -29,23 +29,16 @@ export function DpProvider({ children }) {
     const [qualCost, setQualCost] = useState(0);
 
     /* MergeJoin */
-    const [innerStartSel, setInnerStartSel] = useState(0);
-    const [outerStartSel, setOuterStartSel] = useState(0);
-    const [innerEndSel, setInnerEndSel] = useState(0);
-    const [outerEndSel, setOuterEndSel] = useState(0);
-    const [innerRunCost, setInnerRunCost] = useState(0);
-    const [innerPathRows, setInnerPathRows] = useState(0);
-    const [outerPathRows, setOuterPathRows] = useState(0);
-    const [outerRows, setOuterRows] = useState(0);
-    const [innerRows, setInnerRows] = useState(0);
-    const [outerSkipRows, setOuterSkipRows] = useState(0);
-    const [innerSkipRows, setInnerSkipRows] = useState(0);
     const [sortInner, setSortInner] = useState(false);
     const [sortOuter, setSortOuter] = useState(false);
     const [materializeInner, setMaterializeInner] = useState(false);
     const [innerScanCost, setInnerScanCost] = useState(0);
     const [outerScanCost, setOuterScanCost] = useState(0);
-    const [initialRunCost, setInitialRunCost] = useState(0);
+    const [mergeJoinTuples, setMergeJoinTuples] = useState(0);
+    const [bareInnerCost, setBareInnerCost] = useState(0);
+    const [matInnerCost, setMatInnerCost] = useState(0);
+    const [mergeEvalCost, setMergeEvalCost] = useState(0);
+    const [mergeInitialEvalCost, setMergeInitialEvalCost] = useState(0);
 
     /* HashJoin */
     const [outerPathStartup, setOuterPathStartup] = useState(0);
@@ -62,11 +55,15 @@ export function DpProvider({ children }) {
     const [hashQualEvalCost, setHashQualEvalCost] = useState(0);
 
     /* NestLoop */
+    const [outerPathRows, setOuterPathRows] = useState(0);
     const [outerStartupCost, setOuterStartupCost] = useState(0);
     const [outerRunCost, setOuterRunCost] = useState(0);
+    const [innerRunCost, setInnerRunCost] = useState(0);
     const [innerStartupCost, setInnerStartupCost] = useState(0);
     const [innerRescanRunCost, setInnerRescanRunCost] = useState(0);
     const [innerRescanStartupCost, setInnerRescanStartupCost] = useState(0);
+    const [matchedOuterTupleCost, setMatchedOuterTupleCost] = useState(0);
+    const [unmatchedOuterTupleCost, setUnmatchedOuterTupleCost] = useState(0);
 
     return (
         <DpContext.Provider
@@ -111,40 +108,26 @@ export function DpProvider({ children }) {
                 setTargetPerTuple,
                 costPerPage,
                 setCostPerPage,
-                innerPathRows,
-                setInnerPathRows,
-                outerRows,
-                setOuterRows,
-                innerRows,
-                setInnerRows,
-                outerSkipRows,
-                setOuterSkipRows,
-                innerSkipRows,
-                setInnerSkipRows,
-                innerRunCost,
-                setInnerRunCost,
                 sortInner,
                 setSortInner,
                 sortOuter,
                 setSortOuter,
                 materializeInner,
                 setMaterializeInner,
-                initialRunCost,
-                setInitialRunCost,
-                outerPathRows,
-                setOuterPathRows,
-                outerEndSel,
-                setOuterEndSel,
-                innerEndSel,
-                setInnerEndSel,
-                innerStartSel,
-                setInnerStartSel,
-                outerStartSel,
-                setOuterStartSel,
                 innerScanCost,
                 setInnerScanCost,
                 outerScanCost,
                 setOuterScanCost,
+                mergeJoinTuples,
+                setMergeJoinTuples,
+                bareInnerCost,
+                setBareInnerCost,
+                matInnerCost,
+                setMatInnerCost,
+                mergeEvalCost,
+                setMergeEvalCost,
+                mergeInitialEvalCost,
+                setMergeInitialEvalCost,
                 outerPathStartup,
                 setOuterPathStartup,
                 outerPathTotal,
@@ -169,16 +152,24 @@ export function DpProvider({ children }) {
                 setHashJoinTuples,
                 hashQualEvalCost,
                 setHashQualEvalCost,
+                outerPathRows,
+                setOuterPathRows,
                 outerStartupCost,
                 setOuterStartupCost,
                 outerRunCost,
                 setOuterRunCost,
+                innerRunCost,
+                setInnerRunCost,
                 innerStartupCost,
                 setInnerStartupCost,
                 innerRescanRunCost,
                 setInnerRescanRunCost,
                 innerRescanStartupCost,
                 setInnerRescanStartupCost,
+                matchedOuterTupleCost,
+                setMatchedOuterTupleCost,
+                unmatchedOuterTupleCost,
+                setUnmatchedOuterTupleCost,
             }}
         >
             {children}

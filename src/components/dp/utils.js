@@ -43,14 +43,20 @@ export const generateFormulas = props => {
             startupValue: `= ${props.innerPathTotal} + ${props.outerPathStartup} + ${props.hashCpuCost} + (1.0 * ${props.innerPages})`,
         },
         MergeJoin: {
-            run: `Outer Join CPU Cost`,
-            runValue: `= ${props.outerRunCost}`,
-            startup: `(Inner Sort Cost + Outer Sort Cost) + (Inner Initial Scan Cost + Outer Initial Scan Cost)`,
-            startupValue: `= (${props.innerPathStartup} + ${props.outerPathStartup}) + (${props.innerScanCost} + ${props.outerScanCost})`,
+            run: `Outer Join CPU Cost + Merge Join Evaluation CPU Cost + Inner Rescan Cost + Merge Join CPu Cost`,
+            runValue: `= ${props.outerRunCost} + ${props.mergeEvalCost} + ${
+                props.bareInnerCost + props.matInnerCost
+            } + ${props.mergeJoinTuples * 0.01}`,
+            startup: `(Inner Sort Cost + Outer Sort Cost) + (Inner Initial Scan Cost + Outer Initial Scan Cost) + Merge Join Initial Evaluation CPU Cost`,
+            startupValue: `= (${props.innerPathStartup} + ${props.outerPathStartup}) + (${props.innerScanCost} + ${props.outerScanCost}) + ${props.mergeInitialEvalCost}`,
         },
         NestLoop: {
-            run: `Outer Run Cost + Inner Run Cost + (Outer Rows * Inner Rescan Start Cost) + (Outer Rows * Inner Rescan Run Cost)`,
-            runValue: `= ${props.outerRunCost} + ${props.innerRunCost} + (${props.outerPathRows} * ${props.innerRescanStartupCost}) + (${props.outerPathRows} * ${props.innerRescanRunCost})`,
+            run: `Outer Run Cost + Inner Run Cost + (Outer Rows * Inner Rescan Start Cost) + (Outer Rows * Inner Rescan Run Cost) + (Outer Matched Tuple Cost + Outer Unmatched Tuple Cost) + Inner Scan Cost + Nested Loop Join CPU Cost`,
+            runValue: `= ${props.outerRunCost} + ${props.innerRunCost} + (${props.outerPathRows} * ${
+                props.innerRescanStartupCost
+            }) + (${props.outerPathRows} * ${props.innerRescanRunCost}) + (${props.matchedOuterTupleCost} + ${
+                props.unmatchedOuterTupleCost
+            }) + ${props.innerScanCost} + ${props.tuples * 0.01}`,
             startup: `Outer Startup Cost + Inner Startup Cost`,
             startupValue: `= ${props.outerStartupCost} + ${props.innerStartupCost}`,
         },

@@ -42,19 +42,15 @@ const GraphView = ({ width, height, base, dp, cost }) => {
         setCsquared,
         setTargetPerTuple,
         setCostPerPage,
-        setInnerPathRows,
-        setOuterRows,
-        setInnerRows,
-        setOuterSkipRows,
-        setInnerSkipRows,
         setInnerRunCost,
         setInnerScanCost,
         setOuterScanCost,
+        setMergeJoinTuples,
+        setBareInnerCost,
+        setMatInnerCost,
+        setMergeEvalCost,
+        setMergeInitialEvalCost,
         setOuterPathRows,
-        setOuterEndSel,
-        setInnerEndSel,
-        setInnerStartSel,
-        setInitialRunCost,
         setOuterPathStartup,
         setOuterPathTotal,
         setCpuTupleCost,
@@ -69,6 +65,8 @@ const GraphView = ({ width, height, base, dp, cost }) => {
         setHashJoinTuples,
         setInnerRescanStartupCost,
         setInnerRescanRunCost,
+        setMatchedOuterTupleCost,
+        setUnmatchedOuterTupleCost,
         setOuterRunCost,
         setOuterStartupCost,
         setInnerStartupCost,
@@ -308,11 +306,15 @@ const GraphView = ({ width, height, base, dp, cost }) => {
         const setNestLoopDetails = nodeData => {
             setInnerRescanRunCost(`${nodeData.inner_rescan_run_cost}`);
             setInnerRescanStartupCost(`${nodeData.inner_rescan_start_cost}`);
+            setMatchedOuterTupleCost(`${nodeData.matched_outer_tuple_cost}`);
+            setUnmatchedOuterTupleCost(`${nodeData.unmatched_outer_tuple_cost}`);
             setOuterPathRows(`${nodeData.outer_rows}`);
             setOuterRunCost(`${nodeData.outer_path_run}`);
             setOuterStartupCost(`${nodeData.outer_path_startup}`);
             setInnerStartupCost(`${nodeData.inner_path_startup}`);
             setInnerRunCost(`${nodeData.inner_run_cost}`);
+            setInnerScanCost(`${nodeData.inner_scan_cost}`);
+            setTuples(`${nodeData.ntuples}`);
         };
 
         const setHashJoinDetails = nodeData => {
@@ -326,7 +328,6 @@ const GraphView = ({ width, height, base, dp, cost }) => {
             setOuterPages(`${nodeData.outerpages}`);
             setNumHashClauses(`${nodeData.num_hashclauses}`);
             setOuterPathRows(`${nodeData.outer_path_rows}`);
-            setInnerPathRows(`${nodeData.inner_path_rows}`);
             setCpuTupleCost(`${nodeData.cpu_tuple_cost}`);
             setHashQualEvalCost(`${nodeData.hash_qual_eval_cost}`);
             setHashJoinTuples(`${nodeData.hashjointuples}`);
@@ -334,21 +335,16 @@ const GraphView = ({ width, height, base, dp, cost }) => {
         };
 
         const setMergeJoinDetails = nodeData => {
-            setOuterEndSel(`${nodeData.outerendsel}`);
-            setInnerStartSel(`${nodeData.innerstartsel}`);
-            setInnerEndSel(`${nodeData.innerendsel}`);
-            setInnerRunCost(`${nodeData.inner_run_cost}`);
-            setOuterRows(`${nodeData.outer_rows}`);
-            setInnerRows(`${nodeData.inner_rows}`);
-            setOuterSkipRows(`${nodeData.outer_skip_rows}`);
-            setInnerSkipRows(`${nodeData.inner_skip_rows}`);
-            setInnerRunCost(`${nodeData.inner_run_cost}`);
             setOuterRunCost(`${nodeData.outer_run_cost}`);
             setInnerPathStartup(`${nodeData.inner_startup_cost}`);
             setOuterPathStartup(`${nodeData.outer_startup_cost}`);
             setInnerScanCost(`${nodeData.inner_scan_cost}`);
             setOuterScanCost(`${nodeData.outer_scan_cost}`);
-            setInitialRunCost(`${nodeData.initial_run_cost}`);
+            setMergeJoinTuples(`${nodeData.mergejointuples}`);
+            setBareInnerCost(`${nodeData.bare_inner_cost}`);
+            setMatInnerCost(`${nodeData.mat_inner_cost}`);
+            setMergeEvalCost(`${nodeData.merge_eval_cost}`);
+            setMergeInitialEvalCost(`${nodeData.merge_init_eval_cost}`);
         };
 
         // create links

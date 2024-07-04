@@ -49,18 +49,6 @@ const DpMain = ({ data, plan }) => {
         setTargetPerTuple,
         costPerPage,
         setCostPerPage,
-        innerPathRows,
-        setInnerPathRows,
-        outerRows,
-        setOuterRows,
-        innerRows,
-        setInnerRows,
-        outerSkipRows,
-        setOuterSkipRows,
-        innerSkipRows,
-        setInnerSkipRows,
-        innerRunCost,
-        setInnerRunCost,
         sortInner,
         setSortInner,
         sortOuter,
@@ -71,18 +59,16 @@ const DpMain = ({ data, plan }) => {
         setInnerScanCost,
         outerScanCost,
         setOuterScanCost,
-        outerPathRows,
-        setOuterPathRows,
-        outerEndSel,
-        setOuterEndSel,
-        innerEndSel,
-        setInnerEndSel,
-        innerStartSel,
-        setInnerStartSel,
-        outerStartSel,
-        setOuterStartSel,
-        initialRunCost,
-        setInitialRunCost,
+        mergeJoinTuples,
+        setMergeJoinTuples,
+        bareInnerCost,
+        setBareInnerCost,
+        matInnerCost,
+        setMatInnerCost,
+        mergeEvalCost,
+        setMergeEvalCost,
+        mergeInitialEvalCost,
+        setMergeInitialEvalCost,
         numHashClauses,
         setNumHashClauses,
         hashCpuCost,
@@ -91,6 +77,8 @@ const DpMain = ({ data, plan }) => {
         setSeqPageCost,
         outerPathStartup,
         setOuterPathStartup,
+        outerPathRows,
+        setOuterPathRows,
         outerPathTotal,
         setOuterPathTotal,
         innerPathStartup,
@@ -107,10 +95,16 @@ const DpMain = ({ data, plan }) => {
         setInnerRescanRunCost,
         innerRescanStartupCost,
         setInnerRescanStartupCost,
+        matchedOuterTupleCost,
+        setMatchedOuterTupleCost,
+        unmatchedOuterTupleCost,
+        setUnmatchedOuterTupleCost,
         outerStartupCost,
         setOuterStartupCost,
         outerRunCost,
         setOuterRunCost,
+        innerRunCost,
+        setInnerRunCost,
         innerStartupCost,
         setInnerStartupCost,
         hashJoinTuples,
@@ -149,23 +143,16 @@ const DpMain = ({ data, plan }) => {
         setQualCost(0);
 
         /* MergeJoin */
-        setInnerPathRows(0);
-        setOuterRows(0);
-        setInnerRows(0);
-        setOuterSkipRows(0);
-        setInnerSkipRows(0);
-        setInnerRunCost(0);
-        setOuterPathRows(0);
-        setOuterEndSel(0);
-        setInnerEndSel(0);
-        setInnerStartSel(0);
-        setOuterStartSel(0);
         setInnerScanCost(0);
         setOuterScanCost(0);
         setSortInner(false);
         setSortOuter(false);
         setMaterializeInner(false);
-        setInitialRunCost(0);
+        setMergeJoinTuples(0);
+        setBareInnerCost(0);
+        setMatInnerCost(0);
+        setMergeEvalCost(0);
+        setMergeInitialEvalCost(0);
 
         /* HashJoin */
         setOuterPathStartup(0);
@@ -182,11 +169,15 @@ const DpMain = ({ data, plan }) => {
         setHashQualEvalCost(0);
 
         /* NestLoop */
+        setOuterPathRows(0);
         setInnerRescanRunCost(0);
         setOuterRunCost(0);
+        setInnerRunCost(0);
         setOuterStartupCost(0);
         setInnerStartupCost(0);
         setInnerRescanStartupCost(0);
+        setMatchedOuterTupleCost(0);
+        setUnmatchedOuterTupleCost(0);
 
         const updateSize = () => {
             if (viewRef.current) setViewSize([viewRef.current.offsetWidth, viewRef.current.offsetHeight]);
@@ -252,25 +243,19 @@ const DpMain = ({ data, plan }) => {
                     selectivity={selectivity}
                     targetPerTuple={targetPerTuple}
                     costPerPage={costPerPage}
-                    innerPathRows={innerPathRows}
-                    outerRows={outerRows}
-                    innerRows={innerRows}
-                    outerSkipRows={outerSkipRows}
-                    innerSkipRows={innerSkipRows}
-                    innerRunCost={innerRunCost}
                     sortInner={sortInner}
                     sortOuter={sortOuter}
                     materializeInner={materializeInner}
                     innerScanCost={innerScanCost}
                     outerScanCost={outerScanCost}
-                    outerPathRows={outerPathRows}
-                    outerEndSel={outerEndSel}
-                    innerEndSel={innerEndSel}
-                    innerStartSel={innerStartSel}
-                    outerStartSel={outerStartSel}
-                    initialRunCost={initialRunCost}
+                    mergeJoinTuples={mergeJoinTuples}
+                    bareInnerCost={bareInnerCost}
+                    matInnerCost={matInnerCost}
+                    mergeEvalCost={mergeEvalCost}
+                    mergeInitialEvalCost={mergeInitialEvalCost}
                     hashJoinTuples={hashJoinTuples}
                     hashQualEvalCost={hashQualEvalCost}
+                    outerPathRows={outerPathRows}
                     outerPathStartup={outerPathStartup}
                     outerPathTotal={outerPathTotal}
                     innerPathStartup={innerPathStartup}
@@ -283,7 +268,10 @@ const DpMain = ({ data, plan }) => {
                     outerPages={outerPages}
                     innerRescanRunCost={innerRescanRunCost}
                     innerRescanStartupCost={innerRescanStartupCost}
+                    matchedOuterTupleCost={matchedOuterTupleCost}
+                    unmatchedOuterTupleCost={unmatchedOuterTupleCost}
                     outerRunCost={outerRunCost}
+                    innerRunCost={innerRunCost}
                     outerStartupCost={outerStartupCost}
                     innerStartupCost={innerStartupCost}
                 />
