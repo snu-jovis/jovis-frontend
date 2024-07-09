@@ -58,7 +58,7 @@ function processSub(nodeMap, path, entry, level, numSubs) {
   }
 }
 
-export function parseDp(base, dp, nodeMap, printSub = false) {
+export function parseDp(base, dp, nodeMap, printSub = true) {
   /* base 처리; access paths */
   base.forEach((relation) => {
     relation.paths?.forEach((path) => {
@@ -80,11 +80,19 @@ export function parseDp(base, dp, nodeMap, printSub = false) {
       if (path.join) {
         const pathRelid = `${entry.relid} - ${path.node}`;
 
+        let innerRelid = path.join.inner.relid;
+        const innerMatch = innerRelid.match(/^(.+?)\) required_outer \(/);
+        if (innerMatch) innerRelid = innerMatch[1];
+
+        let outerRelid = path.join.outer.relid;
+        const outerMatch = outerRelid.match(/^(.+?)\) required_outer \(/);
+        if (outerMatch) outerRelid = outerMatch[1];
+
         addNode(nodeMap, path, 2 * level - 2, pathRelid);
         addNode(nodeMap, entry, 2 * level - 1, entry.relid, pathRelid);
 
-        addNode(nodeMap, path, level, pathRelid, path.join.outer.relid);
-        addNode(nodeMap, path, level, pathRelid, path.join.inner.relid);
+        addNode(nodeMap, path, level, pathRelid, innerRelid);
+        addNode(nodeMap, path, level, pathRelid, outerRelid);
       }
 
       if (printSub && path.sub)
