@@ -3,7 +3,7 @@ import "katex/dist/katex.min.css";
 
 export const generateFormulas = (node) => {
   if (node.node === "SeqScan") {
-    return {
+    let formulas = {
       total: katex.renderToString(
         `\\text{Startup Cost} + \\text{CPU Run Cost} + \\text{Disk Run Cost}`
       ),
@@ -14,14 +14,6 @@ export const generateFormulas = (node) => {
           node.total_cost
         }`
       ),
-
-      cpu: katex.renderToString(
-        `(\\text{CPU Cost per Tuple} \\times N_{\\text{tuples}}) + (\\text{Target Cost per Tuple} \\times N_{\\text{rows}})`
-      ),
-      cpu_cost: katex.renderToString(
-        `= ${node.cpu_per_tuple} \\times ${node.baserel_tuples} + ${node.pathtarget_cost} \\times ${node.rows}`
-      ),
-
       disk: katex.renderToString(
         `\\text{Sequential Page Cost} \\times N_{\\text{pages}}`
       ),
@@ -29,6 +21,24 @@ export const generateFormulas = (node) => {
         `= ${node.spc_seq_page_cost} \\times ${node.baserel_pages}`
       ),
     };
+
+    if (node.parallel_divisor > 0) {
+      formulas.cpu = katex.renderToString(
+        `\\text{CPU Run Cost} \\times N_{\\text{workers}}`
+      );
+      formulas.cpu_cost = katex.renderToString(
+        `= ${node.cpu_run_cost} \\times ${node.parallel_divisor}`
+      );
+    } else {
+      formulas.cpu = katex.renderToString(
+        `(\\text{CPU Cost per Tuple} \\times N_{\\text{tuples}}) + (\\text{Target Cost per Tuple} \\times N_{\\text{rows}})`
+      );
+      formulas.cpu_cost = katex.renderToString(
+        `= ${node.cpu_per_tuple} \\times ${node.baserel_tuples} + ${node.pathtarget_cost} \\times ${node.rows}`
+      );
+    }
+
+    return formulas;
   }
 
   if (node.node === "IdxScan") {
