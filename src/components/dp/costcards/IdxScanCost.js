@@ -1,26 +1,13 @@
 import { useState, useEffect } from "react";
-import {
-  TableContainer,
-  Table,
-  TableBody,
-  TableRow,
-  TableCell,
-} from "@mui/material";
 import { generateFormulas } from "../utils";
 
-const SeqScanCost = ({ nodeDetails }) => {
+const IdxScanCost = ({ nodeDetails }) => {
   const [totalForm, setTotalForm] = useState("");
   const [totalCost, setTotalCost] = useState("");
   const [cpuForm, setCpuForm] = useState("");
   const [cpuCost, setCpuCost] = useState("");
   const [diskForm, setDiskForm] = useState("");
   const [diskCost, setDiskCost] = useState("");
-
-  /* TODO */
-  const [maxIOForm, setMaxIOForm] = useState("");
-  const [maxIOCost, setMaxIOCost] = useState("");
-  const [minIOForm, setMinIOForm] = useState("");
-  const [minIOCost, setMinIOCost] = useState("");
 
   useEffect(() => {
     const formulas = generateFormulas(nodeDetails);
@@ -38,54 +25,50 @@ const SeqScanCost = ({ nodeDetails }) => {
   });
 
   return (
-    <TableContainer>
-      <Table className="cost-table">
-        <TableBody>
-          <TableRow>
-            <TableCell>Total Cost</TableCell>
-            <TableCell>
-              <div dangerouslySetInnerHTML={{ __html: totalForm }} />
-              <br />
-              <div dangerouslySetInnerHTML={{ __html: totalCost }} />
-            </TableCell>
-          </TableRow>
-          <TableRow>
-            <TableCell>CPU Run Cost</TableCell>
-            <TableCell>
-              <div dangerouslySetInnerHTML={{ __html: cpuForm }} />
-              <br />
-              <div dangerouslySetInnerHTML={{ __html: cpuCost }} />
-            </TableCell>
-          </TableRow>
-          <TableRow>
-            <TableCell>Disk Run Cost</TableCell>
-            <TableCell>
-              <div dangerouslySetInnerHTML={{ __html: diskForm }} />
-              <br />
-              <div dangerouslySetInnerHTML={{ __html: diskCost }} />
-            </TableCell>
-            {/* TODO */}
-            {/* <TableRow>
-              <TableCell>Max IO Cost</TableCell>
-              <TableCell>
-                <div dangerouslySetInnerHTML={{ __html: maxIOForm }} />
-                <br />
-                <div dangerouslySetInnerHTML={{ __html: maxIOCost }} />
-              </TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell>Min IO Cost</TableCell>
-              <TableCell>
-                <div dangerouslySetInnerHTML={{ __html: minIOForm }} />
-                <br />
-                <div dangerouslySetInnerHTML={{ __html: minIOCost }} />
-              </TableCell>
-            </TableRow> */}
-          </TableRow>
-        </TableBody>
-      </Table>
-    </TableContainer>
+    <table className="m-2 text-bsm">
+      <tbody>
+        <tr className="border-b border-gray-300">
+          <td className="pr-4">Total Cost</td>
+          <td className="py-2">
+            <div
+              className="text-xs"
+              dangerouslySetInnerHTML={{ __html: totalForm }}
+            />
+            <div
+              className="text-xs"
+              dangerouslySetInnerHTML={{ __html: totalCost }}
+            />
+          </td>
+        </tr>
+        <tr className="border-b border-gray-300">
+          <td className="pr-4">CPU Run Cost</td>
+          <td className="py-2">
+            <div
+              className="text-xs"
+              dangerouslySetInnerHTML={{ __html: cpuForm }}
+            />
+            <div
+              className="text-xs"
+              dangerouslySetInnerHTML={{ __html: cpuCost }}
+            />
+          </td>
+        </tr>
+        <tr>
+          <td className="pr-4">Disk Run Cost</td>
+          <td className="py-2">
+            <div
+              className="text-xs"
+              dangerouslySetInnerHTML={{ __html: diskForm }}
+            />
+            <div
+              className="text-xs"
+              dangerouslySetInnerHTML={{ __html: diskCost }}
+            />
+          </td>
+        </tr>
+      </tbody>
+    </table>
   );
 };
 
-export default SeqScanCost;
+export default IdxScanCost;

@@ -1,13 +1,11 @@
 import { useState, useEffect } from "react";
 import { generateFormulas } from "../utils";
 
-const SeqScanCost = ({ nodeDetails }) => {
+const GatherCost = ({ nodeDetails }) => {
   const [totalForm, setTotalForm] = useState("");
   const [totalCost, setTotalCost] = useState("");
-  const [cpuForm, setCpuForm] = useState("");
-  const [cpuCost, setCpuCost] = useState("");
-  const [diskForm, setDiskForm] = useState("");
-  const [diskCost, setDiskCost] = useState("");
+  const [runForm, setRunForm] = useState("");
+  const [runCost, setRunCost] = useState("");
 
   useEffect(() => {
     const formulas = generateFormulas(nodeDetails);
@@ -16,11 +14,8 @@ const SeqScanCost = ({ nodeDetails }) => {
       setTotalForm(formulas.total);
       setTotalCost(formulas.total_cost);
 
-      setCpuForm(formulas.cpu);
-      setCpuCost(formulas.cpu_cost);
-
-      setDiskForm(formulas.disk);
-      setDiskCost(formulas.disk_cost);
+      setRunForm(formulas.run);
+      setRunCost(formulas.run_cost);
     }
   });
 
@@ -41,28 +36,15 @@ const SeqScanCost = ({ nodeDetails }) => {
           </td>
         </tr>
         <tr className="border-b border-gray-300">
-          <td className="pr-4">CPU Run Cost</td>
+          <td className="pr-4">Run Cost</td>
           <td className="py-2">
             <div
               className="text-xs"
-              dangerouslySetInnerHTML={{ __html: cpuForm }}
+              dangerouslySetInnerHTML={{ __html: runForm }}
             />
             <div
               className="text-xs"
-              dangerouslySetInnerHTML={{ __html: cpuCost }}
-            />
-          </td>
-        </tr>
-        <tr>
-          <td className="pr-4">Disk Run Cost</td>
-          <td className="py-2">
-            <div
-              className="text-xs"
-              dangerouslySetInnerHTML={{ __html: diskForm }}
-            />
-            <div
-              className="text-xs"
-              dangerouslySetInnerHTML={{ __html: diskCost }}
+              dangerouslySetInnerHTML={{ __html: runCost }}
             />
           </td>
         </tr>
@@ -71,4 +53,4 @@ const SeqScanCost = ({ nodeDetails }) => {
   );
 };
 
-export default SeqScanCost;
+export default GatherCost;

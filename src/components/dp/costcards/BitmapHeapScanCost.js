@@ -33,7 +33,7 @@ const BitmapHeapScanCost = ({ nodeDetails }) => {
 
   return (
     <TableContainer>
-      <Table className="cost-table">
+      <Table>
         <TableBody>
           <TableRow>
             <TableCell>Total Cost</TableCell>

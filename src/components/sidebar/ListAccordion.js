@@ -1,5 +1,4 @@
 import { useState } from "react";
-import "../../assets/stylesheets/Sidebar.css";
 import {
   List,
   ListItem,
@@ -8,6 +7,7 @@ import {
   AccordionBody,
 } from "@material-tailwind/react";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
+import "../../assets/stylesheets/Sidebar.css";
 
 function ListAcoordion(props) {
   /* props area */

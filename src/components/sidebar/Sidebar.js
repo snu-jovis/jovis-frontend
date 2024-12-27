@@ -1,16 +1,21 @@
 import { useContext, useEffect, useState } from "react";
-import "../../assets/stylesheets/Sidebar.css";
 import { Card } from "@material-tailwind/react";
 import {
   BeakerIcon,
   NewspaperIcon,
   QuestionMarkCircleIcon,
   ServerStackIcon,
+  Bars3Icon,
 } from "@heroicons/react/24/outline";
+
+import "../../assets/stylesheets/Sidebar.css";
+
 import ListAccordion from "./ListAccordion";
+import QueriesAccordion from "./QueriesAccordion";
 import { HistoryContext } from "../providers/HistoryProvider";
 import { SqlToEditorContext } from "../providers/SqlToEditorProvider";
-import queries from "../../assets/data/queries.json";
+
+import presetQueries from "../../assets/data/queries.json";
 
 function Sidebar(props) {
   const { history } = useContext(HistoryContext);
@@ -32,15 +37,22 @@ function Sidebar(props) {
         call(type, history[val].query);
       }
     } else if (type === "tpch") {
-      call(type, queries.tpch[(val + 1).toString()]);
+      call(type, presetQueries.tpch[(val + 1).toString()]);
     } else if (type === "tpcds") {
-      call(type, queries.tpcds[(val + 1).toString()]);
+      call(type, presetQueries.tpcds[(val + 1).toString()]);
     }
   };
 
   return (
     <Card className="main-card m-4 p-1 overflow-y-auto">
-      {/* 메인 메뉴 1: History */}
+      {/* MainMenu 1: Queries */}
+      <QueriesAccordion
+        title="Queries"
+        icon={<Bars3Icon className="h-6 w-6" />}
+        defaultOpen={true}
+      />
+
+      {/* MainMenu 2: History */}
       <ListAccordion
         title="History"
         icon={<NewspaperIcon className="h-6 w-6" />}
@@ -49,21 +61,21 @@ function Sidebar(props) {
         onClick={(d) => onClickHandler("history", d)}
       />
 
-      {/* 메인 메뉴 2: Presets */}
+      {/* MainMenu 3: Presets */}
       <ListAccordion
         title="Presets"
         icon={<ServerStackIcon className="h-6 w-6" />}
         defaultOpen={true}
         children={
           <div>
-            {/* 서브 메뉴 2-1: TPC-H */}
+            {/* SubMenu 3-1: TPC-H */}
             <ListAccordion
               title="TPC-H"
               icon={<QuestionMarkCircleIcon className="h-6 w-6" />}
               data={[...Array(22).keys()].map((i) => `Query ${i + 1}`)}
               onClick={(d) => onClickHandler("tpch", d)}
             />
-            {/* 서브 메뉴 2-2: TPC-DS */}
+            {/* SubMenu 3-2: TPC-DS */}
             <ListAccordion
               title="TPC-DS"
               icon={<BeakerIcon className="h-6 w-6" />}
@@ -73,7 +85,6 @@ function Sidebar(props) {
           </div>
         }
       />
-      {/* <hr /> */}
     </Card>
   );
 }

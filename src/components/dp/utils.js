@@ -1,6 +1,8 @@
 import katex from "katex";
 import "katex/dist/katex.min.css";
 
+// TODO: remove intermediate results
+
 export const generateFormulas = (node) => {
   if (node.node === "SeqScan") {
     let formulas = {
@@ -18,39 +20,101 @@ export const generateFormulas = (node) => {
         `\\text{Sequential Page Cost} \\times N_{\\text{pages}}`
       ),
       disk_cost: katex.renderToString(
-        `= ${node.spc_seq_page_cost} \\times ${node.baserel_pages}`
+        `= ${node.spc_seq_page_cost} \\times ${node.baserel_pages} = ${
+          node.spc_seq_page_cost * node.baserel_pages
+        } = ${node.disk_run_cost}`
       ),
     };
 
-    if (node.parallel_divisor > 0) {
+    if (node.parallel_workers === 0) {
       formulas.cpu = katex.renderToString(
-        `\\text{CPU Run Cost} \\times N_{\\text{workers}}`
+        `\\text{CPU Cost per Tuple} \\times N_{\\text{tuples}} + \\text{Target Cost per Tuple} \\times N_{\\text{rows}}`
       );
       formulas.cpu_cost = katex.renderToString(
-        `= ${node.cpu_run_cost} \\times ${node.parallel_divisor}`
+        `= ${node.cpu_per_tuple} \\times ${node.baserel_tuples} + ${
+          node.pathtarget_cost
+        } \\times ${node.rows} = ${
+          node.cpu_per_tuple * node.baserel_tuples +
+          node.pathtarget_cost * node.rows
+        } = ${node.cpu_run_cost}`
       );
     } else {
       formulas.cpu = katex.renderToString(
-        `(\\text{CPU Cost per Tuple} \\times N_{\\text{tuples}}) + (\\text{Target Cost per Tuple} \\times N_{\\text{rows}})`
+        `(\\text{CPU Cost per Tuple} \\times N_{\\text{tuples}} + \\text{Target Cost per Tuple} \\times N_{\\text{rows}}) \\div \\text{Parallel Divisor}`
       );
       formulas.cpu_cost = katex.renderToString(
-        `= ${node.cpu_per_tuple} \\times ${node.baserel_tuples} + ${node.pathtarget_cost} \\times ${node.rows}`
+        `= (${node.cpu_per_tuple} \\times ${node.baserel_tuples} + ${
+          node.pathtarget_cost
+        } \\times ${node.rows}) \\div ${node.parallel_divisor} = ${
+          (node.cpu_per_tuple * node.baserel_tuples +
+            node.pathtarget_cost * node.rows) /
+          node.parallel_divisor
+        } = ${node.cpu_run_cost}`
       );
     }
 
     return formulas;
   }
 
+  if (node.node === "Gather") {
+    let formulas = {
+      total: katex.renderToString(`\\text{Startup Cost} + \\text{Run Cost}`),
+      total_cost: katex.renderToString(
+        `= ${node.startup_cost} + ${node.run_cost} = ${
+          node.startup_cost + node.run_cost
+        } = ${node.total_cost}`
+      ),
+      run: katex.renderToString(
+        `\\text{Subpath Cost} + \\text{Parallel CPU Cost per Tuple} \\times N_{\\text{rows}}`
+      ),
+      run_cost: katex.renderToString(
+        `= ${node.subpath_cost} + ${node.parallel_tuple_cost} \\times ${
+          node.rows
+        } = ${node.subpath_cost + node.parallel_tuple_cost * node.rows} = ${
+          node.run_cost
+        }`
+      ),
+    };
+
+    return formulas;
+  }
+
+  if (node.node === "GatherMerge") {
+    let formulas = {
+      total: katex.renderToString(
+        `\\text{Startup Cost} + \\text{Run Cost} + \\text{Input Total Cost}`
+      ),
+      total_cost: katex.renderToString(
+        `= ${node.startup_cost - node.input_startup_cost} + ${
+          node.run_cost
+        } + ${node.input_total_cost} = ${
+          node.startup_cost -
+          node.input_startup_cost +
+          node.run_cost +
+          node.input_total_cost
+        } = ${node.total_cost}`
+      ),
+      run: katex.renderToString(
+        `(N_{\\text{rows}} \\times \\text{Comparison Cost} \\times \\log_2 N_{workers}) + (\\text{CPU Cost per Operator} \\times N_{\\text{rows}}) + (\\text{Parallel CPU Cost per Tuple} \\times N_{\\text{rows}} \\times 1.05)`
+      ),
+      run_cost: katex.renderToString(
+        `= (${node.rows} \\times ${node.comparison_cost} \\times ${
+          node.logN
+        }) + (${node.cpu_operator_cost} \\times ${node.rows}) + (${
+          node.parallel_tuple_cost
+        } \\times ${node.rows} \\times 1.05) = ${
+          node.rows * node.comparison_cost * node.logN +
+          node.cpu_operator_cost * node.rows +
+          node.parallel_tuple_cost * node.rows * 1.05
+        } = ${node.run_cost}`
+      ),
+    };
+
+    return formulas;
+  }
+
   if (node.node === "IdxScan") {
-    let min_io, min_io_cost;
-
-    if (node.pages_fetched > 0) {
-    } else {
-      min_io = 0;
-      min_io_cost = 0;
-    }
-
-    return {
+    let formulas = {
       total: katex.renderToString(
         `\\text{Startup Cost} + \\text{Index Scan Cost} + \\text{CPU Run Cost} + \\text{Disk Run Cost}`
       ),
@@ -64,55 +128,217 @@ export const generateFormulas = (node) => {
           node.disk_run_cost
         } = ${node.total_cost}`
       ),
-
-      cpu: katex.renderToString(
-        `(\\text{CPU Cost per Tuple} \\times N_{\\text{tuples}}) + (\\text{Target Cost per Tuple} \\times N_{\\text{rows}})`
-      ),
-      cpu_cost: katex.renderToString(
-        `= ${node.cpu_per_tuple} \\times ${node.tuples_fetched} + ${node.pathtarget_cost} \\times ${node.rows}`
-      ),
-
       disk: katex.renderToString(
         `\\text{Max IO Cost} +  \\text{Correlation}^2 \\times (\\text{Min IO Cost} - \\text{Max IO Cost})`
       ),
       disk_cost: katex.renderToString(
-        `= ${node.max_io_cost} + ${node.index_correlation}^2 \\times (${node.min_io_cost} - ${node.max_io_cost})`
+        `= ${node.max_io_cost} + ${node.index_correlation}^2 \\times (${
+          node.min_io_cost
+        } - ${node.max_io_cost}) = ${
+          node.max_io_cost +
+          node.index_correlation ** 2 * (node.min_io_cost - node.max_io_cost)
+        } = ${node.disk_run_cost}`
       ),
-
-      // TODO: max_io, max_io_cost, min_io, min_io_cost
     };
+
+    if (node.parallel_workers === 0) {
+      formulas.cpu = katex.renderToString(
+        `\\text{CPU Cost per Tuple} \\times N_{\\text{tuples}} + \\text{Target Cost per Tuple} \\times N_{\\text{rows}}`
+      );
+      formulas.cpu_cost = katex.renderToString(
+        `= ${node.cpu_per_tuple} \\times ${node.baserel_tuples} + ${
+          node.pathtarget_cost
+        } \\times ${node.rows} = ${
+          node.cpu_per_tuple * node.baserel_tuples +
+          node.pathtarget_cost * node.rows
+        } = ${node.cpu_run_cost}`
+      );
+    } else {
+      formulas.cpu = katex.renderToString(
+        `(\\text{CPU Cost per Tuple} \\times N_{\\text{tuples}} + \\text{Target Cost per Tuple} \\times N_{\\text{rows}}) \\div \\text{Parallel Divisor}`
+      );
+      formulas.cpu_cost = katex.renderToString(
+        `= (${node.cpu_per_tuple} \\times ${node.baserel_tuples} + ${
+          node.pathtarget_cost
+        } \\times ${node.rows}) \\div ${node.parallel_divisor} = ${
+          (node.cpu_per_tuple * node.baserel_tuples +
+            node.pathtarget_cost * node.rows) /
+          node.parallel_divisor
+        } = ${node.cpu_run_cost}`
+      );
+    }
+
+    return formulas;
   }
 
-  if (node.node === "BitmapHeapScan") {
-    return {
-      total: katex.renderToString(
-        `\\text{Startup Cost} + \\text{CPU Run Cost} + \\text{Disk Run Cost}`
-      ),
+  if (node.node === "NestLoop") {
+    let formulas = {
+      total: katex.renderToString(`\\text{Startup Cost} + \\text{Run Cost}`),
       total_cost: katex.renderToString(
-        `= ${node.startup_cost} + ${node.cpu_run_cost} + ${
-          node.pages_fetched * node.cost_per_page
-        } = ${
-          node.startup_cost +
-          node.cpu_run_cost +
-          node.pages_fetched * node.cost_per_page
+        `= ${node.startup_cost} + ${node.run_cost} = ${
+          node.startup_cost + node.run_cost
         } = ${node.total_cost}`
       ),
-
-      cpu: katex.renderToString(
-        `(\\text{CPU Cost per Tuple} \\times N_{\\text{tuples}}) + (\\text{Target Cost per Tuple} \\times N_{\\text{rows}})`
-      ),
-      cpu_cost: katex.renderToString(
-        `= ${node.cpu_per_tuple} \\times ${node.tuples_fetched} + ${node.pathtarget_cost} \\times ${node.rows}`
-      ),
-
-      disk: katex.renderToString(
-        `N_{\\text{pages\\_fetched}} \\times \\text{Cost per Page}`
-      ),
-      disk_cost: katex.renderToString(
-        `= ${node.pages_fetched} \\times ${node.cost_per_page}`
-      ),
     };
+
+    formulas.run = katex.renderToString(`\\text{Outer Path Run Cost}`);
+    formulas.run_cost = katex.renderToString(
+      `= ${node.initial_outer_path_run_cost}`
+    );
+
+    let intermediate = node.initial_outer_path_run_cost;
+
+    if (node.initial_outer_path_rows > 1) {
+      formulas.run += katex.renderToString(
+        ` + (N_\\text{outer path rows} - 1) \\times \\text{Inner Rescan Start Cost}`
+      );
+      formulas.run_cost += katex.renderToString(
+        ` + (${node.initial_outer_path_rows} - 1) \\times ${node.initial_inner_rescan_start_cost}`
+      );
+
+      intermediate +=
+        (node.initial_outer_path_rows - 1) *
+        node.initial_inner_rescan_start_cost;
+    }
+
+    if (node.is_early_stop === 0) {
+      formulas.run += katex.renderToString(` + \\text{Inner Run Cost}`);
+      formulas.run_cost += katex.renderToString(
+        ` + ${node.initial_inner_run_cost}`
+      );
+
+      intermediate += node.initial_inner_run_cost;
+
+      if (node.initial_outer_path_rows > 1) {
+        formulas.run += katex.renderToString(
+          ` + (N_\\text{outer path rows} - 1) \\times \\text{Inner Rescan Run Cost}`
+        );
+        formulas.run_cost += katex.renderToString(
+          ` + (${node.initial_outer_path_rows} - 1) \\times ${node.initial_inner_rescan_run_cost}`
+        );
+
+        intermediate +=
+          (node.initial_outer_path_rows - 1) *
+          node.initial_inner_rescan_run_cost;
+      }
+    }
+
+    if (node.is_early_stop === 1) {
+      if (node.has_indexed_join_quals === 1) {
+        formulas.run += katex.renderToString(
+          ` + \\text{Inner Run Cost} \\times \\text{Inner Scan Frac}`
+        );
+        formulas.run_cost += katex.renderToString(
+          ` + ${node.inner_run_cost} \\times ${node.inner_scan_frac}`
+        );
+
+        intermediate += node.inner_run_cost * node.inner_scan_frac;
+
+        if (node.outer_matched_rows > 1) {
+          formulas.run += katex.renderToString(
+            ` + (N_\\text{outer matched rows} - 1) \\times \\text{Inner Rescan Run Cost} \\times \\text{Inner Scan Frac}`
+          );
+          formulas.run_cost += katex.renderToString(
+            `+ (${node.outer_matched_rows} - 1) \\times ${node.inner_rescan_run_cost} \\times ${node.inner_scan_frac}`
+          );
+
+          intermediate +=
+            (node.outer_matched_rows - 1) *
+            node.inner_rescan_run_cost *
+            node.inner_scan_frac;
+        }
+
+        formulas.run += katex.renderToString(
+          ` + (N_\\text{outer unmatched rows} \\times \\text{Inner Rescan Run Cost}) \\div N_\\text{Inner Path Rows}`
+        );
+        formulas.run_cost += katex.renderToString(
+          ` + (${node.outer_unmatched_rows} \\times ${node.inner_rescan_run_cost}) \\div ${node.inner_path_rows}`
+        );
+
+        intermediate +=
+          (node.outer_unmatched_rows * node.inner_rescan_run_cost) /
+          node.inner_path_rows;
+      } else {
+        formulas.run += katex.renderToString(` + \\text{Inner Run Cost}`);
+        formulas.run_cost += katex.renderToString(` + ${node.inner_run_cost}`);
+
+        intermediate += node.inner_run_cost;
+
+        if (node.outer_matched_rows > 0) {
+          formulas.run += katex.renderToString(
+            ` + N_\\text{outer matched rows} \\times \\text{Inner Rescan Run Cost} \\times \\text{Inner Scan Frac}`
+          );
+          formulas.run_cost += katex.renderToString(
+            ` + ${node.outer_matched_rows} \\times ${node.inner_rescan_run_cost} \\times ${node.inner_scan_frac}`
+          );
+
+          intermediate +=
+            node.outer_matched_rows *
+            node.inner_rescan_run_cost *
+            node.inner_scan_frac;
+        }
+
+        if (node.outer_unmatched_rows > 0) {
+          formulas.run += katex.renderToString(
+            ` + N_\\text{outer unmatched rows} \\times \\text{Inner Rescan Run Cost}`
+          );
+          formulas.run_cost += katex.renderToString(
+            ` + ${node.outer_unmatched_rows} \\times ${node.inner_rescan_run_cost}`
+          );
+
+          intermediate +=
+            node.outer_unmatched_rows * node.inner_rescan_run_cost;
+        }
+      }
+    }
+
+    formulas.run += katex.renderToString(
+      ` + \\text{CPU Cost per Tuple} \\times N_\\text{tuples} + \\text{Join Cost per Tuple} \\times N_\\text{join tuples}`
+    );
+    formulas.run_cost += katex.renderToString(
+      ` + ${node.cpu_per_tuple} \\times ${node.ntuples} + ${node.cost_per_tuple} \\times ${node.rows}`
+    );
+
+    intermediate +=
+      node.cpu_per_tuple * node.ntuples + node.cost_per_tuple * node.rows;
+
+    formulas.run_cost += katex.renderToString(
+      `= ${intermediate} = ${node.run_cost}`
+    );
+
+    return formulas;
   }
+
+  // if (node.node === "BitmapHeapScan") {
+  //   return {
+  //     total: katex.renderToString(
+  //       `\\text{Startup Cost} + \\text{CPU Run Cost} + \\text{Disk Run Cost}`
+  //     ),
+  //     total_cost: katex.renderToString(
+  //       `= ${node.startup_cost} + ${node.cpu_run_cost} + ${
+  //         node.pages_fetched * node.cost_per_page
+  //       } = ${
+  //         node.startup_cost +
+  //         node.cpu_run_cost +
+  //         node.pages_fetched * node.cost_per_page
+  //       } = ${node.total_cost}`
+  //     ),
+
+  //     cpu: katex.renderToString(
+  //       `(\\text{CPU Cost per Tuple} \\times N_{\\text{tuples}}) + (\\text{Target Cost per Tuple} \\times N_{\\text{rows}})`
+  //     ),
+  //     cpu_cost: katex.renderToString(
+  //       `= ${node.cpu_per_tuple} \\times ${node.tuples_fetched} + ${node.pathtarget_cost} \\times ${node.rows}`
+  //     ),
+
+  //     disk: katex.renderToString(
+  //       `N_{\\text{pages\\_fetched}} \\times \\text{Cost per Page}`
+  //     ),
+  //     disk_cost: katex.renderToString(
+  //       `= ${node.pages_fetched} \\times ${node.cost_per_page}`
+  //     ),
+  //   };
+  // }
 
   return {
     total: "N/A",
@@ -152,40 +378,4 @@ export const generateFormulas = (node) => {
   //     props.innerScanCost
   //   )} + ${formatNumber(props.outerScanCost)})`,
   // },
-  // NestLoop: {
-  //   run: `Outer Path Run Cost + Inner Path Run Cost + (N_outerpathrows - 1) * Inner Rescan Start Cost + (N_outerpathrows - 1) * Inner Rescan Run Cost`,
-  //   runValue: `= ${formatNumber(props.outerRunCost)} + ${formatNumber(
-  //     props.innerRunCost
-  //   )} + ${formatNumber(props.outerPathRows)} * ${formatNumber(
-  //     props.innerRescanStartupCost
-  //   )} + ${formatNumber(props.outerPathRows)} * ${formatNumber(
-  //     props.innerRescanRunCost
-  //   )}`,
-  //   startup: `Outer Path Startup Cost + Inner Path Startup Cost`,
-  //   startupValue: `= ${formatNumber(props.outerStartupCost)} + ${formatNumber(
-  //     props.innerStartupCost
-  //   )}`,
-  // },
-  // IdxScan: {
-  //   run: `Index CPU & IO Cost + Table CPU Cost + Table IO Cost`,
-  //   runValue: `= ${formatNumber(
-  //     props.indexTotalCost - props.indexStartupCost
-  //   )} + ${formatNumber(props.cpuRunCost)} + (${props.maxIOCost} + ${
-  //     props.csquared
-  //   } * (${props.maxIOCost} - ${props.minIOCost}))`,
-  //   startup: `Index Startup Cost`,
-  //   startupValue: `= ${formatNumber(props.indexStartupCost)}`,
-  //   selectivity: `${props.selectivity}`,
-  // },
-  // BitmapHeapScan: {
-  //   run: `(CPU cost per tuple * # of tuples) + (Disk cost per page * # of pages)`,
-  //   runValue: `= (${formatNumber(props.cpuPerTuple)} * ${formatNumber(
-  //     props.tuples
-  //   )}) + (${formatNumber(props.costPerPage)} * ${formatNumber(
-  //     props.pages
-  //   )})`,
-  //   startup: `Index Total Cost`,
-  //   startupValue: `= ${formatNumber(props.indexTotalCost)}`,
-  // },
-  // };
 };

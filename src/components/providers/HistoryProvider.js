@@ -53,7 +53,7 @@ export function HistoryProvider({ children }) {
   return (
     <HistoryContext.Provider
       value={{
-        history: history,
+        history,
         addHistory: onAddHistory,
       }}
     >

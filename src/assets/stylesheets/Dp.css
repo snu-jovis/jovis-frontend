@@ -1,53 +1,6 @@
-.html {
-  height: 100%;
-}
-
-.body {
-  margin: 0;
-  height: 100%;
-  overflow-y: clip;
-}
-
-.svg {
-  position: relative;
-  justify-content: center;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-}
-
-.svg-container {
-  width: 800px;
-  height: 500px;
-  overflow-x: scroll;
-  overflow-y: scroll;
-  border: 1px solid #ccc;
-}
-
-.dp-play-text {
-  font-family: "NanumSquareEB";
-  font-size: 14px;
-}
-
 .dp-node-text {
   font-family: "NanumSquareB";
-  font-size: 14px;
-}
-
-.dp-total-cost {
-  font-family: "NanumSquareR";
-  font-size: small;
-}
-
-.dp-cost-value {
-  font-family: "NanumSquareEB";
-  font-size: large;
-}
-
-.checkbox-container {
-  display: flex;
-  justify-content: flex-end;
-  margin-right: 50px;
+  font-size: x-small;
 }
 
 #play-button {
@@ -64,51 +17,5 @@
 }
 
 #play-button:hover {
-  background-color: #696969;
-}
-
-.flex-container {
-  display: flex;
-  justify-content: center;
-  gap: 50px;
-}
-
-.image-resize {
-  max-width: 300px;
-  height: auto;
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.dp-join-order {
-  font-family: "NanumSquareB";
-  font-size: 15px;
-  color: black;
-  line-height: 1.6;
-  padding: 20px;
-  background-color: #f9f9f9;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  margin-bottom: 20px;
-}
-
-.dp-join-order .my-4 {
-  margin-bottom: 20px;
-  font-weight: bold;
-}
-
-.dp-index-warning {
-  font-family: "NanumSquareR";
-  font-size: small;
-  margin-top: 20px;
-  margin-bottom: 10px;
-  color: red;
-  margin-bottom: 10px;
-  font-weight: bold;
-  font-style: italic;
-}
-
-.cost-table {
-  border: "1px solid lightgray";
+  background-color: #e06666;
 }

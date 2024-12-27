@@ -1,25 +1,31 @@
+import React from "react";
 import "./App.css";
 import Layout from "./components/Layout";
-import React from "react";
 
+import { QueriesProvider } from "./components/providers/QueriesProvider";
 import { HistoryProvider } from "./components/providers/HistoryProvider";
 import { SqlToEditorProvider } from "./components/providers/SqlToEditorProvider";
 import { GeqoProvider } from "./components/providers/GeqoProvider";
-import { DpProvider } from "./components/providers/DpProvider";
 
 function App() {
   return (
     <div className="App">
-      <SqlToEditorProvider>
-        <HistoryProvider>
-          <DpProvider>
-            <GeqoProvider>
-              <Layout />
-            </GeqoProvider>
-          </DpProvider>
-        </HistoryProvider>
-      </SqlToEditorProvider>
+      <AppProviders>
+        <Layout />
+      </AppProviders>
     </div>
+  );
+}
+
+function AppProviders({ children }) {
+  return (
+    <SqlToEditorProvider>
+      <HistoryProvider>
+        <QueriesProvider>
+          <GeqoProvider>{children}</GeqoProvider>
+        </QueriesProvider>
+      </HistoryProvider>
+    </SqlToEditorProvider>
   );
 }
 

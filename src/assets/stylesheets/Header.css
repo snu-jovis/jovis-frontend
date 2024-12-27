@@ -4,7 +4,7 @@
   left: 0;
   right: 0;
   background-color: white;
-  z-index: 1000; /* 가장 앞에 위치 하도록 */
+  z-index: 1000;
 }
 
 .header-items {

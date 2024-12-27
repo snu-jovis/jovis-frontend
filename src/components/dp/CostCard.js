@@ -1,41 +1,42 @@
-import { useState, useEffect } from "react";
 import { Card } from "@material-tailwind/react";
 
 import SeqScanCost from "./costcards/SeqScanCost";
+import GatherCost from "./costcards/GatherCost";
+import GatherMergeCost from "./costcards/GatherMergeCost";
 import IdxScanCost from "./costcards/IdxScanCost";
 import BitmapHeapScanCost from "./costcards/BitmapHeapScanCost";
+import NestLoopCost from "./costcards/NestLoopCost";
 
-const opType = ["SeqScan", "IdxScan", "BitmapHeapScan"];
+const opTypeComponents = {
+  SeqScan: SeqScanCost,
+  Gather: GatherCost,
+  GatherMerge: GatherMergeCost,
+  IdxScan: IdxScanCost,
+  BitmapHeapScan: BitmapHeapScanCost,
+  NestLoop: NestLoopCost,
+};
 
-const CostCard = ({ node, nodeDetails }) => {
-  const [nodeType, setNodeType] = useState("");
+const opType = Object.keys(opTypeComponents);
 
-  useEffect(() => {
-    if (node) setNodeType(node.split(" - ")[1]);
-    else setNodeType("");
-  }, [node]);
-
+const CostCard = ({ nodes }) => {
   return (
-    <>
-      {opType.includes(nodeType) && (
-        <Card className="w-3/4 h-full">
-          <div className="flex justify-between px-4 pt-2">
-            <p className="vis-title pt-2">Cost Formula</p>
-          </div>
-          <div className="m-6">
-            {nodeType === "SeqScan" && (
-              <SeqScanCost nodeDetails={nodeDetails} />
-            )}
-            {nodeType === "IdxScan" && (
-              <IdxScanCost nodeDetails={nodeDetails} />
-            )}
-            {nodeType === "BitmapHeapScan" && (
-              <BitmapHeapScanCost nodeDetails={nodeDetails} />
-            )}
-          </div>
-        </Card>
-      )}
-    </>
+    <div className="flex flex-wrap gap-4 my-4">
+      {nodes.map((node, index) => {
+        const nodeType = node.detail.node;
+        if (!opType.includes(nodeType)) return null;
+        const Component = opTypeComponents[nodeType];
+
+        return (
+          <Card key={index} className="h-full">
+            <div className="mx-2">
+              <div className="flex justify-center my-1 text-bm">{node.id}</div>
+              <hr />
+              <Component nodeDetails={node.detail} />
+            </div>
+          </Card>
+        );
+      })}
+    </div>
   );
 };
 

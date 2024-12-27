@@ -1,13 +1,13 @@
-# pg_queryplans frontend
+# Jovis Frontend
 
-## 짱쉬운 실행법
+## Setup and Execution
 
-1. 아래 명령어를 이용하여 dependencies를 설치합니다.
-```bash
-npm install
-```
-
-2. 아래 명령어를 이용하여 실행합니다.
-```bash
-npm start
-```
+1. Ensure Node.js is installed on your system.
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Start the application:
+   ```bash
+   npm start
+   ```
