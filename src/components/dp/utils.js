@@ -3,6 +3,12 @@ import "katex/dist/katex.min.css";
 
 // TODO: remove intermediate results
 
+const add_qquad = (formula, nqquad) => {
+  for (let i = 0; i < nqquad; i++) {
+    formula += katex.renderToString(`\\qquad`);
+  }
+};
+
 export const generateFormulas = (node) => {
   if (node.node === "SeqScan") {
     let formulas = {
@@ -172,139 +178,214 @@ export const generateFormulas = (node) => {
   }
 
   if (node.node === "NestLoop") {
+    let nqquad = 1;
+
     let formulas = {
       total: katex.renderToString(`\\text{Startup Cost} + \\text{Run Cost}`),
       total_cost: katex.renderToString(
-        `= ${node.startup_cost} + ${node.run_cost} = ${
-          node.startup_cost + node.run_cost
-        } = ${node.total_cost}`
+        `= ${node.startup_cost} + ${node.run_cost} = ${node.total_cost}`
       ),
     };
 
-    formulas.run = katex.renderToString(`\\text{Outer Path Run Cost}`);
+    formulas.run = katex.renderToString(`\\text{Outer Run Cost}`);
     formulas.run_cost = katex.renderToString(
       `= ${node.initial_outer_path_run_cost}`
     );
 
-    let intermediate = node.initial_outer_path_run_cost;
-
     if (node.initial_outer_path_rows > 1) {
+      formulas.run += " " + katex.renderToString(`+`) + " ";
+      formulas.run_cost += " " + katex.renderToString(`+`) + " ";
+
       formulas.run += katex.renderToString(
-        ` + (N_\\text{outer path rows} - 1) \\times \\text{Inner Rescan Start Cost}`
+        `(N_\\text{outer rows} - 1) \\times \\text{Inner Rescan Start Cost}`
       );
       formulas.run_cost += katex.renderToString(
-        ` + (${node.initial_outer_path_rows} - 1) \\times ${node.initial_inner_rescan_start_cost}`
+        `(${node.initial_outer_path_rows} - 1) \\times ${node.initial_inner_rescan_start_cost}`
       );
-
-      intermediate +=
-        (node.initial_outer_path_rows - 1) *
-        node.initial_inner_rescan_start_cost;
     }
 
     if (node.is_early_stop === 0) {
-      formulas.run += katex.renderToString(` + \\text{Inner Run Cost}`);
+      formulas.run += " " + katex.renderToString(`+`) + " ";
+      formulas.run_cost += " " + katex.renderToString(`+`) + " ";
+
+      formulas.run += katex.renderToString(`\\text{Inner Run Cost}`);
       formulas.run_cost += katex.renderToString(
-        ` + ${node.initial_inner_run_cost}`
+        `${node.initial_inner_run_cost}`
       );
 
-      intermediate += node.initial_inner_run_cost;
-
       if (node.initial_outer_path_rows > 1) {
-        formulas.run += katex.renderToString(
-          ` + (N_\\text{outer path rows} - 1) \\times \\text{Inner Rescan Run Cost}`
-        );
-        formulas.run_cost += katex.renderToString(
-          ` + (${node.initial_outer_path_rows} - 1) \\times ${node.initial_inner_rescan_run_cost}`
-        );
+        formulas.run += katex.renderToString(`\\\\`);
+        formulas.run_cost += katex.renderToString(`\\\\`);
 
-        intermediate +=
-          (node.initial_outer_path_rows - 1) *
-          node.initial_inner_rescan_run_cost;
+        for (let i = 0; i < nqquad; i++) {
+          formulas.run += katex.renderToString(`\\qquad`);
+          formulas.run_cost += katex.renderToString(`\\qquad`);
+        }
+        nqquad++;
+
+        formulas.run +=
+          katex.renderToString(`+`) +
+          " " +
+          katex.renderToString(
+            `(N_\\text{outer rows} - 1) \\times \\text{Inner Rescan Run Cost}`
+          );
+        formulas.run_cost +=
+          katex.renderToString(`+`) +
+          " " +
+          katex.renderToString(
+            `(${node.initial_outer_path_rows} - 1) \\times ${node.initial_inner_rescan_run_cost}`
+          );
       }
     }
 
     if (node.is_early_stop === 1) {
       if (node.has_indexed_join_quals === 1) {
-        formulas.run += katex.renderToString(
-          ` + \\text{Inner Run Cost} \\times \\text{Inner Scan Frac}`
-        );
-        formulas.run_cost += katex.renderToString(
-          ` + ${node.inner_run_cost} \\times ${node.inner_scan_frac}`
-        );
+        formulas.run += katex.renderToString(`\\\\`);
+        formulas.run_cost += katex.renderToString(`\\\\`);
 
-        intermediate += node.inner_run_cost * node.inner_scan_frac;
+        for (let i = 0; i < nqquad; i++) {
+          formulas.run += katex.renderToString(`\\qquad`);
+          formulas.run_cost += katex.renderToString(`\\qquad`);
+        }
+        nqquad++;
+
+        formulas.run +=
+          katex.renderToString(`+`) +
+          " " +
+          katex.renderToString(
+            `\\text{Inner Run Cost} \\times \\text{Inner Scan Frac}`
+          );
+        formulas.run_cost +=
+          katex.renderToString(`+`) +
+          " " +
+          katex.renderToString(
+            `${node.inner_run_cost} \\times ${node.inner_scan_frac}`
+          );
 
         if (node.outer_matched_rows > 1) {
-          formulas.run += katex.renderToString(
-            ` + (N_\\text{outer matched rows} - 1) \\times \\text{Inner Rescan Run Cost} \\times \\text{Inner Scan Frac}`
-          );
-          formulas.run_cost += katex.renderToString(
-            `+ (${node.outer_matched_rows} - 1) \\times ${node.inner_rescan_run_cost} \\times ${node.inner_scan_frac}`
-          );
+          formulas.run += katex.renderToString(`\\\\`);
+          formulas.run_cost += katex.renderToString(`\\\\`);
 
-          intermediate +=
-            (node.outer_matched_rows - 1) *
-            node.inner_rescan_run_cost *
-            node.inner_scan_frac;
+          for (let i = 0; i < nqquad; i++) {
+            formulas.run += katex.renderToString(`\\qquad`);
+            formulas.run_cost += katex.renderToString(`\\qquad`);
+          }
+          nqquad++;
+
+          formulas.run +=
+            katex.renderToString(`+`) +
+            " " +
+            katex.renderToString(
+              `(N_\\text{outer matched rows} - 1) \\times \\text{Inner Rescan Run Cost} \\times \\text{Inner Scan Frac}`
+            );
+          formulas.run_cost +=
+            katex.renderToString(`+`) +
+            " " +
+            katex.renderToString(
+              `(${node.outer_matched_rows} - 1) \\times ${node.inner_rescan_run_cost} \\times ${node.inner_scan_frac}`
+            );
         }
 
-        formulas.run += katex.renderToString(
-          ` + (N_\\text{outer unmatched rows} \\times \\text{Inner Rescan Run Cost}) \\div N_\\text{Inner Path Rows}`
-        );
-        formulas.run_cost += katex.renderToString(
-          ` + (${node.outer_unmatched_rows} \\times ${node.inner_rescan_run_cost}) \\div ${node.inner_path_rows}`
-        );
+        formulas.run += katex.renderToString(`\\\\`);
+        formulas.run_cost += katex.renderToString(`\\\\`);
 
-        intermediate +=
-          (node.outer_unmatched_rows * node.inner_rescan_run_cost) /
-          node.inner_path_rows;
+        for (let i = 0; i < nqquad; i++) {
+          formulas.run += katex.renderToString(`\\qquad`);
+          formulas.run_cost += katex.renderToString(`\\qquad`);
+        }
+        nqquad++;
+
+        formulas.run +=
+          katex.renderToString(`+`) +
+          " " +
+          katex.renderToString(
+            `(N_\\text{outer unmatched rows} \\times \\text{Inner Rescan Run Cost}) \\div N_\\text{inner rows}`
+          );
+        formulas.run_cost +=
+          katex.renderToString(`+`) +
+          " " +
+          katex.renderToString(
+            `(${node.outer_unmatched_rows} \\times ${node.inner_rescan_run_cost}) \\div ${node.inner_path_rows}`
+          );
       } else {
-        formulas.run += katex.renderToString(` + \\text{Inner Run Cost}`);
-        formulas.run_cost += katex.renderToString(` + ${node.inner_run_cost}`);
+        formulas.run += " " + katex.renderToString(`+`) + " ";
+        formulas.run_cost += " " + katex.renderToString(`+`) + " ";
 
-        intermediate += node.inner_run_cost;
+        formulas.run += katex.renderToString(`\\text{Inner Run Cost}`);
+        formulas.run_cost += katex.renderToString(`${node.inner_run_cost}`);
 
         if (node.outer_matched_rows > 0) {
-          formulas.run += katex.renderToString(
-            ` + N_\\text{outer matched rows} \\times \\text{Inner Rescan Run Cost} \\times \\text{Inner Scan Frac}`
-          );
-          formulas.run_cost += katex.renderToString(
-            ` + ${node.outer_matched_rows} \\times ${node.inner_rescan_run_cost} \\times ${node.inner_scan_frac}`
-          );
+          formulas.run += katex.renderToString(`\\\\`);
+          formulas.run_cost += katex.renderToString(`\\\\`);
 
-          intermediate +=
-            node.outer_matched_rows *
-            node.inner_rescan_run_cost *
-            node.inner_scan_frac;
+          for (let i = 0; i < nqquad; i++) {
+            formulas.run += katex.renderToString(`\\qquad`);
+            formulas.run_cost += katex.renderToString(`\\qquad`);
+          }
+          nqquad++;
+
+          formulas.run +=
+            katex.renderToString(`+`) +
+            " " +
+            katex.renderToString(
+              `N_\\text{outer matched rows} \\times \\text{Inner Rescan Run Cost} \\times \\text{Inner Scan Frac}`
+            );
+          formulas.run_cost +=
+            katex.renderToString(`+`) +
+            " " +
+            katex.renderToString(
+              `${node.outer_matched_rows} \\times ${node.inner_rescan_run_cost} \\times ${node.inner_scan_frac}`
+            );
         }
 
         if (node.outer_unmatched_rows > 0) {
-          formulas.run += katex.renderToString(
-            ` + N_\\text{outer unmatched rows} \\times \\text{Inner Rescan Run Cost}`
-          );
-          formulas.run_cost += katex.renderToString(
-            ` + ${node.outer_unmatched_rows} \\times ${node.inner_rescan_run_cost}`
-          );
+          formulas.run += katex.renderToString(`\\\\`);
+          formulas.run_cost += katex.renderToString(`\\\\`);
 
-          intermediate +=
-            node.outer_unmatched_rows * node.inner_rescan_run_cost;
+          for (let i = 0; i < nqquad; i++) {
+            formulas.run += katex.renderToString(`\\qquad`);
+            formulas.run_cost += katex.renderToString(`\\qquad`);
+          }
+          nqquad++;
+
+          formulas.run +=
+            katex.renderToString(`+`) +
+            " " +
+            katex.renderToString(
+              `N_\\text{outer unmatched rows} \\times \\text{Inner Rescan Run Cost}`
+            );
+          formulas.run_cost +=
+            katex.renderToString(`+`) +
+            " " +
+            katex.renderToString(
+              `${node.outer_unmatched_rows} \\times ${node.inner_rescan_run_cost}`
+            );
         }
       }
     }
 
-    formulas.run += katex.renderToString(
-      ` + \\text{CPU Cost per Tuple} \\times N_\\text{tuples} + \\text{Join Cost per Tuple} \\times N_\\text{join tuples}`
-    );
-    formulas.run_cost += katex.renderToString(
-      ` + ${node.cpu_per_tuple} \\times ${node.ntuples} + ${node.cost_per_tuple} \\times ${node.rows}`
-    );
+    formulas.run += katex.renderToString(`\\\\`);
+    formulas.run_cost += katex.renderToString(`\\\\`);
 
-    intermediate +=
-      node.cpu_per_tuple * node.ntuples + node.cost_per_tuple * node.rows;
+    for (let i = 0; i < nqquad; i++) {
+      formulas.run += katex.renderToString(`\\qquad`);
+      formulas.run_cost += katex.renderToString(`\\qquad`);
+    }
 
-    formulas.run_cost += katex.renderToString(
-      `= ${intermediate} = ${node.run_cost}`
-    );
+    formulas.run +=
+      katex.renderToString(`+`) +
+      " " +
+      katex.renderToString(
+        `\\text{CPU Cost per Tuple} \\times N_\\text{total tuples} + \\text{Join Cost per Tuple} \\times N_\\text{join tuples}`
+      );
+    formulas.run_cost +=
+      katex.renderToString(`+`) +
+      " " +
+      katex.renderToString(
+        `${node.cpu_per_tuple} \\times ${node.ntuples} + ${node.cost_per_tuple} \\times ${node.rows}`
+      );
+
+    formulas.run_cost += katex.renderToString(`= ${node.run_cost}`);
 
     return formulas;
   }
