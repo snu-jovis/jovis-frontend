@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { generateFormulas } from "../utils";
 
-const GatherCost = ({ nodeDetails }) => {
+const RunCost = ({ nodeDetails }) => {
   const [totalForm, setTotalForm] = useState("");
   const [totalCost, setTotalCost] = useState("");
   const [runForm, setRunForm] = useState("");
@@ -35,7 +35,7 @@ const GatherCost = ({ nodeDetails }) => {
             />
           </td>
         </tr>
-        <tr className="border-b border-gray-300">
+        <tr>
           <td className="pr-4">Run Cost</td>
           <td className="py-2">
             <div
@@ -53,4 +53,4 @@ const GatherCost = ({ nodeDetails }) => {
   );
 };
 
-export default GatherCost;
+export default RunCost;

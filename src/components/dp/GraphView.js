@@ -5,7 +5,7 @@ import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import { parseDp } from "./parseDp";
 
-const GraphView = ({ base, dp, selectedNodes, addNode, removeNode }) => {
+const GraphView = ({ index, base, dp, selectedNodes, addNode, removeNode }) => {
   const dagSvg = useRef(null);
   const svgWidth = 400;
   const svgHeight = 400;
@@ -20,12 +20,12 @@ const GraphView = ({ base, dp, selectedNodes, addNode, removeNode }) => {
     setAnimation((prev) => !prev);
 
     selectedNodes.forEach((node) => {
-      removeNode(node.id);
+      removeNode(index, node.id);
     });
   };
 
   function generateNodeId(d) {
-    return `${d.relid} - ${d.node}`.replace(/\s/g, "");
+    return `${index} ${d.relid} - ${d.node}`.replace(/\s/g, "");
   }
 
   function drawGraph({ graphSvg, data }) {
@@ -183,10 +183,10 @@ const GraphView = ({ base, dp, selectedNodes, addNode, removeNode }) => {
 
       if (isSelected) {
         rect.style("stroke", null).style("stroke-width", null);
-        removeNode(nodeId);
+        removeNode(index, nodeId);
       } else {
         rect.style("stroke", "red").style("stroke-width", "2px");
-        addNode(nodeId, d.data.nodeData);
+        addNode(index, nodeId, d.data.nodeData);
       }
     });
 

@@ -8,17 +8,21 @@ const DpOpt = ({ title, data }) => {
   const viewRef = useRef(null);
 
   const [nodes, setNodes] = useState([]);
-  const addNode = (id, detail) => {
+  const addNode = (index, id, detail) => {
     setNodes((prev) => {
-      const isExist = prev.find((node) => node.id === id);
+      const isExist = prev.find(
+        (node) => node.index === index && node.id === id
+      );
       if (isExist) return prev;
 
-      return [...prev, { id, detail }];
+      return [...prev, { index, id, detail }];
     });
   };
 
-  const removeNode = (id) => {
-    setNodes((prev) => prev.filter((node) => node.id !== id));
+  const removeNode = (index, id) => {
+    setNodes((prev) =>
+      prev.filter((node) => node.index !== index || node.id !== id)
+    );
   };
 
   return (
@@ -29,6 +33,7 @@ const DpOpt = ({ title, data }) => {
         {data.map((item, index) => (
           <div key={index}>
             <GraphView
+              index={index}
               base={item.base}
               dp={item.dp}
               selectedNodes={nodes}

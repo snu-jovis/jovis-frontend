@@ -3,12 +3,6 @@ import "katex/dist/katex.min.css";
 
 // TODO: remove intermediate results
 
-const add_qquad = (formula, nqquad) => {
-  for (let i = 0; i < nqquad; i++) {
-    formula += katex.renderToString(`\\qquad`);
-  }
-};
-
 export const generateFormulas = (node) => {
   if (node.node === "SeqScan") {
     let formulas = {
@@ -178,12 +172,15 @@ export const generateFormulas = (node) => {
   }
 
   if (node.node === "NestLoop") {
+    let intermediate;
     let nqquad = 1;
 
     let formulas = {
       total: katex.renderToString(`\\text{Startup Cost} + \\text{Run Cost}`),
       total_cost: katex.renderToString(
-        `= ${node.startup_cost} + ${node.run_cost} = ${node.total_cost}`
+        `= ${node.startup_cost} + ${node.run_cost} = ${
+          node.startup_cost + node.run_cost
+        } = ${node.total_cost}`
       ),
     };
 
@@ -191,6 +188,7 @@ export const generateFormulas = (node) => {
     formulas.run_cost = katex.renderToString(
       `= ${node.initial_outer_path_run_cost}`
     );
+    intermediate = node.initial_outer_path_run_cost;
 
     if (node.initial_outer_path_rows > 1) {
       formulas.run += " " + katex.renderToString(`+`) + " ";
@@ -202,9 +200,12 @@ export const generateFormulas = (node) => {
       formulas.run_cost += katex.renderToString(
         `(${node.initial_outer_path_rows} - 1) \\times ${node.initial_inner_rescan_start_cost}`
       );
+      intermediate +=
+        (node.initial_outer_path_rows - 1) *
+        node.initial_inner_rescan_start_cost;
     }
 
-    if (node.is_early_stop === 0) {
+    if (!node.is_early_stop) {
       formulas.run += " " + katex.renderToString(`+`) + " ";
       formulas.run_cost += " " + katex.renderToString(`+`) + " ";
 
@@ -212,6 +213,7 @@ export const generateFormulas = (node) => {
       formulas.run_cost += katex.renderToString(
         `${node.initial_inner_run_cost}`
       );
+      intermediate += node.initial_inner_run_cost;
 
       if (node.initial_outer_path_rows > 1) {
         formulas.run += katex.renderToString(`\\\\`);
@@ -235,11 +237,14 @@ export const generateFormulas = (node) => {
           katex.renderToString(
             `(${node.initial_outer_path_rows} - 1) \\times ${node.initial_inner_rescan_run_cost}`
           );
+        intermediate +=
+          (node.initial_outer_path_rows - 1) *
+          node.initial_inner_rescan_run_cost;
       }
     }
 
-    if (node.is_early_stop === 1) {
-      if (node.has_indexed_join_quals === 1) {
+    if (node.is_early_stop) {
+      if (node.has_indexed_join_quals) {
         formulas.run += katex.renderToString(`\\\\`);
         formulas.run_cost += katex.renderToString(`\\\\`);
 
@@ -261,6 +266,7 @@ export const generateFormulas = (node) => {
           katex.renderToString(
             `${node.inner_run_cost} \\times ${node.inner_scan_frac}`
           );
+        intermediate += node.inner_run_cost * node.inner_scan_frac;
 
         if (node.outer_matched_rows > 1) {
           formulas.run += katex.renderToString(`\\\\`);
@@ -284,6 +290,10 @@ export const generateFormulas = (node) => {
             katex.renderToString(
               `(${node.outer_matched_rows} - 1) \\times ${node.inner_rescan_run_cost} \\times ${node.inner_scan_frac}`
             );
+          intermediate +=
+            (node.outer_matched_rows - 1) *
+            node.inner_rescan_run_cost *
+            node.inner_scan_frac;
         }
 
         formulas.run += katex.renderToString(`\\\\`);
@@ -307,12 +317,16 @@ export const generateFormulas = (node) => {
           katex.renderToString(
             `(${node.outer_unmatched_rows} \\times ${node.inner_rescan_run_cost}) \\div ${node.inner_path_rows}`
           );
+        intermediate +=
+          (node.outer_unmatched_rows * node.inner_rescan_run_cost) /
+          node.inner_path_rows;
       } else {
         formulas.run += " " + katex.renderToString(`+`) + " ";
         formulas.run_cost += " " + katex.renderToString(`+`) + " ";
 
         formulas.run += katex.renderToString(`\\text{Inner Run Cost}`);
         formulas.run_cost += katex.renderToString(`${node.inner_run_cost}`);
+        intermediate += node.inner_run_cost;
 
         if (node.outer_matched_rows > 0) {
           formulas.run += katex.renderToString(`\\\\`);
@@ -336,6 +350,10 @@ export const generateFormulas = (node) => {
             katex.renderToString(
               `${node.outer_matched_rows} \\times ${node.inner_rescan_run_cost} \\times ${node.inner_scan_frac}`
             );
+          intermediate +=
+            node.outer_matched_rows *
+            node.inner_rescan_run_cost *
+            node.inner_scan_frac;
         }
 
         if (node.outer_unmatched_rows > 0) {
@@ -360,6 +378,8 @@ export const generateFormulas = (node) => {
             katex.renderToString(
               `${node.outer_unmatched_rows} \\times ${node.inner_rescan_run_cost}`
             );
+          intermediate +=
+            node.outer_unmatched_rows * node.inner_rescan_run_cost;
         }
       }
     }
@@ -384,42 +404,269 @@ export const generateFormulas = (node) => {
       katex.renderToString(
         `${node.cpu_per_tuple} \\times ${node.ntuples} + ${node.cost_per_tuple} \\times ${node.rows}`
       );
+    intermediate +=
+      node.cpu_per_tuple * node.ntuples + node.cost_per_tuple * node.rows;
 
-    formulas.run_cost += katex.renderToString(`= ${node.run_cost}`);
+    formulas.run_cost +=
+      " " + katex.renderToString(`= ${intermediate} = ${node.run_cost}`);
 
     return formulas;
   }
 
-  // if (node.node === "BitmapHeapScan") {
-  //   return {
-  //     total: katex.renderToString(
-  //       `\\text{Startup Cost} + \\text{CPU Run Cost} + \\text{Disk Run Cost}`
-  //     ),
-  //     total_cost: katex.renderToString(
-  //       `= ${node.startup_cost} + ${node.cpu_run_cost} + ${
-  //         node.pages_fetched * node.cost_per_page
-  //       } = ${
-  //         node.startup_cost +
-  //         node.cpu_run_cost +
-  //         node.pages_fetched * node.cost_per_page
-  //       } = ${node.total_cost}`
-  //     ),
+  if (node.node === "MergeJoin") {
+    let intermediate;
 
-  //     cpu: katex.renderToString(
-  //       `(\\text{CPU Cost per Tuple} \\times N_{\\text{tuples}}) + (\\text{Target Cost per Tuple} \\times N_{\\text{rows}})`
-  //     ),
-  //     cpu_cost: katex.renderToString(
-  //       `= ${node.cpu_per_tuple} \\times ${node.tuples_fetched} + ${node.pathtarget_cost} \\times ${node.rows}`
-  //     ),
+    let formulas = {
+      total: katex.renderToString(`\\text{Startup Cost} + \\text{Run Cost}`),
+      total_cost: katex.renderToString(
+        `= ${node.startup_cost} + ${node.run_cost} = ${
+          node.startup_cost + node.run_cost
+        } = ${node.total_cost}`
+      ),
+    };
 
-  //     disk: katex.renderToString(
-  //       `N_{\\text{pages\\_fetched}} \\times \\text{Cost per Page}`
-  //     ),
-  //     disk_cost: katex.renderToString(
-  //       `= ${node.pages_fetched} \\times ${node.cost_per_page}`
-  //     ),
-  //   };
-  // }
+    if (node.sortouter) {
+      formulas.run = katex.renderToString(
+        `\\text{Sort Run Cost} \\times \\text{Outer Selectivity}`
+      );
+      formulas.run_cost = katex.renderToString(
+        `${node.initial_sort_path_run_cost} \\times ${node.initial_outer_sel}`
+      );
+      intermediate = node.initial_sort_path_run_cost * node.initial_outer_sel;
+    } else {
+      formulas.run = katex.renderToString(
+        `\\text{Outer Run Cost} \\times \\text{Outer Selectivity}`
+      );
+      formulas.run_cost = katex.renderToString(
+        `= ${node.initial_outer_path_run_cost} \\times ${node.initial_outer_sel}`
+      );
+      intermediate = node.initial_outer_path_run_cost * node.initial_outer_sel;
+    }
+
+    if (node.matinner) {
+      formulas.run +=
+        " " +
+        katex.renderToString(`+`) +
+        " " +
+        katex.renderToString(`\\text{Materialized Inner Cost}`);
+      formulas.run_cost +=
+        " " +
+        katex.renderToString(`+`) +
+        " " +
+        katex.renderToString(`${node.mat_inner_cost}`);
+      intermediate += node.mat_inner_cost;
+    } else {
+      formulas.run +=
+        " " +
+        katex.renderToString(`+`) +
+        " " +
+        katex.renderToString(`\\text{Bare Inner Cost}`);
+      formulas.run_cost +=
+        " " +
+        katex.renderToString(`+`) +
+        " " +
+        katex.renderToString(`${node.bare_inner_cost}`);
+      intermediate += node.bare_inner_cost;
+    }
+
+    formulas.run +=
+      katex.renderToString(`\\\\ \\qquad +`) +
+      " " +
+      katex.renderToString(
+        `\\text{Merge Qual Cost per Tuple} \\times \\{(N_\\text{outer rows} - N_\\text{outer skip rows}) + (N_\\text{inner rows} - N_\\text{inner skip rows}) \\times \\text{Rescan Ratio})\\}`
+      ) +
+      katex.renderToString(`\\\\ \\qquad \\qquad +`) +
+      " " +
+      katex.renderToString(
+        `\\text{CPU Cost per Tuple} \\times N_\\text{merge join tuples} + \\text{Join Cost per Tuple} \\times N_\\text{join tuples}`
+      );
+    formulas.run_cost +=
+      katex.renderToString(`\\\\ \\qquad +`) +
+      " " +
+      katex.renderToString(
+        `${node.merge_qual_cost} \\times \\{(${node.outer_rows} - ${node.outer_skip_rows}) + (${node.inner_rows} - ${node.inner_skip_rows}) \\times ${node.rescanratio})\\}`
+      ) +
+      katex.renderToString(`\\\\ \\qquad \\qquad +`) +
+      " " +
+      katex.renderToString(
+        `${node.cpu_per_tuple} \\times ${node.mergejointuples} + ${node.cost_per_tuple} \\times ${node.rows}`
+      );
+    intermediate +=
+      node.merge_qual_cost *
+        (node.outer_rows -
+          node.outer_skip_rows +
+          (node.inner_rows - node.inner_skip_rows) * node.rescanratio) +
+      node.cpu_per_tuple * node.mergejointuples +
+      node.cost_per_tuple * node.rows;
+
+    formulas.run_cost +=
+      " " + katex.renderToString(`= ${intermediate} = ${node.run_cost}`);
+
+    return formulas;
+  }
+
+  if (node.node === "HashJoin") {
+    let intermediate;
+    let nqquad = 1;
+
+    let formulas = {
+      total: katex.renderToString(`\\text{Startup Cost} + \\text{Run Cost}`),
+      total_cost: katex.renderToString(
+        `= ${node.startup_cost} + ${node.run_cost} = ${
+          node.startup_cost + node.run_cost
+        } = ${node.total_cost}`
+      ),
+    };
+
+    formulas.run = katex.renderToString(
+      `\\text{Outer Run Cost} + \\text{CPU Cost per Operator} \\times N_\\text{hash clauses} \\times N_\\text{outer rows}`
+    );
+    formulas.run_cost = katex.renderToString(
+      `= ${node.initial_outer_path_run_cost} + ${node.initial_cpu_operator_cost} \\times ${node.initial_num_hashclauses} \\times ${node.initial_outer_path_rows}`
+    );
+    intermediate =
+      node.initial_outer_path_run_cost +
+      node.initial_cpu_operator_cost *
+        node.initial_num_hashclauses *
+        node.initial_outer_path_rows;
+
+    if (node.initial_numbatches > 1) {
+      formulas.run += katex.renderToString(`\\\\`);
+      formulas.run_cost += katex.renderToString(`\\\\`);
+
+      for (let i = 0; i < nqquad; i++) {
+        formulas.run += katex.renderToString(`\\qquad`);
+        formulas.run_cost += katex.renderToString(`\\qquad`);
+      }
+      nqquad++;
+
+      formulas.run +=
+        katex.renderToString(`+`) +
+        " " +
+        katex.renderToString(
+          `\\text{Sequential Page Cost} \\times (N_\\text{inner pages} + 2 \\times N_\\text{outer pages})`
+        );
+      formulas.run_cost +=
+        katex.renderToString(`+`) +
+        " " +
+        katex.renderToString(
+          `${node.initial_seq_page_cost} \\times (${node.initial_innerpages} + 2 \\times ${node.initial_outerpages})`
+        );
+      intermediate +=
+        node.initial_seq_page_cost *
+        (node.initial_innerpages + 2 * node.initial_outerpages);
+    }
+
+    if (node.is_early_stop) {
+      formulas.run += katex.renderToString(`\\\\`);
+      formulas.run_cost += katex.renderToString(`\\\\`);
+
+      for (let i = 0; i < nqquad; i++) {
+        formulas.run += katex.renderToString(`\\qquad`);
+        formulas.run_cost += katex.renderToString(`\\qquad`);
+      }
+      nqquad++;
+
+      formulas.run +=
+        katex.renderToString(`+`) +
+        " " +
+        katex.renderToString(
+          `\\text{Hash Qual Cost per Tuple} \\times N_\\text{outer matched rows} \\times N_\\text{inner bucket rows} \\times 0.5`
+        );
+      formulas.run_cost +=
+        katex.renderToString(`+`) +
+        " " +
+        katex.renderToString(
+          `${node.hash_qual_cost} \\times ${node.outer_matched_rows} \\times ${node.matched_bucket_rows} \\times 0.5`
+        );
+      intermediate +=
+        node.hash_qual_cost *
+        node.outer_matched_rows *
+        node.matched_bucket_rows *
+        0.5;
+
+      formulas.run += katex.renderToString(`\\\\`);
+      formulas.run_cost += katex.renderToString(`\\\\`);
+
+      for (let i = 0; i < nqquad; i++) {
+        formulas.run += katex.renderToString(`\\qquad`);
+        formulas.run_cost += katex.renderToString(`\\qquad`);
+      }
+      nqquad++;
+
+      formulas.run +=
+        katex.renderToString(`+`) +
+        " " +
+        katex.renderToString(
+          `\\text{Hash Qual Cost per Tuple} \\times N_\\text{outer unmatched rows} \\times N_\\text{inner bucket rows} \\times 0.05`
+        );
+      formulas.run_cost +=
+        katex.renderToString(`+`) +
+        " " +
+        katex.renderToString(
+          `${node.hash_qual_cost} \\times ${node.outer_unmatched_rows} \\times ${node.unmatched_bucket_rows} \\times 0.05`
+        );
+      intermediate +=
+        node.hash_qual_cost *
+        node.outer_unmatched_rows *
+        node.unmatched_bucket_rows *
+        0.05;
+    } else {
+      formulas.run += katex.renderToString(`\\\\`);
+      formulas.run_cost += katex.renderToString(`\\\\`);
+
+      for (let i = 0; i < nqquad; i++) {
+        formulas.run += katex.renderToString(`\\qquad`);
+        formulas.run_cost += katex.renderToString(`\\qquad`);
+      }
+      nqquad++;
+
+      formulas.run +=
+        katex.renderToString(`+`) +
+        " " +
+        katex.renderToString(
+          `\\text{Hash Qual Cost per Tuple} \\times N_\\text{outer rows} \\times N_\\text{inner bucket rows} * 0.5`
+        );
+      formulas.run_cost +=
+        katex.renderToString(`+`) +
+        " " +
+        katex.renderToString(
+          `${node.hash_qual_cost} \\times ${node.outer_path_rows} \\times ${node.bucket_rows} \\times 0.5`
+        );
+      intermediate +=
+        node.hash_qual_cost * node.outer_path_rows * node.bucket_rows * 0.5;
+    }
+
+    formulas.run += katex.renderToString(`\\\\`);
+    formulas.run_cost += katex.renderToString(`\\\\`);
+
+    for (let i = 0; i < nqquad; i++) {
+      formulas.run += katex.renderToString(`\\qquad`);
+      formulas.run_cost += katex.renderToString(`\\qquad`);
+    }
+    nqquad++;
+
+    formulas.run +=
+      katex.renderToString(`+`) +
+      " " +
+      katex.renderToString(
+        `\\text{CPU Cost per Tuple} \\times N_\\text{hash join tuples} + \\text{Join Cost per Tuple} \\times N_\\text{join tuples}`
+      );
+    formulas.run_cost +=
+      katex.renderToString(`+`) +
+      " " +
+      katex.renderToString(
+        `${node.cpu_per_tuple} \\times ${node.hashjointuples} + ${node.cost_per_tuple} \\times ${node.rows}`
+      );
+    intermediate +=
+      node.cpu_per_tuple * node.hashjointuples +
+      node.cost_per_tuple * node.rows;
+
+    formulas.run_cost +=
+      " " + katex.renderToString(`= ${intermediate} = ${node.run_cost}`);
+
+    return formulas;
+  }
 
   return {
     total: "N/A",
@@ -429,34 +676,4 @@ export const generateFormulas = (node) => {
     disk: "N/A",
     disk_cost: null,
   };
-
-  // HashJoin: {
-  //   run: `Outer Path Run Cost + Hash Table Probe CPU Cost + Disk Page Read/Write Cost (if batching)`,
-  //   runValue: `= ${formatNumber(
-  //     props.outerPathTotal - props.outerPathStartup
-  //   )} + (0.01 * ${formatNumber(props.numHashClauses)} * ${formatNumber(
-  //     props.outerPathRows
-  //   )}) + (1.0 * (${formatNumber(props.innerPages)} + 2 * ${formatNumber(
-  //     props.outerPages
-  //   )}))`,
-  //   startup: `Inner Path Total Cost + Outer Path Startup Cost + Hash Table Build CPU Cost + Disk Page Read Cost (if batching)`,
-  //   startupValue: `= ${formatNumber(
-  //     props.innerPathTotal + props.outerPathStartup
-  //   )} + ${
-  //     (0.0125 * formatNumber(props.numHashClauses) + 1.0) *
-  //     formatNumber(props.innerPathRows)
-  //   } + (1.0 * ${formatNumber(props.innerPages)})`,
-  // },
-  // MergeJoin: {
-  //   run: `Outer Path Join CPU Cost + Inner Path Join CPU Cost`,
-  //   runValue: `= ${formatNumber(props.initialRunCost)} + ${formatNumber(
-  //     props.innerRunCost
-  //   )}`,
-  //   startup: `(Outer Path Sort Cost + Inner Path Sort Cost) + (Outer Path Initial Scan Cost + Inner Path Initial Scan Cost)`,
-  //   startupValue: `= (${formatNumber(
-  //     props.innerStartupCost
-  //   )} + ${formatNumber(props.outerStartupCost)}) + (${formatNumber(
-  //     props.innerScanCost
-  //   )} + ${formatNumber(props.outerScanCost)})`,
-  // },
 };

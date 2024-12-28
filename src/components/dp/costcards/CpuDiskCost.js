@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
 import { generateFormulas } from "../utils";
 
-const GatherMergeCost = ({ nodeDetails }) => {
+const CpuDiskCost = ({ nodeDetails }) => {
   const [totalForm, setTotalForm] = useState("");
   const [totalCost, setTotalCost] = useState("");
-  const [runForm, setRunForm] = useState("");
-  const [runCost, setRunCost] = useState("");
+  const [cpuForm, setCpuForm] = useState("");
+  const [cpuCost, setCpuCost] = useState("");
+  const [diskForm, setDiskForm] = useState("");
+  const [diskCost, setDiskCost] = useState("");
 
   useEffect(() => {
     const formulas = generateFormulas(nodeDetails);
@@ -14,8 +16,11 @@ const GatherMergeCost = ({ nodeDetails }) => {
       setTotalForm(formulas.total);
       setTotalCost(formulas.total_cost);
 
-      setRunForm(formulas.run);
-      setRunCost(formulas.run_cost);
+      setCpuForm(formulas.cpu);
+      setCpuCost(formulas.cpu_cost);
+
+      setDiskForm(formulas.disk);
+      setDiskCost(formulas.disk_cost);
     }
   });
 
@@ -36,15 +41,28 @@ const GatherMergeCost = ({ nodeDetails }) => {
           </td>
         </tr>
         <tr className="border-b border-gray-300">
-          <td className="pr-4">Run Cost</td>
+          <td className="pr-4">CPU Run Cost</td>
           <td className="py-2">
             <div
               className="text-xs"
-              dangerouslySetInnerHTML={{ __html: runForm }}
+              dangerouslySetInnerHTML={{ __html: cpuForm }}
             />
             <div
               className="text-xs"
-              dangerouslySetInnerHTML={{ __html: runCost }}
+              dangerouslySetInnerHTML={{ __html: cpuCost }}
+            />
+          </td>
+        </tr>
+        <tr>
+          <td className="pr-4">Disk Run Cost</td>
+          <td className="py-2">
+            <div
+              className="text-xs"
+              dangerouslySetInnerHTML={{ __html: diskForm }}
+            />
+            <div
+              className="text-xs"
+              dangerouslySetInnerHTML={{ __html: diskCost }}
             />
           </td>
         </tr>
@@ -53,4 +71,4 @@ const GatherMergeCost = ({ nodeDetails }) => {
   );
 };
 
-export default GatherMergeCost;
+export default CpuDiskCost;
