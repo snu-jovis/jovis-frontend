@@ -131,7 +131,7 @@ const GraphView = ({ index, base, dp, selectedNodes, addNode, removeNode }) => {
       if (parts.length > 1) {
         node
           .append("rect")
-          .attr("id", (d) => d.data.id.replace(/\s/g, ""))
+          .attr("id", (d) => `${index} ${d.data.id}`.replace(/\s/g, ""))
           .attr("width", targetSize)
           .attr("height", targetSize)
           .attr("x", -targetSize / 2)
@@ -263,13 +263,13 @@ const GraphView = ({ index, base, dp, selectedNodes, addNode, removeNode }) => {
         .each(function (d) {
           if (d.data.nodeData.cheapest_total_paths?.join) {
             cheapestInnerId.push(
-              d.data.nodeData.cheapest_total_paths.join.inner.relid.replace(
+              `${index} ${d.data.nodeData.cheapest_total_paths.join.inner.relid}`.replace(
                 /\s/g,
                 ""
               )
             );
             cheapestOuterId.push(
-              d.data.nodeData.cheapest_total_paths.join.outer.relid.replace(
+              `${index} ${d.data.nodeData.cheapest_total_paths.join.outer.relid}`.replace(
                 /\s/g,
                 ""
               )
@@ -307,11 +307,13 @@ const GraphView = ({ index, base, dp, selectedNodes, addNode, removeNode }) => {
             .filter(function (d) {
               return (
                 (Math.floor(d.data.level) === level &&
-                  !cheapestId.includes(`${d.data.id.replace(/\s/g, "")}`)) ||
+                  !cheapestId.includes(
+                    `${index} ${d.data.id}`.replace(/\s/g, "")
+                  )) ||
                 (Math.floor(d.data.level) === level + 1 &&
                   !cheapestId.some((id) => {
                     const relid = id.split("-").slice(0, -1).join("-");
-                    return d.data.id.replace(/\s/g, "") === relid;
+                    return `${index} ${d.data.id}`.replace(/\s/g, "") === relid;
                   }))
               );
             })
@@ -324,17 +326,17 @@ const GraphView = ({ index, base, dp, selectedNodes, addNode, removeNode }) => {
               return (
                 (Math.floor(d.target.data.level) === level &&
                   (!cheapestId.includes(
-                    `${d.target.data.id.replace(/\s/g, "")}`
+                    `${index} ${d.target.data.id}`.replace(/\s/g, "")
                   ) ||
                     (!cheapestInnerId.includes(
-                      `${d.source.data.id.replace(/\s/g, "")}`
+                      `${index} ${d.source.data.id}`.replace(/\s/g, "")
                     ) &&
                       !cheapestOuterId.includes(
-                        `${d.source.data.id.replace(/\s/g, "")}`
+                        `${index} ${d.source.data.id}`.replace(/\s/g, "")
                       )))) ||
                 (Math.floor(d.target.data.level) === level + 1 &&
                   !cheapestId.includes(
-                    `${d.source.data.id.replace(/\s/g, "")}`
+                    `${index} ${d.source.data.id}`.replace(/\s/g, "")
                   ))
               );
             })
