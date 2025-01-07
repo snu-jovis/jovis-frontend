@@ -350,8 +350,14 @@ const GraphView = ({ index, base, dp, selectedNodes, addNode, removeNode }) => {
         });
     }
 
-    if (animation && dp.length > 0) {
-      process();
+    if (animation) {
+      if (dp.length === 0) {
+        data.forEach((d) => {
+          if (!d.id.includes(" - ")) {
+            cheapestId.push(generateNodeId(d.nodeData.cheapest_total_paths));
+          }
+        });
+      } else if (dp.length > 0) process();
 
       nodes.style("opacity", "0");
       links.style("opacity", "0");
