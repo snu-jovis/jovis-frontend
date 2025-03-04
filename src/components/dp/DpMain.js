@@ -2,7 +2,7 @@ import { useContext } from "react";
 import { QueriesContext } from "../providers/QueriesProvider";
 
 import DpOpt from "./DpOpt";
-import DpExplain from "./DpExplain";
+import Explain from "../explain/Explain";
 
 const DpMain = ({ tab }) => {
   const { queries, selectedQueries } = useContext(QueriesContext);
@@ -28,7 +28,6 @@ const DpMain = ({ tab }) => {
                   data={query.opt}
                 />
               );
-
               if (
                 optLength >= 2 ||
                 currentRow.length === 2 ||
@@ -42,18 +41,16 @@ const DpMain = ({ tab }) => {
                 currentRow = [];
               }
             });
-
             return rows;
           })()}
       </div>
-      <div className="grid grid-cols-3 gap-6">
+      <div>
         {tab === "explain" &&
           selectedQueries.map((id) => {
             const query = queries.find((q) => q.id === id);
             if (!query) return null;
-
             return (
-              <DpExplain
+              <Explain
                 key={`dp-explain-${id}`}
                 title={query.title}
                 data={query.plan}

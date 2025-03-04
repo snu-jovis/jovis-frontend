@@ -22,6 +22,7 @@ export function HistoryProvider({ children }) {
   const [history, setHistory] = useState([]);
 
   useEffect(() => {
+    // localStorage.removeItem("history");
     const storage = localStorage.getItem("history");
     if (storage) {
       const parsed = JSON.parse(storage);

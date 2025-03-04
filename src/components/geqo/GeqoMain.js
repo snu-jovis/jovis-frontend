@@ -3,7 +3,7 @@ import CostChart from "./CostChart";
 import FullView from "./FullView";
 import EdgeRecomb from "./EdgeRecomb";
 import JoinOrderTree from "./JoinOrderTree";
-import QueryPlanTree from "./QueryPlanTree";
+import Explain from "../explain/Explain";
 import { Card } from "@material-tailwind/react";
 
 import "../../assets/stylesheets/Geqo.css";
@@ -62,9 +62,9 @@ const GeqoMain = ({ data, plan }) => {
         />
       </div>
       <div ref={indivRef} className="w-1/4 grid grid-cols-1 gap-2 ml-6 mr-4">
-        <Card>
-          <QueryPlanTree width={indivSize} height={indivSize} plan={plan} />
-        </Card>
+        {/* <Card>
+          <ExplainTree width={indivSize} height={indivSize} plan={plan} />
+        </Card> */}
         <Card>
           <EdgeRecomb width={indivSize} height={indivSize} data={data} />
         </Card>

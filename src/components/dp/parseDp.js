@@ -1,5 +1,5 @@
 /*
- * parseDp.js: 데이터 전처리
+ * parseDp.js: preprocess data
  */
 function countSubs(sub) {
   let count = 0;

@@ -1,24 +1,18 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
-import { nodeColor } from "./tree";
+import { nodeColor } from "./nodeColor";
 import { Card } from "@material-tailwind/react";
 
-const QueryPlanTree = ({ plan }) => {
-  plan = JSON.stringify(plan).replace(/"Plans":/g, '"children":');
-  plan = JSON.parse(plan);
-
+const ExplainTree = ({ plan }) => {
   const treeSvg = useRef(null);
   const svgWidth = 400;
   const svgHeight = 400;
   const margin = { x: 50, y: 50 };
-  const defaultRadius = 8;
+  let maxWidth = 0;
 
   const root = d3.hierarchy(plan);
 
-  const dx = 100;
-  const dy = 50;
-
-  const treeLayout = d3.tree().nodeSize([dx, dy]);
+  const treeLayout = d3.tree().size([svgWidth, svgHeight]);
   treeLayout(root);
 
   const diagonal = d3
@@ -29,7 +23,7 @@ const QueryPlanTree = ({ plan }) => {
   let [x0, x1, y0, y1] = [0, 0, 0, 0];
 
   root.x0 = 0;
-  root.y0 = dy / 2;
+  root.y0 = svgHeight / 2;
 
   root.descendants().forEach((d, i) => {
     d.id = i;
@@ -64,6 +58,7 @@ const QueryPlanTree = ({ plan }) => {
       .append("svg")
       .attr("width", svgWidth)
       .attr("height", svgHeight + 2 * margin.y)
+      .attr("height", svgHeight)
       .append("g")
       .attr("transform", `translate(${svgWidth / 2}, ${margin.y})`)
       .call(zoom)
@@ -99,38 +94,71 @@ const QueryPlanTree = ({ plan }) => {
           update(event, d);
         });
 
-      // append circles
+      // append rectangles
       nodeEnter
-        .append("circle")
-        .attr("id", "node-circle")
-        .attr("fill", (d) => nodeColor(d.data["Node Type"]))
-        .attr("r", defaultRadius);
+        .append("rect")
+        .attr("id", "node-rect")
+        .attr("height", 20)
+        .attr("rx", 5)
+        .attr("ry", 5)
+        .attr("fill", (d) => nodeColor(d.data["Node Type"]));
 
-      // append node type
-      nodeEnter
+      // append node type text
+      const nodeText = nodeEnter
         .append("text")
         .attr("id", "node-type")
-        .attr("class", "node-type")
-        .attr("text-anchor", "start")
-        .text((d) => d.data["Node Type"]);
+        .attr("class", "text-bsm")
+        .attr("dy", "1em")
+        .attr("text-anchor", "middle")
+        .text((d) =>
+          d.data["Parallel Aware"]
+            ? `Parallel ${d.data["Node Type"]}`
+            : d.data["Node Type"]
+        );
+
+      let padding = 20;
+      nodeText.each(function (d) {
+        const textWidth = this.getBBox().width + padding;
+
+        if (maxWidth === 0) maxWidth = Math.max(maxWidth, textWidth);
+
+        d3.select(this.parentNode)
+          .select("rect")
+          .attr("width", textWidth)
+          .attr("x", -textWidth / 2);
+      });
+
+      const dx = maxWidth + padding;
+      const dy = 50;
+
+      const treeLayout = d3.tree().nodeSize([dx, dy]);
+      treeLayout(root);
+      nodeEnter.attr("transform", (d) => `translate(${d.x},${d.y})`);
 
       // append relation name
       nodeEnter
         .append("text")
         .attr("id", "relation-name")
-        .attr("class", "relation-name")
-        .attr("dy", 12)
-        .attr("text-anchor", "start")
+        .attr("class", "text-rxsm")
+        .attr("dy", 30)
+        .attr("text-anchor", "middle")
         .text((d) =>
           d.data["Relation Name"]
-            ? d.data["Relation Name"].toUpperCase()
+            ? d.data["Relation Name"]
             : d.data.table_name
-            ? d.data.table_name.toUpperCase()
+            ? d.data.table_name
+            : d.data["CTE Name"]
+            ? d.data["CTE Name"]
             : null
         );
 
       node
         .merge(nodeEnter)
+        .attr("transform", (d) => {
+          return d != source && source.descendants().includes(d)
+            ? `translate(${source.x0},${source.y0})`
+            : `translate(${d.x0},${d.y0})`;
+        })
         .transition(transition)
         .attr("transform", (d) => `translate(${d.x},${d.y})`)
         .attr("fill-opacity", 1)
@@ -179,9 +207,14 @@ const QueryPlanTree = ({ plan }) => {
 
   return (
     <Card className="w-[400px]">
+      {plan["Subplan Name"] && (
+        <p className="text-ebsm italic text-center pt-3">
+          {plan["Subplan Name"]}
+        </p>
+      )}
       <svg ref={treeSvg} width={svgWidth} height={svgHeight} />
     </Card>
   );
 };
 
-export default QueryPlanTree;
+export default ExplainTree;

@@ -42,6 +42,13 @@ const DpOpt = ({ title, data }) => {
             />
           </div>
         ))}
+        {/* <GraphView
+          base={data.base}
+          dp={data.dp}
+          selectedNodes={nodes}
+          addNode={addNode}
+          removeNode={removeNode}
+        /> */}
       </div>
       <CostCard nodes={nodes} />
     </div>
