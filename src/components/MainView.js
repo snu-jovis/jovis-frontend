@@ -157,10 +157,15 @@ export default function MainView() {
             </li>
           </ul>
         </div>
-        <div className="m-4">
-          <DpMain tab={activeTab} />
-          {/* <GeqoMain tab={activeTab} /> */}
-        </div>
+        {queryRes.optimizer && (
+          <div className="m-4">
+            {/* TODO: can a single query be optimized by two diff optimizers? */}
+            {queryRes.optimizer[0].type === "dp" && <DpMain tab={activeTab} />}
+            {queryRes.optimizer[0].type === "geqo" && (
+              <GeqoMain tab={activeTab} />
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

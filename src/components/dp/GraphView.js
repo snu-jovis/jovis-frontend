@@ -6,7 +6,6 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import { parseDp } from "./parseDp";
 
 const GraphView = ({ index, base, dp, selectedNodes, addNode, removeNode }) => {
-  console.log("base", base, "dp", dp);
   const dagSvg = useRef(null);
   const svgWidth = 400;
   const svgHeight = 400;
