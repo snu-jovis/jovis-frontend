@@ -21,11 +21,11 @@ const CostChart = ({ width, height, data: geqoData }) => {
   const legendRef = useRef(null);
   const legendWidth = 230;
   const legendHeight = 20;
-  const legendMargin = { x: 25, y: 6, r: 5 };
+  const legendMargin = { x: 33, y: 6, r: 5 };
 
   const chartSvg = useRef(null);
-  const chartHeight = height ? height - legendHeight : 300;
-  const chartMargin = { top: 30, right: 40, bottom: 20, left: 50 };
+  const chartHeight = height - legendHeight;
+  const chartMargin = { top: 30, right: 40, bottom: 20, left: 60 };
 
   const lineColor = d3
     .scaleOrdinal()
@@ -62,7 +62,7 @@ const CostChart = ({ width, height, data: geqoData }) => {
         .datum(geqoData)
         .transition()
         .duration(500)
-        .attr("stroke-width", 2)
+        .attr("stroke-width", "1px")
         .attr("fill", "none")
         .attr("stroke", lineColor(metric))
         .attr(
@@ -109,7 +109,7 @@ const CostChart = ({ width, height, data: geqoData }) => {
 
       const legendText = legendItem
         .append("text")
-        .attr("class", "font-thin text-xs")
+        .attr("class", "text-rxsm")
         .attr("x", legendMargin.r * 2)
         .attr("y", legendMargin.y + legendMargin.r / 2)
         .text(metricNames[metric]);
@@ -121,6 +121,8 @@ const CostChart = ({ width, height, data: geqoData }) => {
 
   /* initialize the line chart */
   useEffect(() => {
+    if (!geqoData || geqoData.length === 0) return;
+
     const svg = d3.select(chartSvg.current);
     svg.selectAll("*").remove(); // clear
 
@@ -134,7 +136,7 @@ const CostChart = ({ width, height, data: geqoData }) => {
 
     drawAxes(svg, xScale, yScale);
     drawLines(svg, xScale, yScale);
-  }, [width, height, geqoData]);
+  }, [geqoData]);
 
   /* draw legend */
   useEffect(() => {
@@ -290,7 +292,7 @@ const CostChart = ({ width, height, data: geqoData }) => {
     const focusLine = svg
       .append("line")
       .attr("stroke", "gray")
-      .attr("stroke-width", 1);
+      .attr("stroke-width", "1px");
 
     const focusText = svg.append("text").attr("text-anchor", "middle");
 
@@ -338,8 +340,8 @@ const CostChart = ({ width, height, data: geqoData }) => {
         focusText
           .attr("x", xScale(focused.gen_num))
           .attr("y", chartMargin.top - 20)
-          .attr("class", "focus-gen")
-          .text(`Generation ${focused.gen_num}`);
+          .attr("class", "text-rxsm")
+          .text(`Generation ${focused.gen_num + 1}`);
 
         metrics.forEach((metric) => {
           if (!selectedMetric || selectedMetric === metric) {
@@ -379,12 +381,12 @@ const CostChart = ({ width, height, data: geqoData }) => {
 
   return (
     <div>
-      <div className="flex justify-between px-4 pt-2">
-        <p className="vis-title py-2">Cost Chart</p>
+      <div className="flex justify-between items-center px-4">
+        <p className="text-ebsm">Cost Chart</p>
         <Checkbox
-          className="h-4 w-4 rounded-full border-gray-900/20 bg-gray-900/10 transition-all hover:scale-105 hover:before:opacity-0"
+          className="h-4 w-4 rounded-full border-gray-900/20 bg-gray-900/10 transition-all hover:scale-80 hover:before:opacity-0"
           checked={logScale}
-          label={<p className="text">Log scale</p>}
+          label={<p className="text-bsm">Log scale</p>}
           onChange={handleCheckboxChange}
         />
       </div>

@@ -29,26 +29,37 @@ const DpOpt = ({ title, data }) => {
     <div ref={viewRef}>
       <p className="text-bm">{title}</p>
       <hr className="my-1 border-2" />
-      <div className="flex gap-4">
-        {data.map((item, index) => (
-          <div key={index}>
-            <GraphView
-              index={index}
-              base={item.base}
-              dp={item.dp}
-              selectedNodes={nodes}
-              addNode={addNode}
-              removeNode={removeNode}
-            />
-          </div>
-        ))}
-        {/* <GraphView
-          base={data.base}
-          dp={data.dp}
-          selectedNodes={nodes}
-          addNode={addNode}
-          removeNode={removeNode}
-        /> */}
+      <div>
+        {(() => {
+          const rows = [];
+          let currentRow = [];
+
+          data.forEach((item, index) => {
+            currentRow.push(
+              <div key={index}>
+                <GraphView
+                  index={index}
+                  base={item.base}
+                  dp={item.dp}
+                  selectedNodes={nodes}
+                  addNode={addNode}
+                  removeNode={removeNode}
+                />
+              </div>
+            );
+
+            if (currentRow.length === 3 || index === data.length - 1) {
+              rows.push(
+                <div key={`row-${rows.length}`} className="flex gap-4 mb-4">
+                  {currentRow}
+                </div>
+              );
+              currentRow = [];
+            }
+          });
+
+          return rows;
+        })()}
       </div>
       <CostCard nodes={nodes} />
     </div>

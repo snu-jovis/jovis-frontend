@@ -8,12 +8,14 @@ import { QueriesContext } from "./providers/QueriesProvider";
 import { HistoryContext } from "./providers/HistoryProvider";
 import { SqlToEditorContext } from "./providers/SqlToEditorProvider";
 
-import DpMain from "./dp/DpMain";
-import GeqoMain from "./geqo/GeqoMain";
+import DpOpt from "./dp/DpOpt";
+import GeqoOpt from "./geqo/GeqoOpt";
+import Explain from "./explain/Explain";
 
 export default function MainView() {
   const editorRef = useRef(null);
-  const { addQueries } = useContext(QueriesContext);
+
+  const { queries, addQueries, selectedQueries } = useContext(QueriesContext);
   const { addHistory } = useContext(HistoryContext);
   const { setCallback } = useContext(SqlToEditorContext);
 
@@ -157,15 +159,88 @@ export default function MainView() {
             </li>
           </ul>
         </div>
-        {queryRes.optimizer && (
-          <div className="m-4">
-            {/* TODO: can a single query be optimized by two diff optimizers? */}
-            {queryRes.optimizer[0].type === "dp" && <DpMain tab={activeTab} />}
-            {queryRes.optimizer[0].type === "geqo" && (
-              <GeqoMain tab={activeTab} />
-            )}
-          </div>
-        )}
+        <div>
+          {activeTab === "planning" &&
+            (() => {
+              const rows = [];
+              let currentRow = [];
+              let i = 0;
+
+              selectedQueries.forEach((id) => {
+                const query = queries.find((q) => q.id === id); // find query by id
+                if (!query) return;
+
+                const optLength = query.opt?.length || 0;
+                const optType = query.opt?.[0]?.type;
+
+                if (optType === "dp") i += optLength;
+                else if (optType === "geqo") i = 4;
+
+                if (i > 3) {
+                  rows.push(
+                    <div key={`row-${rows.length}`} className="flex gap-6">
+                      {currentRow}
+                    </div>
+                  );
+                  currentRow = [];
+                  i = optLength;
+                }
+
+                if (optType === "dp") {
+                  currentRow.push(
+                    <DpOpt
+                      key={`dp-opt-${id}`}
+                      title={query.title}
+                      data={query.opt}
+                    />
+                  );
+                  if (i > 3) {
+                    rows.push(
+                      <div key={`row-${rows.length}`} className="flex gap-6">
+                        {currentRow}
+                      </div>
+                    );
+                    currentRow = [];
+                    i = 0;
+                  }
+                } else if (optType === "geqo") {
+                  rows.push(
+                    <div key={`row-${rows.length}`} className="flex gap-6">
+                      <GeqoOpt
+                        key={`geqo-opt-${id}`}
+                        title={query.title}
+                        // can GEQO have multiple optimization results?
+                        // if not, it's fine to use query.opt[0]
+                        data={query.opt[0]}
+                      />
+                    </div>
+                  );
+                  i = 0;
+                }
+              });
+              rows.push(
+                <div key={`row-${rows.length}`} className="flex gap-6">
+                  {currentRow}
+                </div>
+              );
+
+              return rows;
+            })()}
+        </div>
+        <div className="mt-4">
+          {activeTab === "explain" &&
+            selectedQueries.map((id) => {
+              const query = queries.find((q) => q.id === id);
+              if (!query) return null;
+              return (
+                <Explain
+                  key={`explain-${id}`}
+                  title={query.title}
+                  data={query.plan}
+                />
+              );
+            })}
+        </div>
       </div>
     </div>
   );

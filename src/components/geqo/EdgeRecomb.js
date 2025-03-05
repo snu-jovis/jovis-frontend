@@ -290,8 +290,8 @@ const EdgeRecomb = ({ width, height, data }) => {
 
   return (
     <>
-      <div className="flex justify-between px-4 py-2">
-        <p className="vis-title py-2">Edge Recombination Crossover</p>
+      <div className="px-4 pt-2">
+        <p className="text-ebsm">Edge Recombination Crossover</p>
       </div>
       {mom && dad && child ? (
         <div>
@@ -311,12 +311,9 @@ const EdgeRecomb = ({ width, height, data }) => {
           </div>
         </div>
       ) : (
-        <div
-          style={{ width: `${width}px`, height: `${height}px` }}
-          className="flex items-center justify-center"
-        >
-          <span className="font-[NanumSquareB] text-base">
-            Choose a gene to see the ERX process.
+        <div className="flex justify-center items-center h-[500px]">
+          <span className="text-bsm">
+            Choose a gene to <br /> see the ERX process.
           </span>
         </div>
       )}

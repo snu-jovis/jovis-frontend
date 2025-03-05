@@ -14,10 +14,10 @@ const FullView = ({ width, height, data: geqoData, map }) => {
   const numGene = geqoData[0].pool.length;
 
   const [showRecomb, setShowRecomb] = useState(false);
-  // const [selectedGen, setSelectedGen] = useState([0, numGen]);
-  const [selectedGen, setSelectedGen] = useState([0, 20]);
-  // const [selectedGene, setSelectedGene] = useState([0, numGene]);
-  const [selectedGene, setSelectedGene] = useState([0, 30]);
+  const [selectedGen, setSelectedGen] = useState([0, numGen]);
+  // const [selectedGen, setSelectedGen] = useState([0, 20]);
+  const [selectedGene, setSelectedGene] = useState([0, numGene]);
+  // const [selectedGene, setSelectedGene] = useState([0, 30]);
 
   const genRef = useRef(null);
   const horizRef = useRef(null);
@@ -253,7 +253,7 @@ const FullView = ({ width, height, data: geqoData, map }) => {
   }, [width, height, geqoData]);
 
   return (
-    <div className="place-content-center">
+    <div className="place-content-center mr-8">
       <div className="flex items-center place-content-center">
         <svg
           className="vert-slider"
