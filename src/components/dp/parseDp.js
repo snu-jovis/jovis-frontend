@@ -5,8 +5,7 @@ function countSubs(sub) {
   let count = 0;
   while (sub) {
     sub = sub.sub;
-    count++;
-  }
+    count++;  }
   return count;
 }
 
@@ -58,23 +57,56 @@ function processSub(nodeMap, path, entry, level, numSubs) {
   }
 }
 
-export function parseDp(base, dp, nodeMap, printSub = true) {
-  /* base 처리; access paths */
+function parseBase(base, nodeMap, printSub, appendChild, appendExist) {
+  let level = appendExist ? 2 : 0;
+  if (appendChild) level -= 2;
+
   base.forEach((relation) => {
+    // add regular path
     relation.paths?.forEach((path) => {
-      if (printSub) processSub(nodeMap, path, relation, 1, countSubs(path.sub));
+      if (printSub) processSub(nodeMap, path, relation, level + 1, countSubs(path.sub));
       else {
         if (path.sub) return;
 
-        addNode(nodeMap, path, 0, getRelId(path));
-        addNode(nodeMap, relation, 1, relation.relid, getRelId(path));
+        addNode(nodeMap, path, level, getRelId(path));
+        addNode(nodeMap, relation, level + 1, relation.relid, getRelId(path));
       }
+
+      // add append path 
+      // KOO-001: assume that append path is always in the base 
+      relation.append?.forEach((append) => {
+        parseBase([append], nodeMap, printSub, true, appendExist);
+
+        // connect to the append node.
+        // append path should have "Append" path name
+        const pathRelid = `${relation.relid} - ` + path.node;
+        addNode(nodeMap, append, 2, pathRelid, append.relid);
+      });
     });
   });
 
+  return appendExist;
+}
+
+export function parseDp(base, dp, nodeMap, printSub = true) {
+  /* base 처리; access paths */
+
+  // if there is any append node, levels zero and one are used by the append node,
+  //   and the base node starts from level two.
+  // Otherwise, the base node starts from level zero.
+  const appendExist = base.some((relation) => relation.append);
+  parseBase(base, nodeMap, printSub, false, appendExist);
+
   /* dp 처리 */
   dp.forEach((entry) => {
-    const level = entry.relid.split(" ").length;
+    let level = 0;
+    // KOO-002: assume there is no aliased join
+    if (entry.relid.includes("unnamed_join")) {
+      level = (entry.relid.split(" ").length - 1) * 2 - 1;
+    } else {
+      level = entry.relid.split(" ").length * 2 - 1;
+    }
+    if (appendExist) level += 2;
 
     entry.paths?.forEach((path) => {
       if (path.join) {
@@ -88,15 +120,15 @@ export function parseDp(base, dp, nodeMap, printSub = true) {
         const outerMatch = outerRelid.match(/^(.+?)\) required_outer \(/);
         if (outerMatch) outerRelid = outerMatch[1];
 
-        addNode(nodeMap, path, 2 * level - 2, pathRelid);
-        addNode(nodeMap, entry, 2 * level - 1, entry.relid, pathRelid);
+        addNode(nodeMap, path, level - 1, pathRelid);
+        addNode(nodeMap, entry, level, entry.relid, pathRelid);
 
         addNode(nodeMap, path, level, pathRelid, innerRelid);
         addNode(nodeMap, path, level, pathRelid, outerRelid);
       }
 
       if (printSub && path.sub)
-        processSub(nodeMap, path, entry, 2 * level - 1, countSubs(path.sub));
+        processSub(nodeMap, path, entry, level, countSubs(path.sub));
     });
   });
 
