@@ -1,47 +1,58 @@
-import { useEffect, useRef, useState } from "react";
 import CostChart from "./CostChart";
 import FullView from "./FullView";
 import EdgeRecomb from "./EdgeRecomb";
 import JoinOrderTree from "./JoinOrderTree";
+import Rerun from "./Rerun";
 import { Card } from "@material-tailwind/react";
 
 import "../../assets/stylesheets/Geqo.css";
 
-const GeqoOpt = ({ title, data }) => {
-  const viewRef = useRef(null);
+// TODO: selectedGene should be an array
 
-  const chartRef = useRef(null);
-  const fullRef = useRef(null);
-  const indivRef = useRef(null);
+const GeqoOpt = ({ title, data, submitQuery, addHistory }) => {
+  const { query, database, opt } = data;
+
+  // can GEQO have multiple optimization results?
+  // if not, it's fine to use query.opt[0]
+  const geqoData = opt[0].geqo;
 
   return (
-    <div ref={viewRef}>
+    <div>
       <p className="text-bm mt-4">{title}</p>
       <hr className="my-1 border-2" />
       <div className="flex mt-2 mb-6">
-        <div ref={chartRef} className="grid grid-cols-1 gap-2">
+        <div className="grid grid-cols-1 gap-2">
           <Card>
-            <CostChart width={300} height={200} data={data.geqo.gen} />
+            <CostChart width={300} height={200} data={geqoData.gen} />
           </Card>
           <Card>
             <JoinOrderTree
               width={300}
               height={300}
-              data={data.geqo.reloptinfo}
+              data={geqoData.reloptinfo}
             />
           </Card>
         </div>
-        <div ref={fullRef} className="flex">
+        <div className="flex">
           <FullView
-            width={550}
-            height={550}
-            data={data.geqo.gen}
-            map={data.for}
+            width={450}
+            height={450}
+            data={geqoData.gen}
+            map={opt[0].for}
           />
         </div>
-        <div ref={indivRef} className="grid grid-cols-1 gap-2">
+        <div className="grid grid-cols-1 gap-2">
+          <Card className="w-[310px]">
+            <Rerun
+              query={query}
+              database={database}
+              data={geqoData}
+              submitQuery={submitQuery}
+              addHistory={addHistory}
+            />
+          </Card>
           <Card>
-            <EdgeRecomb width={300} height={500} data={data} />
+            <EdgeRecomb width={300} height={300} data={opt[0]} />
           </Card>
         </div>
       </div>

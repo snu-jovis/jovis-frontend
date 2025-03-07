@@ -6,6 +6,11 @@
   width: 1280px;
 }
 
+.text-lxsm {
+  font-family: "NanumSquareL";
+  font-size: x-small;
+}
+
 .text-lsm {
   font-family: "NanumSquareL";
   font-size: small;
@@ -39,6 +44,11 @@
 .text-rl {
   font-family: "NanumSquareR";
   font-size: large;
+}
+
+.text-bxsm {
+  font-family: "NanumSquareB";
+  font-size: x-small;
 }
 
 .text-bsm {

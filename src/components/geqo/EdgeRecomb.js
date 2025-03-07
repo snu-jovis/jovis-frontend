@@ -294,24 +294,19 @@ const EdgeRecomb = ({ width, height, data }) => {
         <p className="text-ebsm">Edge Recombination Crossover</p>
       </div>
       {mom && dad && child ? (
-        <div>
+        <div className="w-[310px] h-[360px]">
           <div className="flex justify-center justify-items-center items-center">
             <svg ref={momRef} width={width / 2} height={height / 2} />
-            <h1 className="erx-sign mx-2">+</h1>
+            <p className="text-bl">+</p>
             <svg ref={dadRef} width={width / 2} height={height / 2} />
           </div>
-          <div
-            style={{ width: `${width}px`, height: `20px` }}
-            className="erx-sign flex justify-center items-center mb-4"
-          >
-            =
-          </div>
+          <p className="text-bl text-center">=</p>
           <div className="flex justify-center justify-items-center items-center">
             <svg ref={childRef} width={width} height={height / 2} />
           </div>
         </div>
       ) : (
-        <div className="flex justify-center items-center h-[500px]">
+        <div className="flex justify-center items-center w-[310px] h-[360px]">
           <span className="text-bsm">
             Choose a gene to <br /> see the ERX process.
           </span>
