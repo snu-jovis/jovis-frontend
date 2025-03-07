@@ -8,8 +8,7 @@ const JoinOrderTree = ({ width, height, data: relOptInfo }) => {
     (info) => info.relid === chosen
   );
 
-  const costHeight = 30;
-  const svgHeight = height - costHeight;
+  const svgHeight = height;
   const [fitness, setFitness] = useState(0);
   const [selectedCost, setSelectedCost] = useState("");
 
@@ -65,7 +64,7 @@ const JoinOrderTree = ({ width, height, data: relOptInfo }) => {
 
   const dx = treeWidth / 5;
   const dy = 40;
-  const margin = { x: 20, top: 30, bottom: 50 };
+  const margin = { x: 20, top: 30 };
   const barMargin = { x: 35, y: 20 };
 
   const treeLayout = d3.tree().nodeSize([dx, dy]);
@@ -305,24 +304,20 @@ const JoinOrderTree = ({ width, height, data: relOptInfo }) => {
       <div className="flex justify-between px-4 pt-2">
         <p className="text-ebsm">Join Order Tree</p>
       </div>
-      {/* {relOptInfo[chosen] ? ( */}
       {chosenRelOptInfo ? (
-        <div>
+        <div className="h-[340px]">
           <div className="flex">
             <svg ref={treeRef} width={treeWidth} height={svgHeight} />
             <svg ref={barRef} width={barWidth} height={svgHeight} />
           </div>
-          <hr className="m-2 border-1" />
-          <div
-            style={{ width: `${width}}px`, height: `${costHeight}px` }}
-            className="flex justify-center gap-2"
-          >
-            <p className="text-bsm">Fitness: {fitness}</p>
-            <p>{selectedCost}</p>
+          <hr className="mx-2 mb-2 border-1" />
+          <div className="flex justify-center gap-2">
+            <p className="text-rsm">Fitness: {fitness}</p>
+            <p className="text-rsm">{selectedCost}</p>
           </div>
         </div>
       ) : (
-        <div className="flex justify-center items-center h-[300px]">
+        <div className="flex justify-center items-center h-[340px]">
           <span className="text-bsm">Choose a gene to see the join order.</span>
         </div>
       )}

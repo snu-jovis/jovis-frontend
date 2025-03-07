@@ -6,32 +6,24 @@ import { GeqoContext } from "../providers/GeqoProvider";
 const FullView = ({ width, height, data: geqoData, map }) => {
   const { setChosen, setMom, setDad, setChild } = useContext(GeqoContext);
 
-  const svgWidth = (5 * width) / 6;
-  const svgHeight = (5 * height) / 6;
+  const svgWidth = width;
+  const svgHeight = height;
   const sliderSize = 80;
+  const sliderMargin = 10;
 
   const numGen = geqoData.length;
   const numGene = geqoData[0].pool.length;
 
   const [showRecomb, setShowRecomb] = useState(false);
   const [selectedGen, setSelectedGen] = useState([0, numGen]);
-  // const [selectedGen, setSelectedGen] = useState([0, 20]);
   const [selectedGene, setSelectedGene] = useState([0, numGene]);
-  // const [selectedGene, setSelectedGene] = useState([0, 30]);
 
   const genRef = useRef(null);
   const horizRef = useRef(null);
   const vertRef = useRef(null);
 
-  const margin = { x: 0, y: 0 };
-  const sliderMargin = 10;
-
-  const [rectWidth, setRectWidth] = useState(
-    (svgWidth - 2 * margin.x) / numGen
-  );
-  const [rectHeight, setRectHeight] = useState(
-    (svgHeight - 2 * margin.y) / numGene
-  );
+  const [rectWidth, setRectWidth] = useState(svgWidth / numGen);
+  const [rectHeight, setRectHeight] = useState(svgHeight / numGene);
 
   const minFitness = geqoData[0].worst;
   const maxFitness = geqoData[numGen - 1].best;
@@ -51,19 +43,6 @@ const FullView = ({ width, height, data: geqoData, map }) => {
 
   const handleClick = (gen, gene) => {
     setChosen(map);
-    // setChosen(gene.gene);
-
-    // const newMap = map.split(" ").reduce((obj, item, index) => {
-    //   obj[index + 1] = item;
-    //   return obj;
-    // }, {});
-
-    // var newGene = [];
-    // gene.gene.split(" ").reduce((obj, item, index) => {
-    //   newGene.push(item);
-    // }, {});
-
-    // const relId = newGene.map((id) => newMap[id]).join(" ");
 
     if (gene.parents) {
       setMom(geqoData[gen - 1].pool[gene.parents[0]].gene);
@@ -87,12 +66,8 @@ const FullView = ({ width, height, data: geqoData, map }) => {
     const svg = d3.select(genRef.current);
     svg.selectAll("*").remove(); // clear
 
-    setRectWidth(
-      (svgWidth - 2 * margin.x) / (selectedGen[1] - selectedGen[0] + 1)
-    );
-    setRectHeight(
-      (svgHeight - 2 * margin.y) / (selectedGene[1] - selectedGene[0])
-    );
+    setRectWidth(svgWidth / (selectedGen[1] - selectedGen[0] + 1));
+    setRectHeight(svgHeight / (selectedGene[1] - selectedGene[0]));
 
     filteredGen.forEach((gen, i) => {
       const filteredGene = gen.pool.filter(
@@ -115,7 +90,6 @@ const FullView = ({ width, height, data: geqoData, map }) => {
           .attr("fill", gene.color)
           .attr("stroke", "lightgray")
           .attr("stroke-width", 0.1)
-          .attr("transform", `translate(${margin.x},${margin.y})`)
           .on("mouseover", function (event, d) {
             d3.select(this).attr("fill", d3.rgb(gene.color).darker());
             tooltip
@@ -141,26 +115,16 @@ const FullView = ({ width, height, data: geqoData, map }) => {
 
         if (showRecomb) {
           if (gene.parents) {
-            // svg.select(`#gene-${gen.gen_num}-${gene.population_num}`);
-            // svg.select(`#gene-${gen.gen_num - 1}-${gene.parents[0]}`);
-            // svg.select(`#gene-${gen.gen_num - 1}-${gene.parents[1]}`);
-
             svg
               .append("line")
-              .attr("x1", (i - 1) * rectWidth + rectWidth / 2 + margin.x)
-              .attr(
-                "y1",
-                gene.parents[0] * rectHeight + rectHeight / 2 + margin.y
-              )
-              .attr("x2", (i - 1) * rectWidth + rectWidth / 2 + margin.x)
-              .attr(
-                "y2",
-                gene.parents[0] * rectHeight + rectHeight / 2 + margin.y
-              )
+              .attr("x1", (i - 1) * rectWidth + rectWidth / 2)
+              .attr("y1", gene.parents[0] * rectHeight + rectHeight / 2)
+              .attr("x2", (i - 1) * rectWidth + rectWidth / 2)
+              .attr("y2", gene.parents[0] * rectHeight + rectHeight / 2)
               .transition()
               .duration(1000)
-              .attr("x2", (i - 1) * rectWidth + rectWidth + margin.x)
-              .attr("y2", j * rectHeight + rectHeight / 2 + margin.y)
+              .attr("x2", (i - 1) * rectWidth + rectWidth)
+              .attr("y2", j * rectHeight + rectHeight / 2)
               .attr(
                 "stroke",
                 geqoData[selectedGen[0] + i - 1].pool[gene.parents[0]].color
@@ -169,20 +133,14 @@ const FullView = ({ width, height, data: geqoData, map }) => {
 
             svg
               .append("line")
-              .attr("x1", (i - 1) * rectWidth + rectWidth / 2 + margin.x)
-              .attr(
-                "y1",
-                gene.parents[1] * rectHeight + rectHeight / 2 + margin.y
-              )
-              .attr("x2", (i - 1) * rectWidth + rectWidth / 2 + margin.x)
-              .attr(
-                "y2",
-                gene.parents[1] * rectHeight + rectHeight / 2 + margin.y
-              )
+              .attr("x1", (i - 1) * rectWidth + rectWidth / 2)
+              .attr("y1", gene.parents[1] * rectHeight + rectHeight / 2)
+              .attr("x2", (i - 1) * rectWidth + rectWidth / 2)
+              .attr("y2", gene.parents[1] * rectHeight + rectHeight / 2)
               .transition()
               .duration(1000)
-              .attr("x2", (i - 1) * rectWidth + rectWidth + margin.x)
-              .attr("y2", j * rectHeight + rectHeight / 2 + margin.y)
+              .attr("x2", (i - 1) * rectWidth + rectWidth)
+              .attr("y2", j * rectHeight + rectHeight / 2)
               .attr(
                 "stroke",
                 geqoData[selectedGen[0] + i - 1].pool[gene.parents[1]].color
@@ -214,9 +172,6 @@ const FullView = ({ width, height, data: geqoData, map }) => {
       .default(selectedGen)
       .fill("gray")
       .width(svgWidth)
-      // .on("onchange", (val) => {
-      //   setSelectedGen(val);
-      // })
       .on("end", (val) => {
         setSelectedGen(val);
       });
@@ -239,9 +194,6 @@ const FullView = ({ width, height, data: geqoData, map }) => {
       .default(selectedGene)
       .fill("gray")
       .height(svgHeight)
-      // .on("onchange", (val) => {
-      //   setSelectedGene([numGene - val[1], numGene - val[0]]);
-      // })
       .on("end", (val) => {
         setSelectedGene([numGene - val[1], numGene - val[0]]);
       });

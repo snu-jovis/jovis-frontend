@@ -14,11 +14,12 @@ export function QueriesProvider({ children }) {
   const [queries, setQueries] = useState([]);
   const [selectedQueries, setSelectedQueries] = useState([]);
 
-  const onAddQueries = (sql, opt, plan) => {
+  const onAddQueries = (sql, db, opt, plan) => {
     const newData = {
       id: Date.now(),
       title: sql.substring(0, Math.min(sql.length, TITLE_SUBSTRING_LENGTH)),
       query: sql,
+      database: db,
       opt,
       plan,
     };

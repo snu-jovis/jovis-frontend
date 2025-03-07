@@ -1,9 +1,6 @@
-import { useRef } from "react";
 import ExplainTree from "./ExplainTree";
 
 const Explain = ({ title, data }) => {
-  const viewRef = useRef(null);
-
   data = JSON.stringify(data).replace(/"Plans":/g, '"children":');
   data = JSON.parse(data);
 
@@ -30,7 +27,7 @@ const Explain = ({ title, data }) => {
   const initPlans = extractInitPlan(data);
 
   return (
-    <div className="mb-4" ref={viewRef}>
+    <div className="mb-4">
       <p className="text-bm">{title}</p>
       <hr className="my-1 border-2" />
       <div className="grid grid-cols-3 gap-4">

@@ -39,6 +39,7 @@ export default function MainView() {
         setQueryRes(response.data);
         addQueries(
           sql,
+          db,
           response.data.optimizer,
           response.data.result[0][0][0].Plan
         );
@@ -209,9 +210,9 @@ export default function MainView() {
                       <GeqoOpt
                         key={`geqo-opt-${id}`}
                         title={query.title}
-                        // can GEQO have multiple optimization results?
-                        // if not, it's fine to use query.opt[0]
-                        data={query.opt[0]}
+                        data={query}
+                        submitQuery={submitQuery}
+                        addHistory={addHistory}
                       />
                     </div>
                   );

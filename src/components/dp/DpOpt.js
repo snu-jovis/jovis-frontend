@@ -1,12 +1,10 @@
-import { useState, useRef } from "react";
+import { useState } from "react";
 import GraphView from "./GraphView";
 import CostCard from "./CostCard";
 
 import "../../assets/stylesheets/Dp.css";
 
 const DpOpt = ({ title, data }) => {
-  const viewRef = useRef(null);
-
   const [nodes, setNodes] = useState([]);
   const addNode = (index, id, detail) => {
     setNodes((prev) => {
@@ -26,7 +24,7 @@ const DpOpt = ({ title, data }) => {
   };
 
   return (
-    <div ref={viewRef}>
+    <div>
       <p className="text-bm">{title}</p>
       <hr className="my-1 border-2" />
       <div>
