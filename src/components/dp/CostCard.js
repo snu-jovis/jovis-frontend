@@ -15,6 +15,9 @@ const opTypeComponents = {
   NestLoop: RunCost,
   MergeJoin: RunCost,
   HashJoin: RunCost,
+  CteScan: RunCost,
+  MergeAppend: RunCost,
+  Append: RunCost,
 };
 
 const opType = Object.keys(opTypeComponents);
