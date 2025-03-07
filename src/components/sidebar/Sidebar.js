@@ -79,7 +79,14 @@ function Sidebar(props) {
             <ListAccordion
               title="TPC-DS"
               icon={<BeakerIcon className="h-6 w-6" />}
-              data={[...Array(99).keys()].map((i) => `Query ${i + 1}`)}
+              data={[...Array(101).keys()].map((i) => {
+                if (i < 22) return `Query ${i + 1}`;
+                else if (i === 22) return "Query 23-1";
+                else if (i === 23) return "Query 23-2";
+                else if (i === 24) return "Query 24-1";
+                else if (i === 25) return "Query 24-2";
+                else return `Query ${i - 1}`;
+              })}
               onClick={(d) => onClickHandler("tpcds", d)}
             />
           </div>
