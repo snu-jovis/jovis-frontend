@@ -24,7 +24,7 @@ const DpOpt = ({ title, data }) => {
   };
 
   return (
-    <div>
+    <div className="my-2">
       <p className="text-bm">{title}</p>
       <hr className="my-1 border-2" />
       <div>
@@ -48,7 +48,7 @@ const DpOpt = ({ title, data }) => {
 
             if (currentRow.length === 3 || index === data.length - 1) {
               rows.push(
-                <div key={`row-${rows.length}`} className="flex gap-4 mb-4">
+                <div key={`row-${rows.length}`} className="flex gap-4 mb-2">
                   {currentRow}
                 </div>
               );

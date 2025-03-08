@@ -19,7 +19,8 @@ export default function MainView() {
   const { addHistory } = useContext(HistoryContext);
   const { setCallback } = useContext(SqlToEditorContext);
 
-  const [database, setDatabase] = useState("postgres"); // candidates: postgres, tpch1gb, and tpcds1gb
+  // candidates: postgres, tpch1gb, tpcds1gb, and imdbload
+  const [database, setDatabase] = useState("postgres");
   const [queryRes, setQueryRes] = useState({});
   const [isLoading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("planning");
@@ -55,12 +56,14 @@ export default function MainView() {
     submitQuery(database, sql);
 
     // history
-    // the exact database name (e.g., tpch1gb and tpcds1gb) should be known by only the main view
-    // another component only knows the database type (e.g., tpch and tpcds)
+    // the exact database name (e.g., tpch1gb, tpcds1gb, and imdbload) should be known by only the main view
+    // another component only knows the database type (e.g., tpch, tpcds and imdb)
     if (database === "tpch1gb") {
       addHistory("tpch", sql);
     } else if (database === "tpcds1gb") {
       addHistory("tpcds", sql);
+    } else if (database === "imdbload") {
+      addHistory("imdb", sql);
     } else {
       addHistory(database, sql);
     }
@@ -77,6 +80,8 @@ export default function MainView() {
       setDatabase("tpch1gb");
     } else if (type === "tpcds") {
       setDatabase("tpcds1gb");
+    } else if (type === "job") {
+      setDatabase("imdbload");
     } else {
       setDatabase("postgres");
     }
@@ -130,6 +135,7 @@ export default function MainView() {
               <Option value="postgres">Default Database</Option>
               <Option value="tpch1gb">TPC-H</Option>
               <Option value="tpcds1gb">TPC-DS</Option>
+              <Option value="imdbload">IMDB</Option>
             </Select>
           </div>
           {isLoading && (

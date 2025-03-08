@@ -6,6 +6,7 @@ import {
   QuestionMarkCircleIcon,
   ServerStackIcon,
   Bars3Icon,
+  VideoCameraIcon,
 } from "@heroicons/react/24/outline";
 
 import "../../assets/stylesheets/Sidebar.css";
@@ -33,6 +34,8 @@ function Sidebar(props) {
         call("tpch", history[val].query);
       } else if (history[val].db === "tpcds") {
         call("tpcds", history[val].query);
+      } else if (history[val].db === "imdb") {
+        call("job", history[val].query);
       } else {
         call(type, history[val].query);
       }
@@ -40,6 +43,8 @@ function Sidebar(props) {
       call(type, presetQueries.tpch[(val + 1).toString()]);
     } else if (type === "tpcds") {
       call(type, presetQueries.tpcds[(val + 1).toString()]);
+    } else if (type === "job") {
+      call(type, presetQueries.job[val]);
     }
   };
 
@@ -81,6 +86,15 @@ function Sidebar(props) {
               icon={<BeakerIcon className="h-6 w-6" />}
               data={[...Array(99).keys()].map((i) => `Query ${i + 1}`)}
               onClick={(d) => onClickHandler("tpcds", d)}
+            />
+            {/* SubMenu 3-3: JOB on IMDB */}
+            <ListAccordion
+              title="JOB"
+              icon={<VideoCameraIcon className="h-6 w-6" />}
+              data={Object.keys(presetQueries.job).map((key) => `Query ${key}`)}
+              onClick={(d) =>
+                onClickHandler("job", Object.keys(presetQueries.job)[d])
+              }
             />
           </div>
         }
