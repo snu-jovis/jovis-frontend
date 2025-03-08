@@ -59,7 +59,7 @@ const GraphView = ({ index, base, dp, selectedNodes, addNode, removeNode }) => {
       .attr(
         "transform",
         `translate(${svgWidth - (svgWidth - dagWidth * scale) / 2}, ${
-          svgHeight - margin.y
+          svgHeight - (svgHeight - dagHeight * scale) / 2
         }) scale(${scale}) rotate(180)`
       )
       .call(
@@ -368,9 +368,20 @@ const GraphView = ({ index, base, dp, selectedNodes, addNode, removeNode }) => {
 
   useEffect(() => {
     const nodeMap = new Map();
+
+    // KOO-003: handling same relid issue ("*SELECT* 1")
+    base.forEach((relation) => {
+      relation.append?.forEach((append) => {
+        if (append.relid.includes("__CHILD")) return;
+        if (append.relid === "*SELECT* 1")
+          append.relid = `${append.relid}__CHILD`;
+      });
+    });
+
+    const parseRes = parseDp(base, dp, nodeMap);
     drawGraph({
       graphSvg: dagSvg,
-      data: parseDp(base, dp, nodeMap),
+      data: parseRes,
     });
   }, [base, dp, showCostScale, animation]);
 
