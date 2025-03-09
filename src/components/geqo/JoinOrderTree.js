@@ -5,7 +5,6 @@ import { GeqoContext } from "../providers/GeqoProvider";
 const JoinOrderTree = ({ width, height, data: relOptInfo }) => {
   const { chosen } = useContext(GeqoContext);
   const chosenRelOptInfo = relOptInfo[chosen];
-  console.log(chosenRelOptInfo);
 
   const svgHeight = height;
   const [fitness, setFitness] = useState(0);
