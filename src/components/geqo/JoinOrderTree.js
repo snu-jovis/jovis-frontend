@@ -5,6 +5,7 @@ import { GeqoContext } from "../providers/GeqoProvider";
 const JoinOrderTree = ({ width, height, data: relOptInfo }) => {
   const { chosen } = useContext(GeqoContext);
   const chosenRelOptInfo = relOptInfo[chosen];
+  console.log(chosenRelOptInfo);
 
   const svgHeight = height;
   const [fitness, setFitness] = useState(0);
@@ -37,18 +38,28 @@ const JoinOrderTree = ({ width, height, data: relOptInfo }) => {
     return newNode;
   }
 
-  // total cost = startup cost + run cost
   function flatten(root, all) {
     const nodes = [];
+    const costs = [];
 
+    // DFS traversal
     function recurse(node) {
-      if (node.children) node.children.forEach(recurse);
+      let childrenCost = 0;
+      if (node.children) {
+        node.children.forEach((child) => {
+          recurse(child);
+          childrenCost += child.data.total_cost;
+        });
+      }
 
       if (all) nodes.push(node);
-      else nodes.push(node.data.total_cost - node.data.startup_cost);
+      else nodes.push(node.data.total_cost - childrenCost);
+
+      costs.push(node.data.total_cost - childrenCost);
     }
     recurse(root);
 
+    if (all) return { nodes, costs };
     return nodes;
   }
 
@@ -73,16 +84,13 @@ const JoinOrderTree = ({ width, height, data: relOptInfo }) => {
     .y((d) => d.y);
 
   useEffect(() => {
-    // if (!relOptInfo[chosen]) return;
     if (!chosenRelOptInfo) return;
 
     setFitness(
-      // d3.format(".0f")(relOptInfo[chosen].cheapest_total_paths.total_cost)
       d3.format(".0f")(chosenRelOptInfo.cheapest_total_paths.total_cost)
     );
 
     /* Tree */
-    // const treeData = convertPath(relOptInfo[chosen].cheapest_total_paths);
     const treeData = convertPath(chosenRelOptInfo.cheapest_total_paths);
     const root = d3.hierarchy(treeData);
     treeLayout(root);
@@ -135,24 +143,24 @@ const JoinOrderTree = ({ width, height, data: relOptInfo }) => {
       nodeEnter
         .append("text")
         .attr("id", "node-type")
-        .attr("class", "node-type-op")
-        .attr("dy", (d) => (d.children ? "0.3em" : "-0.8em"))
+        .attr("class", "text-rxsm")
+        .attr("dy", (d) => (d.children ? "0.3em" : "-0.2em"))
         .attr("text-anchor", "middle")
         .text((d) => d.data.name);
 
       nodeEnter
         .append("text")
         .attr("id", "node-type")
-        .attr("class", "node-type-rel")
+        .attr("class", "text-bxsm")
         .attr("dy", function (d) {
           if (
             d.depth === root.height &&
             d.parent.children[0].data.relid.length > 8
           ) {
             if (d.data.relid === d.parent.children[0].data.relid)
-              return "1.2em";
-            else return "0.3em";
-          } else return "0.4em";
+              return "1.6em";
+            else return "0.7em";
+          } else return "0.8em";
         })
         .attr("text-anchor", "start")
         .text(function (d) {
@@ -247,7 +255,7 @@ const JoinOrderTree = ({ width, height, data: relOptInfo }) => {
       .attr("height", (d) => barYScale(d[0]) - barYScale(d[1]));
 
     /* Mapping with Tree */
-    const flatTree = flatten(root, true);
+    const { nodes: flatTree, costs: computedCosts } = flatten(root, true);
 
     var prev = -1;
     rect.selectAll("rect").on("click", function (event, d) {
@@ -276,9 +284,7 @@ const JoinOrderTree = ({ width, height, data: relOptInfo }) => {
       });
 
       setSelectedCost(
-        `Run Cost: ${d3.format(".0f")(
-          flatTree[i].data.total_cost
-        )} (${percent})`
+        `Run Cost: ${d3.format(".0f")(computedCosts[i])} (${percent})`
       );
 
       svg

@@ -1,8 +1,6 @@
 import katex from "katex";
 import "katex/dist/katex.min.css";
 
-// TODO: remove intermediate results
-
 export const generateFormulas = (node) => {
   if (node.node === "SeqScan") {
     let formulas = {
@@ -663,18 +661,18 @@ export const generateFormulas = (node) => {
 
   if (node.node === "CteScan") {
     let formulas = {
-      total: katex.renderToString(
-        `\\text{Startup Cost} + \\text{Run Cost}`
-      ),
+      total: katex.renderToString(`\\text{Startup Cost} + \\text{Run Cost}`),
       total_cost: katex.renderToString(
-        `= ${node.startup_cost} + ${node.run_cost} = ${node.startup_cost + node.run_cost}`
+        `= ${node.startup_cost} + ${node.run_cost} = ${
+          node.startup_cost + node.run_cost
+        }`
       ),
       run: katex.renderToString(
         `\\text{CPU Cost per Tuple} \\times N_{\\text{tuples}} + \\text{Target Cost per Tuple} \\times N_{\\text{rows}}`
       ),
       run_cost: katex.renderToString(
         `= ${node.cpu_per_tuple} \\times ${node.baserel_tuples} + ${node.pathtarget_cost} \\times ${node.rows} = ${node.run_cost}`
-      )
+      ),
     };
 
     return formulas;
@@ -683,9 +681,7 @@ export const generateFormulas = (node) => {
   if (node.node === "MergeAppend") {
     const logm = Math.log2(node.n_streams < 2 ? 2 : node.n_streams);
     let formulas = {
-      total: katex.renderToString(
-        `\\text{Startup Cost} + \\text{Run Cost}`
-      ),
+      total: katex.renderToString(`\\text{Startup Cost} + \\text{Run Cost}`),
       total_cost: katex.renderToString(
         `= ${node.startup_cost} + ${node.run_cost} = ${node.total_cost}`
       ),
@@ -693,49 +689,46 @@ export const generateFormulas = (node) => {
         `(N_{\\text{rows}} \\times \\text{Comparison Cost} \\times \\log_2 M) + (\\text{CPU Operator Cost} \\times N_{\\text{rows}})`
       ),
       run_cost: katex.renderToString(
-        `= (${node.rows} \\times ${node.comparison_cost} \\times ${logm}) + (${node.cpu_tuple_cost * node.multiplier} \\times ${node.rows}) = ${node.run_cost}`
-      )
+        `= (${node.rows} \\times ${node.comparison_cost} \\times ${logm}) + (${
+          node.cpu_tuple_cost * node.multiplier
+        } \\times ${node.rows}) = ${node.run_cost}`
+      ),
     };
-  
+
     return formulas;
   }
 
   if (node.node === "Append") {
     if (node.parallel_aware === 0) {
       let formulas = {
-        total: katex.renderToString(
-          `\\text{Run Cost}`
-        ),
-        total_cost: katex.renderToString(
-          `= ${node.total_cost}`
-        ),
+        total: katex.renderToString(`\\text{Run Cost}`),
+        total_cost: katex.renderToString(`= ${node.total_cost}`),
         run: katex.renderToString(
           `\\text{Subpath Cost} + \\text{CPU Cost per Tuple} \\times N_{\\text{rows}}`
         ),
         run_cost: katex.renderToString(
-          `= ${node.nonpartial_cost} + ${node.cpu_tuple_cost * node.multiplier} \\times ${node.rows} = ${node.total_cost}`
-
-        )
+          `= ${node.nonpartial_cost} + ${
+            node.cpu_tuple_cost * node.multiplier
+          } \\times ${node.rows} = ${node.total_cost}`
+        ),
       };
-  
+
       return formulas;
     }
 
     let formulas = {
-      total: katex.renderToString(
-        `\\text{Run Cost}`
-      ),
-      total_cost: katex.renderToString(
-        `= ${node.total_cost}`
-      ),
+      total: katex.renderToString(`\\text{Run Cost}`),
+      total_cost: katex.renderToString(`= ${node.total_cost}`),
       run: katex.renderToString(
         `\\text{Subpath Partial Cost} + \\text{Subpath Non-Partial Cost} + \\text{CPU Cost per Tuple} \\times N_{\\text{rows}}`
       ),
       run_cost: katex.renderToString(
-        `= ${node.partial_cost} + ${node.nonpartial_cost} + ${node.cpu_tuple_cost * node.multiplier} \\times ${node.rows} = ${node.total_cost}`
-      )
+        `= ${node.partial_cost} + ${node.nonpartial_cost} + ${
+          node.cpu_tuple_cost * node.multiplier
+        } \\times ${node.rows} = ${node.total_cost}`
+      ),
     };
-  
+
     return formulas;
   }
 };

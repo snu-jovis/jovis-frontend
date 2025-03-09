@@ -2,8 +2,6 @@ import { useState } from "react";
 import GraphView from "./GraphView";
 import CostCard from "./CostCard";
 
-import "../../assets/stylesheets/Dp.css";
-
 const DpOpt = ({ title, data }) => {
   const [nodes, setNodes] = useState([]);
   const addNode = (index, id, detail) => {

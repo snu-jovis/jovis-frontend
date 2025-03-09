@@ -5,9 +5,7 @@ import JoinOrderTree from "./JoinOrderTree";
 import Rerun from "./Rerun";
 import { Card } from "@material-tailwind/react";
 
-import "../../assets/stylesheets/Geqo.css";
-
-// TODO: selectedGene should be an array
+// JIN-001: AssertionError due to Cost=NaN with 7-a, 13-a, 13-b, 13-c, 32-a, and 32-b
 
 const GeqoOpt = ({ title, data, submitQuery, addHistory }) => {
   const { query, database, opt } = data;

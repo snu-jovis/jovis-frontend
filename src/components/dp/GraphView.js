@@ -150,7 +150,7 @@ const GraphView = ({ index, base, dp, selectedNodes, addNode, removeNode }) => {
       .append("text")
       .attr("text-anchor", "middle")
       .attr("alignment-baseline", "middle")
-      .attr("class", "dp-node-text")
+      .attr("class", "text-bxsm")
       .attr("transform", `rotate(180)`)
       .each(function (d) {
         var lines;

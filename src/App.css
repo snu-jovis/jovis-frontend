@@ -81,6 +81,34 @@
   font-size: large;
 }
 
+#play-button {
+  background: #f08080;
+  padding-right: 26px;
+  border-radius: 3px;
+  border: none;
+  color: white;
+  margin: 0;
+  padding: 0 12px;
+  width: 70px;
+  cursor: pointer;
+  height: 30px;
+}
+
+#play-button:hover {
+  background-color: #e06666;
+}
+
 .katex {
   font-size: 0.5em;
+}
+
+.gene-tooltip {
+  position: absolute;
+  visibility: hidden;
+  padding: 3px;
+  font-family: "NanumSquareB";
+  font-size: 11px;
+  color: white;
+  background-color: black;
+  opacity: 0.6;
 }

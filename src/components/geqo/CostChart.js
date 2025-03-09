@@ -360,7 +360,7 @@ const CostChart = ({ width, height, data: geqoData }) => {
               )
               .attr("y", yScale(focused[metric]) - 5)
               .attr("fill", lineColor(metric))
-              .attr("class", "focus-cost")
+              .attr("class", "text-rxsm")
               .text(d3.format(".4s")(focused[metric]));
           }
         });
