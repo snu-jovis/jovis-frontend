@@ -14,13 +14,20 @@ const Rerun = ({ query, database, data, submitQuery, addHistory }) => {
       .join(",");
   };
 
-  const addConfToSQL = (sql, order) => `
-    set local geqo_adaptive_pool to on;
-    set local geqo_init_pool to '${order}';
-    set local geqo_seed to ${newSeed};
-    set local geqo_selection_bias to ${newBias};
-    ${sql}
-  `;
+  const addConfToSQL = (sql, order) => {
+    sql = sql
+      .split(";\n")
+      .filter(
+        (line) =>
+          !(line.includes("set") && line.includes("geqo_adaptive_pool")) &&
+          !(line.includes("set") && line.includes("geqo_init_pool")) &&
+          !(line.includes("set") && line.includes("geqo_seed")) &&
+          !(line.includes("set") && line.includes("geqo_selection_bias"))
+      )
+      .join(";\n");
+
+    return `set local geqo_adaptive_pool to on;\nset local geqo_init_pool to '${order}';\nset local geqo_seed to ${newSeed};\nset local geqo_selection_bias to ${newBias};\n${sql}`;
+  };
 
   const handleRerun = () => {
     let joinOrder = updateJoinOrder(topN);

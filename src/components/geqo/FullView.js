@@ -3,8 +3,8 @@ import * as d3 from "d3";
 import { sliderHorizontal, sliderVertical } from "d3-simple-slider";
 import { GeqoContext } from "../providers/GeqoProvider";
 
-const FullView = ({ width, height, data: geqoData, map }) => {
-  const { setChosen, setMom, setDad, setChild } = useContext(GeqoContext);
+const FullView = ({ width, height, data: geqoData }) => {
+  const { setChosen, setMom, setDad } = useContext(GeqoContext);
 
   const svgWidth = width;
   const svgHeight = height;
@@ -42,16 +42,14 @@ const FullView = ({ width, height, data: geqoData, map }) => {
   });
 
   const handleClick = (gen, gene) => {
-    setChosen(map);
+    setChosen(gene.gene);
 
     if (gene.parents) {
       setMom(geqoData[gen - 1].pool[gene.parents[0]].gene);
       setDad(geqoData[gen - 1].pool[gene.parents[1]].gene);
-      setChild(gene.gene);
     } else {
       setMom("");
       setDad("");
-      setChild("");
     }
   };
 
@@ -94,7 +92,9 @@ const FullView = ({ width, height, data: geqoData, map }) => {
             d3.select(this).attr("fill", d3.rgb(gene.color).darker());
             tooltip
               .html(
-                `Generation: ${gen.gen_num}<br>Population: ${gene.population_num}<br>Fitness: ${gene.fitness}`
+                `Generation: ${gen.gen_num + 1}<br>Population: ${
+                  gene.population_num
+                }<br>Fitness: ${gene.fitness}`
               )
               .style("visibility", "visible");
           })

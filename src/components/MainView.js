@@ -7,6 +7,7 @@ import { Button, Select, Option, Spinner } from "@material-tailwind/react";
 import { QueriesContext } from "./providers/QueriesProvider";
 import { HistoryContext } from "./providers/HistoryProvider";
 import { SqlToEditorContext } from "./providers/SqlToEditorProvider";
+import { GeqoProvider } from "./providers/GeqoProvider";
 
 import DpOpt from "./dp/DpOpt";
 import GeqoOpt from "./geqo/GeqoOpt";
@@ -213,13 +214,15 @@ export default function MainView() {
                 } else if (optType === "geqo") {
                   rows.push(
                     <div key={`row-${rows.length}`} className="flex gap-6">
-                      <GeqoOpt
-                        key={`geqo-opt-${id}`}
-                        title={query.title}
-                        data={query}
-                        submitQuery={submitQuery}
-                        addHistory={addHistory}
-                      />
+                      <GeqoProvider>
+                        <GeqoOpt
+                          key={`geqo-opt-${id}`}
+                          title={query.title}
+                          data={query}
+                          submitQuery={submitQuery}
+                          addHistory={addHistory}
+                        />
+                      </GeqoProvider>
                     </div>
                   );
                   i = 0;

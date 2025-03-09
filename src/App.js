@@ -5,7 +5,6 @@ import Layout from "./components/Layout";
 import { QueriesProvider } from "./components/providers/QueriesProvider";
 import { HistoryProvider } from "./components/providers/HistoryProvider";
 import { SqlToEditorProvider } from "./components/providers/SqlToEditorProvider";
-import { GeqoProvider } from "./components/providers/GeqoProvider";
 
 function App() {
   return (
@@ -21,9 +20,7 @@ function AppProviders({ children }) {
   return (
     <SqlToEditorProvider>
       <HistoryProvider>
-        <QueriesProvider>
-          <GeqoProvider>{children}</GeqoProvider>
-        </QueriesProvider>
+        <QueriesProvider>{children}</QueriesProvider>
       </HistoryProvider>
     </SqlToEditorProvider>
   );

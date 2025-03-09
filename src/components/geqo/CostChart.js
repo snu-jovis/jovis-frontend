@@ -51,7 +51,7 @@ const CostChart = ({ width, height, data: geqoData }) => {
       .append("g")
       .attr("id", "yAxis")
       .attr("transform", `translate(${chartMargin.left}, 0)`)
-      .call(d3.axisLeft(yScale).tickFormat(d3.format(".0e")));
+      .call(d3.axisLeft(yScale).tickFormat(d3.format(".4s")));
   };
 
   const drawLines = (svg, xScale, yScale) => {
@@ -176,7 +176,7 @@ const CostChart = ({ width, height, data: geqoData }) => {
           .select("#yAxis")
           .transition()
           .duration(500)
-          .call(d3.axisLeft(yScale).tickFormat(d3.format(".0e")));
+          .call(d3.axisLeft(yScale).tickFormat(d3.format(".4s")));
 
     metrics.forEach((metric) => {
       svg
@@ -235,7 +235,7 @@ const CostChart = ({ width, height, data: geqoData }) => {
           .select("#yAxis")
           .transition()
           .duration(500)
-          .call(d3.axisLeft(yScale).tickFormat(d3.format(".0e")));
+          .call(d3.axisLeft(yScale).tickFormat(d3.format(".4s")));
 
     metrics.forEach((metric) => {
       if (!selectedMetric || selectedMetric === metric) {
@@ -361,11 +361,7 @@ const CostChart = ({ width, height, data: geqoData }) => {
               .attr("y", yScale(focused[metric]) - 5)
               .attr("fill", lineColor(metric))
               .attr("class", "focus-cost")
-              .text(
-                logScale
-                  ? d3.format(".4s")(focused[metric])
-                  : d3.format(".2e")(focused[metric])
-              );
+              .text(d3.format(".4s")(focused[metric]));
           }
         });
       })

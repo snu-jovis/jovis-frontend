@@ -118,7 +118,7 @@ function handleParentHover(momRef, dadRef, selectedPath) {
 const EdgeRecomb = ({ width, height, data }) => {
   const relMap = data.geqo.map;
 
-  const { mom, dad, child } = useContext(GeqoContext);
+  const { chosen, mom, dad } = useContext(GeqoContext);
 
   const momRef = useRef(null);
   const dadRef = useRef(null);
@@ -275,10 +275,10 @@ const EdgeRecomb = ({ width, height, data }) => {
   }
 
   useEffect(() => {
-    if (mom !== "" && dad !== "" && child !== "") {
+    if (mom !== "" && dad !== "" && chosen !== "") {
       const momData = preprocessData(relMap, mom);
       const dadData = preprocessData(relMap, dad);
-      const childData = preprocessData(relMap, child);
+      const childData = preprocessData(relMap, chosen);
 
       addColor(momData, dadData, childData);
 
@@ -286,14 +286,14 @@ const EdgeRecomb = ({ width, height, data }) => {
       drawGraph(dadRef, dadData, "d");
       drawGraph(childRef, childData, "c");
     }
-  }, [mom, dad, child]);
+  }, [mom, dad, chosen]);
 
   return (
     <>
       <div className="px-4 pt-2">
         <p className="text-ebsm">Edge Recombination Crossover</p>
       </div>
-      {mom && dad && child ? (
+      {mom && dad && chosen ? (
         <div className="w-[310px] h-[360px]">
           <div className="flex justify-center justify-items-center items-center">
             <svg ref={momRef} width={width / 2} height={height / 2} />
