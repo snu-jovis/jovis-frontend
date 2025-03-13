@@ -243,9 +243,21 @@ const GraphView = ({ index, base, dp, selectedNodes, addNode, removeNode }) => {
 
       const numRels = dp[dp.length - 1].relid.split(" ").length;
       data.forEach((d) => {
-        if (d.id.split(" ").length === numRels && !d.id.includes(" - ")) {
+        const isRelation = d.id.includes(" - ");
+        const length = d.id.split(" ").length;
+        if (length === numRels && !isRelation) {
           cheapestId.push(generateNodeId(d.nodeData.cheapest_total_paths));
           makeCheapestPath(d.nodeData.cheapest_total_paths.join);
+        }
+
+        // operands of append node should be selected along with join
+        const isAppend = d.id.includes(" - Append") || d.id.includes(" - MergeAppend");
+        if (isAppend) {
+          // find their parent nodes and put their cheapest path in the cheapestId
+          d.parentIds.forEach((parentId) => {
+            const parent = data.find((d) => d.id === parentId);
+            cheapestId.push(generateNodeId(parent.nodeData.cheapest_total_paths));
+          });
         }
       });
     }
@@ -262,20 +274,40 @@ const GraphView = ({ index, base, dp, selectedNodes, addNode, removeNode }) => {
         })
         .each(function (d) {
           if (d.data.nodeData.cheapest_total_paths?.join) {
-            cheapestInnerId.push(
+            const inner =
               `${index} ${d.data.nodeData.cheapest_total_paths.join.inner.relid}`.replace(
                 /\s/g,
                 ""
-              )
-            );
-            cheapestOuterId.push(
+              );
+            const outer =
               `${index} ${d.data.nodeData.cheapest_total_paths.join.outer.relid}`.replace(
                 /\s/g,
                 ""
-              )
-            );
+              );
+            cheapestInnerId.push(inner);
+            cheapestOuterId.push(outer);
           }
         });
+
+      // for append
+      if (level === 2) {
+        nodes
+          .filter(function (d) {
+            const isLevelForAppend = Math.floor(d.data.level) === 2;
+            const isAppend =
+              d.data.id.includes(" - Append") ||
+              d.data.id.includes(" - MergeAppend");
+            return isLevelForAppend && isAppend;
+          })
+          .each(function (d) {
+            // if append node, insert every operand to the cheapest inner id set.
+            //  (the inner set is arbitrary)
+            d.data.parentIds.forEach((parentId) => {
+              const id = `${index} ${parentId}`.replace(/\s/g, "");
+              cheapestInnerId.push(id);
+            });
+          });
+      }
 
       // 1. makes nodes appear
       nodes
@@ -323,21 +355,18 @@ const GraphView = ({ index, base, dp, selectedNodes, addNode, removeNode }) => {
 
           links
             .filter(function (d) {
+              const targetId = `${index} ${d.target.data.id}`.replace(/\s/g, "");
+              const sourceId = `${index} ${d.source.data.id}`.replace(/\s/g, "");
+
+              const targetLevel = Math.floor(d.target.data.level);
+              const notInBothSource =
+                !cheapestInnerId.includes(sourceId) &&
+                !cheapestOuterId.includes(sourceId);
+
               return (
-                (Math.floor(d.target.data.level) === level &&
-                  (!cheapestId.includes(
-                    `${index} ${d.target.data.id}`.replace(/\s/g, "")
-                  ) ||
-                    (!cheapestInnerId.includes(
-                      `${index} ${d.source.data.id}`.replace(/\s/g, "")
-                    ) &&
-                      !cheapestOuterId.includes(
-                        `${index} ${d.source.data.id}`.replace(/\s/g, "")
-                      )))) ||
-                (Math.floor(d.target.data.level) === level + 1 &&
-                  !cheapestId.includes(
-                    `${index} ${d.source.data.id}`.replace(/\s/g, "")
-                  ))
+                (targetLevel === level &&
+                  (!cheapestId.includes(targetId) || notInBothSource)) ||
+                (targetLevel === level + 1 && !cheapestId.includes(sourceId))
               );
             })
             .transition()
@@ -373,8 +402,19 @@ const GraphView = ({ index, base, dp, selectedNodes, addNode, removeNode }) => {
     base.forEach((relation) => {
       relation.append?.forEach((append) => {
         if (append.relid.includes("__CHILD")) return;
-        if (append.relid === "*SELECT* 1")
-          append.relid = `${append.relid}__CHILD`;
+        if (append.relid === "*SELECT* 1") {
+          // update all relid to "*SELECT* 1__CHILD"
+          const newRelid = `${append.relid}__CHILD`;
+          append.relid = newRelid;
+          append.cheapest_param_paths.forEach((path) => {
+            path.relid = newRelid;
+          });
+          append.cheapest_startup_paths.relid = newRelid;
+          append.cheapest_total_paths.relid = newRelid;
+          append.paths.forEach((path) => {
+            path.relid = newRelid;
+          });
+        }
       });
     });
 
