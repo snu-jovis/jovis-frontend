@@ -40,6 +40,9 @@ const GeqoOpt = ({ title, data, submitQuery, addHistory }) => {
           />
         </div>
         <div className="grid grid-cols-1 gap-2">
+          <Card>
+            <EdgeRecomb width={300} height={300} data={opt[0]} />
+          </Card>
           <Card className="w-[310px]">
             <Rerun
               query={query}
@@ -48,9 +51,6 @@ const GeqoOpt = ({ title, data, submitQuery, addHistory }) => {
               submitQuery={submitQuery}
               addHistory={addHistory}
             />
-          </Card>
-          <Card>
-            <EdgeRecomb width={300} height={300} data={opt[0]} />
           </Card>
         </div>
       </div>

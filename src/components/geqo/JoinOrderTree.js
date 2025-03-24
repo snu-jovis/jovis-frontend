@@ -315,7 +315,7 @@ const JoinOrderTree = ({ width, height, data: relOptInfo }) => {
           </div>
           <hr className="mx-2 mb-2 border-1" />
           <div className="flex justify-center gap-2">
-            <p className="text-rsm">Fitness: {fitness}</p>
+            <p className="text-rsm">Cost: {fitness}</p>
             <p className="text-rsm">{selectedCost}</p>
           </div>
         </div>
