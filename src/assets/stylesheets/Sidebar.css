@@ -1,0 +1,15 @@
+.main-card {
+  width: 240px;
+  height: 90vh;
+}
+
+.sub-menu-text {
+  font-family: "NanumSquareB";
+  font-size: medium;
+  margin-right: auto;
+}
+
+.query-menu-text {
+  font-family: "NanumSquareR";
+  font-size: small;
+}

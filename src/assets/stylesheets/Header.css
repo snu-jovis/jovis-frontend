@@ -1,0 +1,20 @@
+.header {
+  width: 100%;
+  top: 0;
+  left: 0;
+  right: 0;
+  background-color: white;
+  z-index: 1000;
+}
+
+.header-items {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 5px 1rem;
+}
+
+.header-name {
+  font-family: "NanumSquareEB";
+  font-size: x-large;
+}

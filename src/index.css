@@ -1,13 +1,31 @@
-body {
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body,
+#root {
+  height: 100%;
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  padding: 0;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+@font-face {
+  font-family: "NanumSquareL";
+  src: url("assets/fonts/NanumSquareL.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "NanumSquareR";
+  src: url("assets/fonts/NanumSquareR.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "NanumSquareB";
+  src: url("assets/fonts/NanumSquareB.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "NanumSquareEB";
+  src: url("assets/fonts/NanumSquareEB.ttf") format("truetype");
 }

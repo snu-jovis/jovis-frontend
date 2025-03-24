@@ -1,38 +1,114 @@
 .App {
-  text-align: center;
+  background-color: whitesmoke;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.view-container {
+  width: 1280px;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.text-lxsm {
+  font-family: "NanumSquareL";
+  font-size: x-small;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
+.text-lsm {
+  font-family: "NanumSquareL";
+  font-size: small;
+}
+
+.text-lm {
+  font-family: "NanumSquareL";
+  font-size: medium;
+}
+
+.text-ll {
+  font-family: "NanumSquareL";
+  font-size: large;
+}
+
+.text-rxsm {
+  font-family: "NanumSquareR";
+  font-size: x-small;
+}
+
+.text-rsm {
+  font-family: "NanumSquareR";
+  font-size: small;
+}
+
+.text-rm {
+  font-family: "NanumSquareR";
+  font-size: medium;
+}
+
+.text-rl {
+  font-family: "NanumSquareR";
+  font-size: large;
+}
+
+.text-bxsm {
+  font-family: "NanumSquareB";
+  font-size: x-small;
+}
+
+.text-bsm {
+  font-family: "NanumSquareB";
+  font-size: small;
+}
+
+.text-bm {
+  font-family: "NanumSquareB";
+  font-size: medium;
+}
+
+.text-bl {
+  font-family: "NanumSquareB";
+  font-size: large;
+}
+
+.text-ebsm {
+  font-family: "NanumSquareEB";
+  font-size: small;
+}
+
+.text-ebm {
+  font-family: "NanumSquareEB";
+  font-size: medium;
+}
+
+.text-ebl {
+  font-family: "NanumSquareEB";
+  font-size: large;
+}
+
+#play-button {
+  background: #f08080;
+  padding-right: 26px;
+  border-radius: 3px;
+  border: none;
   color: white;
+  margin: 0;
+  padding: 0 12px;
+  width: 70px;
+  cursor: pointer;
+  height: 30px;
 }
 
-.App-link {
-  color: #61dafb;
+#play-button:hover {
+  background-color: #e06666;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.katex {
+  font-size: 0.5em;
+}
+
+.gene-tooltip {
+  position: absolute;
+  visibility: hidden;
+  padding: 3px;
+  font-family: "NanumSquareB";
+  font-size: 11px;
+  color: white;
+  background-color: black;
+  opacity: 0.6;
 }
